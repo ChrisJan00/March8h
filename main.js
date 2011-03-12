@@ -1,3 +1,22 @@
+function preload() {
+	//images
+	GLOBAL.imageFire = new Image();
+	GLOBAL.imageFire.src = "Fire.png";
+	GLOBAL.imageWater = new Image();
+	GLOBAL.imageWater.src = "Water.png";
+	GLOBAL.imageEarth = new Image();
+	GLOBAL.imageEarth.src = "Earth.png";
+	GLOBAL.imageWind = new Image();
+	GLOBAL.imageWind.src = "Air.png";
+}
+
+function imagesLoaded() {
+	return GLOBAL.imageFire.complete
+		&& GLOBAL.imageWater.complete 
+		&& GLOBAL.imageEarth.complete
+		&& GLOBAL.imageWind.complete;
+}
+
 function prepareGame()
 { 
 	GLOBAL.gameCanvas = document.getElementById("canvas1");
@@ -326,12 +345,30 @@ function drawStone(stone, where) {
 	
 	if (stone.visible) {
 		// draw stone
-		ctx.fillStyle = stone.color;
-		ctx.beginPath();
-		ctx.arc(ix*50 + x0 + 25,iy*50 + y0 + 25, 22, 0, Math.PI*2,true);
-		ctx.closePath();
-		ctx.fill();
-		ctx.stroke();
+		switch (stone.colorCode){
+		case 0:{
+			ctx.drawImage(GLOBAL.imageFire,ix*50 + x0 + 4,iy*50 + y0 + 4);
+			break;
+			}
+		case 1:{
+			ctx.drawImage(GLOBAL.imageEarth,ix*50 + x0 + 4,iy*50 + y0 + 4);
+		 	break;
+			}
+		case 2:{
+			ctx.drawImage(GLOBAL.imageWater,ix*50 + x0 + 4,iy*50 + y0 + 4);
+		 	break;
+			}
+		case 3:{
+			ctx.drawImage(GLOBAL.imageWind,ix*50 + x0 + 4,iy*50 + y0 + 4);
+		 	break;
+			}
+		}
+		// ctx.fillStyle = stone.color;
+		// ctx.beginPath();
+		// ctx.arc(ix*50 + x0 + 25,iy*50 + y0 + 25, 22, 0, Math.PI*2,true);
+		// ctx.closePath();
+		// ctx.fill();
+		// ctx.stroke();
 	}
 }
 function colorForPlayer(pn) {
@@ -373,20 +410,35 @@ function showOrder() {
 		ctx.stroke();
 	}
 	
-	drawFilledCircle( 205, 435, colorForCode(1) );
+	var ctx = GLOBAL.gameContext;
+	//drawFilledCircle( 205, 435, colorForCode(1) );
+	ctx.drawImage(GLOBAL.imageFire,205 - 20, 435 - 20);
 	drawArrow( 235, 435, 250, 435 );
-	drawFilledCircle( 280, 435, colorForCode(2) );
+	//drawFilledCircle( 280, 435, colorForCode(2) );
+	ctx.drawImage(GLOBAL.imageWind,280 - 20, 435 - 20);
 	drawArrow( 310, 435, 325, 435 );
-	drawFilledCircle( 355, 435, colorForCode(0) );
+	//drawFilledCircle( 355, 435, colorForCode(0) );
+	ctx.drawImage(GLOBAL.imageEarth,355 - 20, 435 - 20);
 	drawArrow( 385, 435, 400, 435 );
-	drawFilledCircle( 430, 435, colorForCode(3) );
+	//drawFilledCircle( 430, 435, colorForCode(3) );
+	ctx.drawImage(GLOBAL.imageWater,430 - 20, 435 - 20);
 	//drawArrow( 235, 435, 260, 435 );
 }
 
 function startGame()
 {
-	prepareGame();
-	connectMouse();
+	preload();
+	setTimeout(waitForImages, 500);
+}
+
+function waitForImages()
+{
+	if (!imagesLoaded())
+		setTimeout(waitForImages, 500);
+	else {
+		prepareGame();
+		connectMouse();
+	}
 }
 // gravityDir:
 // 0: up
