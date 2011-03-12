@@ -16,6 +16,7 @@ function prepareGame()
 	//GLOBAL.board = {};
 	initBoard();
 	GLOBAL.pile = {};
+	GLOBAL.stoneCount = 36;
 	
 	
 	// start with an empty background
@@ -34,10 +35,12 @@ function prepareGame()
 		y : 0,
 		button : false
 	};
+		
+}
+function connectMouse() {
 	GLOBAL.gameCanvas.addEventListener('mousedown', mouseDown, false);
     GLOBAL.gameCanvas.addEventListener('mousemove', mouseMove, false);
     GLOBAL.gameCanvas.addEventListener('mouseup',   mouseUp, false);
-	
 }
 
 function initBoard() {
@@ -139,6 +142,10 @@ function clickedOnBoard() {
 	var miy = Math.floor((GLOBAL.mouse.y - 90)/50);
 	var boardIndex = mix + miy * 6;
 	
+	if (GLOBAL.action.turn==-1) {
+		prepareGame();
+		return;
+	}
 	// no selection?
 	if (GLOBAL.action.selection == -1)
 		return;
@@ -171,8 +178,12 @@ function clickedOnBoard() {
 	startFlood(mix, miy);
 	
 	GLOBAL.action.selection = -1;
-	GLOBAL.action.turn = 3-GLOBAL.action.turn;
-	showPlayer();
+	if (--GLOBAL.stoneCount) {
+		GLOBAL.action.turn = 3-GLOBAL.action.turn;
+		showPlayer();
+	} else {
+		checkVictory();
+	}
 	
 	// var st = {
 	// 	ix : mix,
@@ -181,6 +192,39 @@ function clickedOnBoard() {
 	// 	bgColor: "#334455"
 	// };
 	// drawStone(st, 0);
+}
+
+function checkVictory() {
+	GLOBAL.action.turn = -1;
+	var counts = {};
+	counts[0] = 0;
+	counts[1] = 0;
+	for (var i=0; i<6; i++)
+		for (var j=0; j<6; j++) {
+			if (GLOBAL.board[i][j])
+				counts[ GLOBAL.board[i][j].owner - 1 ]++;
+		}
+		
+	var victory1 = counts[0]>counts[1];
+	
+	var ctx = GLOBAL.gameContext;
+	ctx.fillStyle = "#FFFFFF";
+	ctx.fillRect(170,0,300,89);
+	var pn = GLOBAL.action.turn - 1;
+	ctx.font = "bold 24px sans-serif";
+	var msg;
+	if (counts[0]>counts[1]) {
+		ctx.fillStyle = colorForPlayer(0);
+		msg = "Player purple won the game!";
+	} else if (counts[0] < counts[1]) {
+		ctx.fillStyle = colorForPlayer(1);
+		msg = "Player orange won the game!";
+	} else {
+		ctx.fillStyle = "#000000";
+		msg = "Tie game";
+	}
+	var msglen = ctx.measureText(msg);
+	ctx.fillText(msg, 320 - msglen.width/2, 45 );
 }
 
 function mouseUp( ev ) {
@@ -342,6 +386,7 @@ function showOrder() {
 function startGame()
 {
 	prepareGame();
+	connectMouse();
 }
 // gravityDir:
 // 0: up
