@@ -26,6 +26,7 @@ function prepareGame()
 	chooseTiles(1);
 	chooseTiles(2);
 	showPlayer();
+	showOrder()
 	
 	// clicking on the board
 	GLOBAL.mouse = {
@@ -304,6 +305,40 @@ function showPlayer() {
 	ctx.fillText(msg, 320 - msglen.width/2, 45 );
 }
 
+function showOrder() {
+	var drawFilledCircle = function(x,y,color) {
+		var ctx = GLOBAL.gameContext;
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.arc(x, y, 22, 0, Math.PI*2,true);
+		ctx.closePath();
+		ctx.fill();
+		ctx.stroke();
+	}
+	
+	// only arrows pointing to the right by now
+	var drawArrow = function(xfrom,yfrom,xto,yto) {
+		var ctx = GLOBAL.gameContext;
+		ctx.strokeStyle = "#000000";
+		ctx.beginPath();
+		ctx.moveTo(xfrom,yfrom);
+		ctx.lineTo(xto,yto);
+		ctx.lineTo(xto-6,yto-6);
+		ctx.moveTo(xto-6,yto+6);
+		ctx.lineTo(xto,yto);
+		ctx.stroke();
+	}
+	
+	drawFilledCircle( 205, 435, colorForCode(1) );
+	drawArrow( 235, 435, 250, 435 );
+	drawFilledCircle( 280, 435, colorForCode(2) );
+	drawArrow( 310, 435, 325, 435 );
+	drawFilledCircle( 355, 435, colorForCode(0) );
+	drawArrow( 385, 435, 400, 435 );
+	drawFilledCircle( 430, 435, colorForCode(3) );
+	//drawArrow( 235, 435, 260, 435 );
+}
+
 function startGame()
 {
 	prepareGame();
@@ -338,7 +373,7 @@ function checkTile(ix, iy) {
 	var defensePile = new Array();
 	
 	// left
-	if (ix>0 && GLOBAL.board[ix-1][iy] && GLOBAL.floodFill[ix-1][iy]) {
+	if (ix>0 && GLOBAL.board[ix-1][iy] && GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix-1][iy].colorCode)) {
 			attackPile.push(GLOBAL.board[ix-1][iy]);
 		} else if (tileWinsTile(GLOBAL.board[ix-1][iy].colorCode, stone.colorCode)) {
@@ -348,7 +383,7 @@ function checkTile(ix, iy) {
 	
 	
 	// right
-	if (ix<5 && GLOBAL.board[ix+1][iy] && GLOBAL.floodFill[ix+1][iy]) {
+	if (ix<5 && GLOBAL.board[ix+1][iy] && GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix+1][iy].colorCode)) {
 			attackPile.push(GLOBAL.board[ix+1][iy]);
 		} else if (tileWinsTile(GLOBAL.board[ix+1][iy].colorCode, stone.colorCode)) {
@@ -357,7 +392,7 @@ function checkTile(ix, iy) {
 	}
 	
 	// up
-	if (iy>0 && GLOBAL.board[ix][iy-1] && GLOBAL.floodFill[ix][iy-1]) {
+	if (iy>0 && GLOBAL.board[ix][iy-1] && GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy-1].colorCode)) {
 			attackPile.push(GLOBAL.board[ix][iy-1]);
 		} else if (tileWinsTile(GLOBAL.board[ix][iy-1].colorCode, stone.colorCode)) {
@@ -366,7 +401,7 @@ function checkTile(ix, iy) {
 	}
 	
 	// down
-	if (iy<5 && GLOBAL.board[ix][iy+1] && GLOBAL.floodFill[ix][iy+1]) {
+	if (iy<5 && GLOBAL.board[ix][iy+1] && GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy+1].colorCode)) {
 			attackPile.push(GLOBAL.board[ix][iy+1]);
 		} else if (tileWinsTile(GLOBAL.board[ix][iy+1].colorCode, stone.colorCode)) {
@@ -421,14 +456,14 @@ function tileWinsTile(colorAtk, colorDef) {
 }
 
 function convertStone(from, to) {
-	if (!GLOBAL.floodFill[from.ix][from.iy])
+	if (!GLOBAL.floodFill[to.ix][to.iy])
 		return;
 		
 	to.colorCode = from.colorCode;
 	to.color = from.color;
 	to.owner = from.owner;
 	to.bgColor = from.bgColor;
-	GLOBAL.floodFill[from.ix][from.iy] = false;
+	GLOBAL.floodFill[to.ix][to.iy] = false;
 	
 	drawStone(to, 0);
 }
