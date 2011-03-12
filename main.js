@@ -36,6 +36,9 @@ function prepareGame()
 	initBoard();
 	GLOBAL.pile = {};
 	GLOBAL.stoneCount = 36;
+	GLOBAL.counts = {};
+	GLOBAL.counts[0] = 0;
+	GLOBAL.counts[1] = 0;
 	
 	
 	// start with an empty background
@@ -197,6 +200,7 @@ function clickedOnBoard() {
 	startFlood(mix, miy);
 	
 	GLOBAL.action.selection = -1;
+	countMarkers();
 	if (--GLOBAL.stoneCount) {
 		GLOBAL.action.turn = 3-GLOBAL.action.turn;
 		showPlayer();
@@ -213,17 +217,20 @@ function clickedOnBoard() {
 	// drawStone(st, 0);
 }
 
-function checkVictory() {
-	GLOBAL.action.turn = -1;
-	var counts = {};
-	counts[0] = 0;
-	counts[1] = 0;
+function countMarkers() {
+	GLOBAL.counts = {};
+	GLOBAL.counts[0] = 0;
+	GLOBAL.counts[1] = 0;
 	for (var i=0; i<6; i++)
 		for (var j=0; j<6; j++) {
 			if (GLOBAL.board[i][j])
-				counts[ GLOBAL.board[i][j].owner - 1 ]++;
+				GLOBAL.counts[ GLOBAL.board[i][j].owner - 1 ]++;
 		}
-		
+}
+
+function checkVictory() {
+	GLOBAL.action.turn = -1;
+	var counts = GLOBAL.counts;
 	var victory1 = counts[0]>counts[1];
 	
 	var ctx = GLOBAL.gameContext;
@@ -231,13 +238,20 @@ function checkVictory() {
 	ctx.fillRect(170,0,300,89);
 	var pn = GLOBAL.action.turn - 1;
 	ctx.font = "bold 24px sans-serif";
+	
+	ctx.fillStyle = colorForPlayer(0);
+	ctx.fillText(GLOBAL.counts[0]+" ", 175, 45);
+	ctx.fillStyle = colorForPlayer(1);
+	ctx.fillText(GLOBAL.counts[1]+" ", 430, 45);
+	ctx.fillStyle = colorForPlayer(pn);
+	
 	var msg;
 	if (counts[0]>counts[1]) {
 		ctx.fillStyle = colorForPlayer(0);
-		msg = "Player purple won the game!";
+		msg = "purple won!";
 	} else if (counts[0] < counts[1]) {
 		ctx.fillStyle = colorForPlayer(1);
-		msg = "Player orange won the game!";
+		msg = "orange won!";
 	} else {
 		ctx.fillStyle = "#000000";
 		msg = "Tie game";
@@ -384,8 +398,13 @@ function showPlayer() {
 	ctx.fillRect(170,0,300,89);
 	var pn = GLOBAL.action.turn - 1;
 	ctx.font = "bold 24px sans-serif";
+	ctx.fillStyle = colorForPlayer(0);
+	ctx.fillText(GLOBAL.counts[0]+" ", 175, 45);
+	ctx.fillStyle = colorForPlayer(1);
+	ctx.fillText(GLOBAL.counts[1]+" ", 440, 45);
 	ctx.fillStyle = colorForPlayer(pn);
-	var msg = "Player "+(pn?"orange":"purple")+"'s turn";
+	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
+	var msg = (pn?"orange":"purple")+"'s turn";
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, 320 - msglen.width/2, 45 );
 }
