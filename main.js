@@ -305,6 +305,10 @@ function drawPile(x0)
 		ctx.lineTo(x0 + i*side, y0 + side*9);
 		ctx.stroke();
 	}
+	
+	ctx.fillStyle = colorForPlayer(x0<340?0:1);
+	ctx.fillRect(x0,0,100,y0);
+	ctx.fillRect(x0,9*50+y0,100,y0);
 }
 
 function drawStone(stone, where) {
