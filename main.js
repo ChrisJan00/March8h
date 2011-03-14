@@ -1,3 +1,6 @@
+// todo: double check the magic numbers
+// todo: double check flood (defense before attack?)
+
 function preload() {
 	//images
 	GLOBAL.imageFire = new Image();
@@ -351,15 +354,17 @@ function drawBoard()
 	var side = data.side;
 	var ctx = GLOBAL.gameContext;
 	ctx.strokeStyle = "#000000"
-	for (var i=0;i<=data.rows;i++) {
+	for (var i=0;i<=data.cols;i++) {
 		ctx.beginPath();
 		ctx.moveTo(x0 + i*side, y0);
-		ctx.lineTo(x0 + i*side, y0 + side*data.cols);
+		ctx.lineTo(x0 + i*side, y0 + side*data.rows);
 		ctx.stroke();
-		
+	}
+	
+	for (var i=0;i<=data.rows;i++) {
 		ctx.beginPath();
 		ctx.moveTo(x0, y0+i*side);
-		ctx.lineTo(x0 + side*data.rows, y0+i*side);
+		ctx.lineTo(x0 + side*data.cols, y0+i*side);
 		ctx.stroke();
 	}
 }
@@ -496,8 +501,8 @@ function showOrder() {
 	var y = GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side
 	
 	var x0 = GLOBAL.coords.board.x0
-	var y0 = y + 5
-	var y1 = y + GLOBAL.imageFire.height/2 + 5
+	var y0 = y + 10
+	var y1 = y + GLOBAL.imageFire.height/2 + 10
 	var ctx = GLOBAL.gameContext;
 
 	ctx.drawImage(GLOBAL.imageFire, x0 + 2*b , y0);
