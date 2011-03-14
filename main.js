@@ -501,8 +501,8 @@ function showOrder() {
 	var y = GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side
 	
 	var x0 = GLOBAL.coords.board.x0
-	var y0 = y + 10
-	var y1 = y + GLOBAL.imageFire.height/2 + 10
+	var y0 = y + 5
+	var y1 = y + GLOBAL.imageFire.height/2 + 5
 	var ctx = GLOBAL.gameContext;
 
 	ctx.drawImage(GLOBAL.imageFire, x0 + 2*b , y0);
