@@ -69,10 +69,10 @@ function prepareGame()
 			y0: 15,
 			width: 300,
 			height: 52
-		},
-		totalStones : 36
+		}
 	};
 	initBoard();
+	GLOBAL.stoneCount = GLOBAL.coords.board.rows * GLOBAL.coords.board.cols;
 	
 	// start with an empty background
 	clear();
@@ -136,6 +136,7 @@ function fillBoard() {
 			st.bgColor = colorForPlayer(playernum-1);
 			GLOBAL.board[sx][sy] = st;
 			drawStone(st, 2);
+			GLOBAL.stoneCount--;
 		}
 	}
 }
@@ -271,8 +272,8 @@ function clickedOnBoard() {
 	
 	GLOBAL.action.selection = -1;
 	countMarkers();
-	if (GLOBAL.stoneCount) {
-		GLOBAL.action.turn = 3-GLOBAL.action.turn;
+	GLOBAL.action.turn = 3-GLOBAL.action.turn;
+	if (--GLOBAL.stoneCount) {
 		showPlayer();
 	} else {
 		checkVictory();
@@ -283,12 +284,10 @@ function countMarkers() {
 	GLOBAL.counts = {};
 	GLOBAL.counts[0] = 0;
 	GLOBAL.counts[1] = 0;
-	GLOBAL.stoneCount = GLOBAL.coords.totalStones;
 	for (var i=0; i<GLOBAL.coords.board.cols; i++)
 		for (var j=0; j<GLOBAL.coords.board.rows; j++) {
 			if (GLOBAL.board[i][j]) {
 				GLOBAL.counts[ GLOBAL.board[i][j].owner - 1 ]++;
-				GLOBAL.stoneCount--;
 			}
 		}
 }
@@ -389,14 +388,14 @@ function drawPile(n)
 	for (var i=0;i<=data.rows;i++) {
 		ctx.beginPath();
 		ctx.moveTo(x0, y0+i*side);
-		ctx.lineTo(x0 + side*2, y0+i*side);
+		ctx.lineTo(x0 + side*data.cols, y0+i*side);
 		ctx.stroke();
 	}
 	
 	for (var i=0;i<=data.cols;i++) {
 		ctx.beginPath();
 		ctx.moveTo(x0 + i*side, y0);
-		ctx.lineTo(x0 + i*side, y0 + side*8);
+		ctx.lineTo(x0 + i*side, y0 + side*data.rows);
 		ctx.stroke();
 	}
 }
@@ -552,7 +551,8 @@ function checkTile(ix, iy) {
 	var defensePile = new Array();
 	
 	// left
-	if (ix>0 && GLOBAL.board[ix-1][iy] && GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy]) {
+	if (ix>0 && GLOBAL.board[ix-1][iy] 
+		&& GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix-1][iy].colorCode)) {
 			attackPile.push(GLOBAL.board[ix-1][iy]);
 		} else if (tileWinsTile(GLOBAL.board[ix-1][iy].colorCode, stone.colorCode)) {
@@ -562,7 +562,8 @@ function checkTile(ix, iy) {
 	
 	
 	// right
-	if (ix<5 && GLOBAL.board[ix+1][iy] && GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]) {
+	if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
+		&& GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix+1][iy].colorCode)) {
 			attackPile.push(GLOBAL.board[ix+1][iy]);
 		} else if (tileWinsTile(GLOBAL.board[ix+1][iy].colorCode, stone.colorCode)) {
@@ -571,7 +572,8 @@ function checkTile(ix, iy) {
 	}
 	
 	// up
-	if (iy>0 && GLOBAL.board[ix][iy-1] && GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]) {
+	if (iy>0 && GLOBAL.board[ix][iy-1] 
+		&& GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy-1].colorCode)) {
 			attackPile.push(GLOBAL.board[ix][iy-1]);
 		} else if (tileWinsTile(GLOBAL.board[ix][iy-1].colorCode, stone.colorCode)) {
@@ -580,7 +582,8 @@ function checkTile(ix, iy) {
 	}
 	
 	// down
-	if (iy<5 && GLOBAL.board[ix][iy+1] && GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]) {
+	if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
+		&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]) {
 		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy+1].colorCode)) {
 			attackPile.push(GLOBAL.board[ix][iy+1]);
 		} else if (tileWinsTile(GLOBAL.board[ix][iy+1].colorCode, stone.colorCode)) {
