@@ -4,13 +4,13 @@
 function preload() {
 	//images
 	GLOBAL.imageFire = new Image();
-	GLOBAL.imageFire.src = "Fire.png";
+	GLOBAL.imageFire.src = "graphics/fire.png";
 	GLOBAL.imageWater = new Image();
-	GLOBAL.imageWater.src = "Water.png";
+	GLOBAL.imageWater.src = "graphics/water.png";
 	GLOBAL.imageEarth = new Image();
-	GLOBAL.imageEarth.src = "Earth.png";
+	GLOBAL.imageEarth.src = "graphics/earth.png";
 	GLOBAL.imageWind = new Image();
-	GLOBAL.imageWind.src = "Air.png";
+	GLOBAL.imageWind.src = "graphics/air.png";
 }
 
 function imagesLoaded() {
