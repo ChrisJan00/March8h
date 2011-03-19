@@ -44,16 +44,16 @@ function prepareGame()
 				border : 10,
 				side : 50,
 				x0 : 25,
-				y0 : 20,
-				rows: 8,
+				y0 : 10,
+				rows: 9,
 				cols: 2
 			},
 			{
 				border : 10,
 				side : 50,
 				x0 : 495,
-				y0 : 20,
-				rows: 8,
+				y0 : 10,
+				rows: 9,
 				cols: 2
 			},
 		],
@@ -112,6 +112,7 @@ function randint(n) {
 }
 
 function fillBoard() {
+	return;
 	var data = GLOBAL.coords.board;
 	var sx, sy;
 	for (var playernum=1;playernum<3;playernum++) {
