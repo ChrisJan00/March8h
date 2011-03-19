@@ -11,6 +11,9 @@ function preload() {
 	GLOBAL.imageEarth.src = "graphics/earth.png";
 	GLOBAL.imageWind = new Image();
 	GLOBAL.imageWind.src = "graphics/air.png";
+	
+	GLOBAL.bouncingFlood = false;
+	GLOBAL.attackFirst = true;
 }
 
 function imagesLoaded() {
@@ -36,7 +39,7 @@ function prepareGame()
 		selection:-1
 	};
 	GLOBAL.pile = {};
-	GLOBAL.bouncingFlood = false;
+	
 
 	GLOBAL.coords = {
 		pile : [
@@ -74,6 +77,24 @@ function prepareGame()
 	initBoard();
 	GLOBAL.stoneCount = GLOBAL.coords.board.rows * GLOBAL.coords.board.cols;
 	
+	GLOBAL.options = {
+		bounce : {
+			x0 : 610,
+			y0 : 20,
+			x1 : 660,
+			y1 : 70,
+			enabled : GLOBAL.bouncingFlood
+		},
+		attack : {
+			x0 : 610,
+			y0 : 90,
+			x1 : 660,
+			y1 : 140,
+			enabled : GLOBAL.attackFirst
+		}
+		
+	}
+	
 	// start with an empty background
 	clear();
 	drawBoard();
@@ -84,7 +105,9 @@ function prepareGame()
 	fillBoard();
 	countMarkers();
 	showPlayer();
-	showOrder()
+	showOrder();
+	drawOpt(GLOBAL.options.bounce);
+	drawOpt(GLOBAL.options.attack);
 	
 	// clicking on the board
 	GLOBAL.mouse = {
@@ -197,6 +220,22 @@ function mouseDown( ev ) {
 		 && GLOBAL.mouse.y >= GLOBAL.coords.board.y0 
 		 && GLOBAL.mouse.y <= GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side)
 		clickedOnBoard();
+	else if (GLOBAL.mouse.x >= GLOBAL.options.bounce.x0
+		&& GLOBAL.mouse.x <= GLOBAL.options.bounce.x1
+		&& GLOBAL.mouse.y >= GLOBAL.options.bounce.y0
+		&& GLOBAL.mouse.y <= GLOBAL.options.bounce.y1) {
+			GLOBAL.bouncingFlood = !GLOBAL.bouncingFlood;
+			GLOBAL.options.bounce.enabled = GLOBAL.bouncingFlood;
+			drawOpt( GLOBAL.options.bounce );
+		}
+	else if (GLOBAL.mouse.x >= GLOBAL.options.attack.x0
+		&& GLOBAL.mouse.x <= GLOBAL.options.attack.x1
+		&& GLOBAL.mouse.y >= GLOBAL.options.attack.y0
+		&& GLOBAL.mouse.y <= GLOBAL.options.attack.y1) {
+			GLOBAL.attackFirst = !GLOBAL.attackFirst;
+			GLOBAL.options.attack.enabled = GLOBAL.attackFirst;
+			drawOpt( GLOBAL.options.attack );
+		}
 }
 
 function clickedOnPile(pilenum) {
@@ -595,26 +634,15 @@ function checkTile(ix, iy) {
 	var sleepDelay = 50;
 	var toConvert = new Array();
 	
-	// attack: convert each tile
-	for (var i=0; i<attackPile.length; i++) {
-		if (GLOBAL.floodFill[attackPile[i].ix][attackPile[i].iy])
-			toConvert.push(attackPile[i]);
-		convertStone( stone, attackPile[i] );
-	}
-	
-	// defense: first find an own tile for defense
-	var wasConverted = false;
-	for (var i=0; i<defensePile.length; i++) {
-		if (defensePile[i].owner == stone.owner) {
-			if (GLOBAL.floodFill[stone.ix][stone.iy])
-				toConvert.push(stone);
-				convertStone( defensePile[i], stone );
-			wasConverted = true;
-			break;
+	if (GLOBAL.attackFirst) {
+		// attack: convert each tile
+		for (var i=0; i<attackPile.length; i++) {
+			if (GLOBAL.floodFill[attackPile[i].ix][attackPile[i].iy])
+				toConvert.push(attackPile[i]);
+			convertStone( stone, attackPile[i] );
 		}
-	}
-	// if not, an enemy tile
-	if (!wasConverted) {
+		
+		// defense
 		for (var i=0; i<defensePile.length; i++) {
 			if (defensePile[i].owner != stone.owner) {
 				if (GLOBAL.floodFill[stone.ix][stone.iy])
@@ -623,7 +651,27 @@ function checkTile(ix, iy) {
 				break;
 			}
 		}
+	} else {
+		// defense
+		for (var i=0; i<defensePile.length; i++) {
+			if (defensePile[i].owner != stone.owner) {
+				if (GLOBAL.floodFill[stone.ix][stone.iy])
+					toConvert.push(stone);
+				convertStone( defensePile[i], stone );
+				attackPile=[];
+				checkTile(stone.ix,stone.iy);
+				break;
+			}
+		}
+		
+		// attack
+		for (var i=0; i<attackPile.length; i++) {
+			if (GLOBAL.floodFill[attackPile[i].ix][attackPile[i].iy])
+				toConvert.push(attackPile[i]);
+			convertStone( stone, attackPile[i] );
+		}
 	}
+	
 	
 	// and now expand
 	for (var i=0; i<toConvert.length; i++)
@@ -650,6 +698,38 @@ function convertStone(from, to) {
 	
 	drawStone(to, 2);
 }
+
+function drawOpt(opt)
+{
+	var x0 = opt.x0;
+	var y0 = opt.y0;
+	var x1 = opt.x1;
+	var y1 = opt.y1;
+	
+	// draw background
+	var ctx = GLOBAL.gameContext;
+	ctx.fillStyle = "#FFFFFF";
+	ctx.strokeStyle = "#000000";
+	ctx.beginPath();
+	ctx.moveTo(x0, y0);
+	ctx.lineTo(x1, y0);
+	ctx.lineTo(x1, y1);
+	ctx.lineTo(x0, y1);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+	
+	// draw cross
+	if (opt.enabled) {
+		ctx.beginPath();
+		ctx.moveTo(x0,y0);
+		ctx.lineTo(x1, y1);
+		ctx.moveTo(x1,y0);
+		ctx.lineTo(x0,y1);
+		ctx.stroke();
+	}
+}
+
 
 //---------------------------------------------------------------------------------------------
 
