@@ -11,9 +11,6 @@ function preload() {
 	GLOBAL.imageEarth.src = "graphics/earth.png";
 	GLOBAL.imageWind = new Image();
 	GLOBAL.imageWind.src = "graphics/air.png";
-	
-	GLOBAL.bouncingFlood = false;
-	GLOBAL.attackFirst = true;
 }
 
 function imagesLoaded() {
@@ -77,24 +74,6 @@ function prepareGame()
 	initBoard();
 	GLOBAL.stoneCount = GLOBAL.coords.board.rows * GLOBAL.coords.board.cols;
 	
-	GLOBAL.options = {
-		bounce : {
-			x0 : 610,
-			y0 : 20,
-			x1 : 660,
-			y1 : 70,
-			enabled : GLOBAL.bouncingFlood
-		},
-		attack : {
-			x0 : 610,
-			y0 : 90,
-			x1 : 660,
-			y1 : 140,
-			enabled : GLOBAL.attackFirst
-		}
-		
-	}
-	
 	// start with an empty background
 	clear();
 	drawBoard();
@@ -106,8 +85,6 @@ function prepareGame()
 	countMarkers();
 	showPlayer();
 	showOrder();
-	drawOpt(GLOBAL.options.bounce);
-	drawOpt(GLOBAL.options.attack);
 	
 	// clicking on the board
 	GLOBAL.mouse = {
@@ -220,22 +197,6 @@ function mouseDown( ev ) {
 		 && GLOBAL.mouse.y >= GLOBAL.coords.board.y0 
 		 && GLOBAL.mouse.y <= GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side)
 		clickedOnBoard();
-	else if (GLOBAL.mouse.x >= GLOBAL.options.bounce.x0
-		&& GLOBAL.mouse.x <= GLOBAL.options.bounce.x1
-		&& GLOBAL.mouse.y >= GLOBAL.options.bounce.y0
-		&& GLOBAL.mouse.y <= GLOBAL.options.bounce.y1) {
-			GLOBAL.bouncingFlood = !GLOBAL.bouncingFlood;
-			GLOBAL.options.bounce.enabled = GLOBAL.bouncingFlood;
-			drawOpt( GLOBAL.options.bounce );
-		}
-	else if (GLOBAL.mouse.x >= GLOBAL.options.attack.x0
-		&& GLOBAL.mouse.x <= GLOBAL.options.attack.x1
-		&& GLOBAL.mouse.y >= GLOBAL.options.attack.y0
-		&& GLOBAL.mouse.y <= GLOBAL.options.attack.y1) {
-			GLOBAL.attackFirst = !GLOBAL.attackFirst;
-			GLOBAL.options.attack.enabled = GLOBAL.attackFirst;
-			drawOpt( GLOBAL.options.attack );
-		}
 }
 
 function clickedOnPile(pilenum) {
@@ -578,104 +539,98 @@ function startFlood(ix, iy) {
 			GLOBAL.floodFill[i][j] = true;
 	}
 	
-	checkTile(ix, iy);
+	checkDefense(ix, iy);
+	checkAttack(ix, iy);
 }
 
-function checkTile(ix, iy) {
+function checkDefense(ix, iy) {
 	
 	var stone = GLOBAL.board[ix][iy];
 	if (!stone)
 		return;
 		
-	var attackPile = new Array();
-	var defensePile = new Array();
+	if (!GLOBAL.floodFill[ix][iy])
+		return;
+		
+	var attacker = false;
 	
 	// left
 	if (ix>0 && GLOBAL.board[ix-1][iy] 
-		&& GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy]) {
-		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix-1][iy].colorCode)) {
-			attackPile.push(GLOBAL.board[ix-1][iy]);
-		} else if (tileWinsTile(GLOBAL.board[ix-1][iy].colorCode, stone.colorCode)) {
-			defensePile.push(GLOBAL.board[ix-1][iy]);
-		}
-	}
-	
-	
+		&& GLOBAL.board[ix-1][iy].owner != stone.owner 
+		&& tileWinsTile(GLOBAL.board[ix-1][iy].colorCode, stone.colorCode) )
+		attacker = GLOBAL.board[ix-1][iy];
+		
 	// right
-	if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
-		&& GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]) {
-		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix+1][iy].colorCode)) {
-			attackPile.push(GLOBAL.board[ix+1][iy]);
-		} else if (tileWinsTile(GLOBAL.board[ix+1][iy].colorCode, stone.colorCode)) {
-			defensePile.push(GLOBAL.board[ix+1][iy]);
-		}
-	}
-	
+	else if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
+		&& GLOBAL.board[ix+1][iy].owner != stone.owner
+		&& tileWinsTile(GLOBAL.board[ix+1][iy].colorCode, stone.colorCode) )
+		attacker = GLOBAL.board[ix+1][iy];
+		
 	// up
-	if (iy>0 && GLOBAL.board[ix][iy-1] 
-		&& GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]) {
-		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy-1].colorCode)) {
-			attackPile.push(GLOBAL.board[ix][iy-1]);
-		} else if (tileWinsTile(GLOBAL.board[ix][iy-1].colorCode, stone.colorCode)) {
-			defensePile.push(GLOBAL.board[ix][iy-1]);
-		}
-	}
-	
+	else if (iy>0 && GLOBAL.board[ix][iy-1] 
+		&& GLOBAL.board[ix][iy-1].owner != stone.owner
+		&& tileWinsTile(GLOBAL.board[ix][iy-1].colorCode, stone.colorCode) )
+		attacker = GLOBAL.board[ix][iy-1];
+		
 	// down
-	if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
-		&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]) {
-		if (tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy+1].colorCode)) {
-			attackPile.push(GLOBAL.board[ix][iy+1]);
-		} else if (tileWinsTile(GLOBAL.board[ix][iy+1].colorCode, stone.colorCode)) {
-			defensePile.push(GLOBAL.board[ix][iy+1]);
-		}
-	}
+	else if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
+		&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
+		&& tileWinsTile(GLOBAL.board[ix][iy+1].colorCode, stone.colorCode) )
+		attacker = GLOBAL.board[ix][iy+1];
 	
-	var sleepDelay = 50;
-	var toConvert = new Array();
 	
-	if (GLOBAL.attackFirst) {
-		// attack: convert each tile
-		for (var i=0; i<attackPile.length; i++) {
-			if (GLOBAL.floodFill[attackPile[i].ix][attackPile[i].iy])
-				toConvert.push(attackPile[i]);
-			convertStone( stone, attackPile[i] );
+	if (attacker) 
+		convertStone( attacker, stone );
+}
+
+function checkAttack(sx, sy) {
+	
+	if (!GLOBAL.board[sx][sy])
+		return;
+		
+	var attackStack = new Array();
+	
+	attackStack.push(GLOBAL.board[sx][sy]);
+	
+	while (attackStack.length) {
+		var stone = attackStack.shift();
+		var ix = stone.ix;
+		var iy = stone.iy;
+		
+		// left
+		if (ix>0 && GLOBAL.board[ix-1][iy] 
+			&& GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy] 
+			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix-1][iy].colorCode) ) {
+				convertStone(stone, GLOBAL.board[ix-1][iy]);
+				attackStack.push(GLOBAL.board[ix-1][iy]);
 		}
 		
-		// defense
-		for (var i=0; i<defensePile.length; i++) {
-			if (defensePile[i].owner != stone.owner) {
-				if (GLOBAL.floodFill[stone.ix][stone.iy])
-					toConvert.push(stone);
-				convertStone( defensePile[i], stone );
-				break;
-			}
-		}
-	} else {
-		// defense
-		for (var i=0; i<defensePile.length; i++) {
-			if (defensePile[i].owner != stone.owner) {
-				if (GLOBAL.floodFill[stone.ix][stone.iy])
-					toConvert.push(stone);
-				convertStone( defensePile[i], stone );
-				attackPile=[];
-				checkTile(stone.ix,stone.iy);
-				break;
-			}
+		
+		// right
+		if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
+			&& GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]
+			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix+1][iy].colorCode) ) {
+				convertStone(stone, GLOBAL.board[ix+1][iy]);
+				attackStack.push(GLOBAL.board[ix+1][iy]);
 		}
 		
-		// attack
-		for (var i=0; i<attackPile.length; i++) {
-			if (GLOBAL.floodFill[attackPile[i].ix][attackPile[i].iy])
-				toConvert.push(attackPile[i]);
-			convertStone( stone, attackPile[i] );
+		// up
+		if (iy>0 && GLOBAL.board[ix][iy-1] 
+			&& GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]
+			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy-1].colorCode) ) {
+				convertStone(stone, GLOBAL.board[ix][iy-1]);
+				attackStack.push(GLOBAL.board[ix][iy-1]);
 		}
+		
+		// down
+		if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
+			&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
+			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy+1].colorCode) ) {
+				convertStone(stone, GLOBAL.board[ix][iy+1]);
+				attackStack.push(GLOBAL.board[ix][iy+1]);
+		}
+	
 	}
-	
-	
-	// and now expand
-	for (var i=0; i<toConvert.length; i++)
-		checkTile(toConvert[i].ix,toConvert[i].iy);
 }
 
 function tileWinsTile(colorAtk, colorDef) {
@@ -694,55 +649,7 @@ function convertStone(from, to) {
 	to.color = from.color;
 	to.owner = from.owner;
 	to.bgColor = from.bgColor;
-	GLOBAL.floodFill[to.ix][to.iy] = GLOBAL.bouncingFlood;
+	GLOBAL.floodFill[to.ix][to.iy] = false;
 	
 	drawStone(to, 2);
-}
-
-function drawOpt(opt)
-{
-	var x0 = opt.x0;
-	var y0 = opt.y0;
-	var x1 = opt.x1;
-	var y1 = opt.y1;
-	
-	// draw background
-	var ctx = GLOBAL.gameContext;
-	ctx.fillStyle = "#FFFFFF";
-	ctx.strokeStyle = "#000000";
-	ctx.beginPath();
-	ctx.moveTo(x0, y0);
-	ctx.lineTo(x1, y0);
-	ctx.lineTo(x1, y1);
-	ctx.lineTo(x0, y1);
-	ctx.closePath();
-	ctx.fill();
-	ctx.stroke();
-	
-	// draw cross
-	if (opt.enabled) {
-		ctx.beginPath();
-		ctx.moveTo(x0,y0);
-		ctx.lineTo(x1, y1);
-		ctx.moveTo(x1,y0);
-		ctx.lineTo(x0,y1);
-		ctx.stroke();
-	}
-}
-
-
-//---------------------------------------------------------------------------------------------
-
-// Use this function to update the simulation.  dt will be the same as gameControl.updateStep, given in ms
-function update(dt) 
-{
-	
-}
-
-// Use this function to update the graphics, using the game state computed in "update".  dt is given in milliseconds and represents
-// elapsed time since the last call to dt.  Use it to interpolate the graphics and achieve a smoother simulation, although you can
-// safely ignore it if you want (no interpolation at all).
-function draw(dt)
-{ 
-	
 }
