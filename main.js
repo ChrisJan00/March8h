@@ -1,5 +1,3 @@
-// todo: double check the magic numbers
-// todo: double check flood (defense before attack?)
 
 function preload() {
 	//images
