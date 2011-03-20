@@ -81,7 +81,6 @@ function prepareGame()
 	drawPile(1);
 	chooseTiles(1);
 	chooseTiles(2);
-	fillBoard();
 	countMarkers();
 	showPlayer();
 	showOrder();
@@ -111,37 +110,6 @@ function randint(n) {
 	return Math.floor(Math.random() * n);
 }
 
-function fillBoard() {
-	return;
-	var data = GLOBAL.coords.board;
-	var sx, sy;
-	for (var playernum=1;playernum<3;playernum++) {
-		for (var i=0;i<2; i++) {
-			do {
-				sx = randint(data.cols);
-				sy = randint(data.rows);
-			} while (GLOBAL.board[sx][sy]);
-			
-			var st = {
-				ix : sx,
-				iy : sy,
-				bgColor : "#FFFFFF",
-				visible: true,
-				selected: false,
-				color: 0,
-				colorCode: 0,
-				owner : playernum
-			}
-			st.colorCode = randint(4);
-			st.color = colorForCode(st.colorCode);
-			st.bgColor = colorForPlayer(playernum-1);
-			GLOBAL.board[sx][sy] = st;
-			drawStone(st, 2);
-			GLOBAL.stoneCount--;
-		}
-	}
-}
-
 function chooseTiles(playernum) {
 	var pn = playernum-1;
 	if (pn<0) return;
@@ -156,12 +124,10 @@ function chooseTiles(playernum) {
 			bgColor : "#FFFFFF",
 			visible: true,
 			selected: false,
-			color: 0,
-			colorCode: 0,
+			element: 0,
 			owner : playernum
 		}
-		st.colorCode = randint(4);
-		st.color = colorForCode(st.colorCode);
+		st.element = randint(4);
 		
 		GLOBAL.pile[pn].push(st);
 		drawStone(st, pn);
@@ -260,9 +226,8 @@ function clickedOnBoard() {
 		ix: mix,
 		iy: miy,
 		bgColor : 0,
-		color: stone.color,
 		visible : true,
-		colorCode: stone.colorCode,
+		element: stone.element,
 		owner : stone.owner
 		};
  	newStone.bgColor = colorForPlayer(pn);
@@ -439,7 +404,7 @@ function drawStone(stone, where) {
 	
 	if (stone.visible) {
 		// draw stone
-		switch (stone.colorCode){
+		switch (stone.element){
 		case 0:{
 			ctx.drawImage(GLOBAL.imageFire,ix*50 + x0,iy*50 + y0);
 			break;
@@ -557,25 +522,25 @@ function checkDefense(ix, iy) {
 	// left
 	if (ix>0 && GLOBAL.board[ix-1][iy] 
 		&& GLOBAL.board[ix-1][iy].owner != stone.owner 
-		&& tileWinsTile(GLOBAL.board[ix-1][iy].colorCode, stone.colorCode) )
+		&& tileWinsTile(GLOBAL.board[ix-1][iy].element, stone.element) )
 		attacker = GLOBAL.board[ix-1][iy];
 		
 	// right
 	else if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
 		&& GLOBAL.board[ix+1][iy].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix+1][iy].colorCode, stone.colorCode) )
+		&& tileWinsTile(GLOBAL.board[ix+1][iy].element, stone.element) )
 		attacker = GLOBAL.board[ix+1][iy];
 		
 	// up
 	else if (iy>0 && GLOBAL.board[ix][iy-1] 
 		&& GLOBAL.board[ix][iy-1].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix][iy-1].colorCode, stone.colorCode) )
+		&& tileWinsTile(GLOBAL.board[ix][iy-1].element, stone.element) )
 		attacker = GLOBAL.board[ix][iy-1];
 		
 	// down
 	else if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
 		&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-		&& tileWinsTile(GLOBAL.board[ix][iy+1].colorCode, stone.colorCode) )
+		&& tileWinsTile(GLOBAL.board[ix][iy+1].element, stone.element) )
 		attacker = GLOBAL.board[ix][iy+1];
 	
 	
@@ -600,7 +565,7 @@ function checkAttack(sx, sy) {
 		// left
 		if (ix>0 && GLOBAL.board[ix-1][iy] 
 			&& GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy] 
-			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix-1][iy].colorCode) ) {
+			&& tileWinsTile(stone.element, GLOBAL.board[ix-1][iy].element) ) {
 				convertStone(stone, GLOBAL.board[ix-1][iy]);
 				attackStack.push(GLOBAL.board[ix-1][iy]);
 		}
@@ -609,7 +574,7 @@ function checkAttack(sx, sy) {
 		// right
 		if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
 			&& GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]
-			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix+1][iy].colorCode) ) {
+			&& tileWinsTile(stone.element, GLOBAL.board[ix+1][iy].element) ) {
 				convertStone(stone, GLOBAL.board[ix+1][iy]);
 				attackStack.push(GLOBAL.board[ix+1][iy]);
 		}
@@ -617,7 +582,7 @@ function checkAttack(sx, sy) {
 		// up
 		if (iy>0 && GLOBAL.board[ix][iy-1] 
 			&& GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]
-			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy-1].colorCode) ) {
+			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy-1].element) ) {
 				convertStone(stone, GLOBAL.board[ix][iy-1]);
 				attackStack.push(GLOBAL.board[ix][iy-1]);
 		}
@@ -625,7 +590,7 @@ function checkAttack(sx, sy) {
 		// down
 		if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
 			&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-			&& tileWinsTile(stone.colorCode, GLOBAL.board[ix][iy+1].colorCode) ) {
+			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy+1].element) ) {
 				convertStone(stone, GLOBAL.board[ix][iy+1]);
 				attackStack.push(GLOBAL.board[ix][iy+1]);
 		}
@@ -633,11 +598,11 @@ function checkAttack(sx, sy) {
 	}
 }
 
-function tileWinsTile(colorAtk, colorDef) {
-	if (colorAtk == 0 && colorDef == 3) return true;
-	if (colorAtk == 1 && colorDef == 2) return true;
-	if (colorAtk == 2 && colorDef == 0) return true;
-	if (colorAtk == 3 && colorDef == 1) return true;
+function tileWinsTile(elemAtk, elemDef) {
+	if (elemAtk == 0 && elemDef == 3) return true;
+	if (elemAtk == 1 && elemDef == 2) return true;
+	if (elemAtk == 2 && elemDef == 0) return true;
+	if (elemAtk == 3 && elemDef == 1) return true;
 	return false;
 }
 
@@ -645,8 +610,7 @@ function convertStone(from, to) {
 	if (!GLOBAL.floodFill[to.ix][to.iy])
 		return;
 		
-	to.colorCode = from.colorCode;
-	to.color = from.color;
+	to.element = from.element;
 	to.owner = from.owner;
 	to.bgColor = from.bgColor;
 	GLOBAL.floodFill[to.ix][to.iy] = false;
