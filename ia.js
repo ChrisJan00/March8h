@@ -501,17 +501,19 @@ function waitForImages()
 
 //---------------------------------------------------------------------------------------------
 function startFlood(ix, iy) {
+	resetFlood();
+	
+	checkDefense(ix, iy);
+	checkAttack(ix, iy);
+}
+function resetFlood() {
 	GLOBAL.floodFill = {}
 	for (var i=0;i<GLOBAL.coords.board.cols;i++) {
 		GLOBAL.floodFill[i] = {};
 		for (var j=0; j<GLOBAL.coords.board.rows; j++)
 			GLOBAL.floodFill[i][j] = true;
 	}
-	
-	checkDefense(ix, iy);
-	checkAttack(ix, iy);
 }
-
 function checkDefense(ix, iy) {
 	
 	var stone = GLOBAL.board[ix][iy];
@@ -630,6 +632,28 @@ function computerPlay() {
 	// take defense into account (as in "don't play there")
 	var options = new Array();
 	
+	var checkSimilar = function(x,y,stone, floodPile, options) {
+		if (x<0 || x>=GLOBAL.coords.board.cols1 || y<0 || y>=GLOBAL.coords.board.rows)
+			return 0;
+		
+		var otherStone = GLOBAL.board[x][y];
+		if (otherStone && GLOBAL.floodFill[x][y]
+			&& otherStone.owner==stone.owner && otherStone.element==stone.element) {
+			floodPile.push(otherStone);
+			GLOBAL.floodFill[x][y] = false;
+			return 1;
+		}
+		// todo: in options I have to push more information (type of the new stone)
+		// also, consider if the new stone is available
+		// also, consider maximizing score (if there was this option already, see if I can get a better score for it)
+		// also, check enemy defense
+		if (!otherStone)
+			options.push({ix:x,iy:y});
+		GLOBAL.floodFill[x][y] = false;
+		return 0;
+		
+	}
+	
 	// find how many tiles of each type do I have
 	var pileLimit = GLOBAL.coords.pile[pn].rows*GLOBAL.coords.pile[pn].cols;
 	var typeCount = [0,0,0,0];
@@ -641,18 +665,37 @@ function computerPlay() {
 			availableCount++;
 		}
 	
+	resetFlood();
 	for (var i=0;i<GLOBAL.coords.board.rows;i++)
 		for (var j=0;j<GLOBAL.coords.board.cols;j++)
-			if (GLOBAL.board[i][j] && GLOBAL.board[i][j].owner != pn) {
+			if (GLOBAL.board[i][j] && GLOBAL.board[i][j].owner != GLOBAL.action.turn && GLOBAL.floodFill[i][j]) {
 				// find neighbouring empty tiles
-				// empty array [6,6]
-				var floodPile = new Array ();
-				// while blabla...
+
 				
+				var floodPile = new Array ();
+				floodPile.push(GLOBAL.board[i][j]);
+				GLOBAL.floodFill[i][j] = false;
+				
+				var optionsTmp = new Array();
+				var floodCount = 1;
+				while (floodPile.length) {
+					var stone = floodPile.shift();
+					// check
+					floodCount += checkSimilar(stone.ix,stone.iy-1,stone,floodPile,optionsTmp);
+					floodCount += checkSimilar(stone.ix,stone.iy+1,stone,floodPile,optionsTmp);
+					floodCount += checkSimilar(stone.ix-1,stone.iy,stone,floodPile,optionsTmp);
+					floodCount += checkSimilar(stone.ix+1,stone.iy,stone,floodPile,optionsTmp);
+				}
+				
+				// mark
+				while (optionsTmp.length) {
+					var option = optionsTmp.shift();
+					options.push({ix:option.ix, iy:option.iy, score:floodCount});
+				}
 				
 			}
 		
-
+	var yota = 2;
 	// if there is no good move left, then
 	// starting with my color that maximizes entropy
 	// look for the first empty position you can fill up that is not a suicide
