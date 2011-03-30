@@ -88,7 +88,7 @@ function prepareGame()
 	
 	// start with an empty background
 	clear();
-	drawBoard();
+	GLOBAL.Board.drawEmpty();
 	drawPile(0);
 	drawPile(1);
 	chooseTiles(1);
@@ -170,11 +170,8 @@ function mouseDown( ev ) {
 		 && GLOBAL.mouse.y >= GLOBAL.coords.pile[1].y0 
 		 && GLOBAL.mouse.y <= GLOBAL.coords.pile[1].y0 + GLOBAL.coords.pile[1].rows * GLOBAL.coords.pile[1].side)
 		clickedOnPile(1);
-	else if (GLOBAL.mouse.x >= GLOBAL.coords.board.x0 
-		 && GLOBAL.mouse.x <= GLOBAL.coords.board.x0 + GLOBAL.coords.board.cols * GLOBAL.coords.board.side
-		 && GLOBAL.mouse.y >= GLOBAL.coords.board.y0 
-		 && GLOBAL.mouse.y <= GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side)
-		clickedOnBoard();
+	else if (GLOBAL.Board.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+ 		clickedOnBoard();
 }
 
 function clickedOnPile(pilenum) {
@@ -211,8 +208,7 @@ function clickedOnPile(pilenum) {
 
 function clickedOnBoard() {
 	var data = GLOBAL.coords.board
-	var mix = Math.floor((GLOBAL.mouse.x - data.x0)/data.side);
-	var miy = Math.floor((GLOBAL.mouse.y - data.y0)/data.side);
+	var [mix,miy] = GLOBAL.Board.coordsOf(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	
 	if (GLOBAL.action.turn == -1) {
 		prepareGame();
@@ -331,28 +327,7 @@ function clear() {
 	GLOBAL.gameContext.fillRect(0, 0, GLOBAL.gameCanvas.width, GLOBAL.gameCanvas.height);
 	
 }
-function drawBoard()
-{
-	var data = GLOBAL.coords.board
-	var x0 = data.x0;
-	var y0 = data.y0;
-	var side = data.side;
-	var ctx = GLOBAL.gameContext;
-	ctx.strokeStyle = "#000000"
-	for (var i=0;i<=data.cols;i++) {
-		ctx.beginPath();
-		ctx.moveTo(x0 + i*side, y0);
-		ctx.lineTo(x0 + i*side, y0 + side*data.rows);
-		ctx.stroke();
-	}
-	
-	for (var i=0;i<=data.rows;i++) {
-		ctx.beginPath();
-		ctx.moveTo(x0, y0+i*side);
-		ctx.lineTo(x0 + side*data.cols, y0+i*side);
-		ctx.stroke();
-	}
-}
+
 
 function drawPile(n) 
 {
@@ -411,16 +386,20 @@ function drawStone(stone, where) {
 	
 	// draw background
 	var ctx = GLOBAL.gameContext;
-	ctx.fillStyle = stone.bgColor;
-	ctx.strokeStyle = "#000000";
-	ctx.beginPath();
-	ctx.moveTo(x0 + ix*50, y0+iy*50);
-	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50);
-	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50+50);
-	ctx.lineTo(x0 + ix*50, y0+iy*50+50);
-	ctx.closePath();
-	ctx.fill();
-	ctx.stroke();
+	if (where == 2) 
+		GLOBAL.Board.deleteTile(ix, iy, stone.bgColor);
+	else {
+		ctx.fillStyle = stone.bgColor;
+		ctx.strokeStyle = "#000000";
+		ctx.beginPath();
+		ctx.moveTo(x0 + ix*50, y0+iy*50);
+		ctx.lineTo(x0 + ix*50 + 50, y0+iy*50);
+		ctx.lineTo(x0 + ix*50 + 50, y0+iy*50+50);
+		ctx.lineTo(x0 + ix*50, y0+iy*50+50);
+		ctx.closePath();
+		ctx.fill();
+		ctx.stroke();
+	}
 	
 	if (stone.visible) {
 		// draw stone
@@ -456,16 +435,7 @@ function drawStoneAnimated(stone,frame)
  	
  	// draw background
  	var ctx = GLOBAL.gameContext;
- 	ctx.fillStyle = stone.bgColor;
- 	ctx.strokeStyle = "#000000";
- 	ctx.beginPath();
- 	ctx.moveTo(x0 + ix*50, y0+iy*50);
- 	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50);
- 	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50+50);
- 	ctx.lineTo(x0 + ix*50, y0+iy*50+50);
- 	ctx.closePath();
- 	ctx.fill();
- 	ctx.stroke();
+ 	GLOBAL.Board.deleteTile(ix, iy, stone.bgColor);
  	
  	var whichAnimation;
  	switch(stone.element) {
@@ -486,6 +456,7 @@ function drawStoneAnimated(stone,frame)
 function colorForPlayer(pn) {
 	return pn?"#FF8C00":"#9932CC";
 }
+
 function showPlayer() {
 	var data = GLOBAL.coords.text
 	var ctx = GLOBAL.gameContext;
@@ -552,345 +523,4 @@ function waitForImages()
 		prepareGame();
 		connectMouse();
 	}
-}
-
-//---------------------------------------------------------------------------------------------
-function startFlood(ix, iy) {
-	resetFlood();
-	
-	var defended = checkDefense(ix, iy);
-	if (!defended)
-		checkAttack(ix, iy);
-}
-function resetFlood() {
-	GLOBAL.floodFill = {}
-	for (var i=0;i<GLOBAL.coords.board.cols;i++) {
-		GLOBAL.floodFill[i] = {};
-		for (var j=0; j<GLOBAL.coords.board.rows; j++)
-			GLOBAL.floodFill[i][j] = true;
-	}
-}
-function checkDefense(ix, iy) {
-	
-	var stone = GLOBAL.board[ix][iy];
-	if (!stone)
-		return false;
-		
-	if (!GLOBAL.floodFill[ix][iy])
-		return false;
-		
-	var attacker = false;
-	
-	// left
-	if (ix>0 && GLOBAL.board[ix-1][iy] 
-		&& GLOBAL.board[ix-1][iy].owner != stone.owner 
-		&& tileWinsTile(GLOBAL.board[ix-1][iy].element, stone.element) )
-		attacker = GLOBAL.board[ix-1][iy];
-		
-	// right
-	else if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
-		&& GLOBAL.board[ix+1][iy].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix+1][iy].element, stone.element) )
-		attacker = GLOBAL.board[ix+1][iy];
-		
-	// up
-	else if (iy>0 && GLOBAL.board[ix][iy-1] 
-		&& GLOBAL.board[ix][iy-1].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix][iy-1].element, stone.element) )
-		attacker = GLOBAL.board[ix][iy-1];
-		
-	// down
-	else if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
-		&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-		&& tileWinsTile(GLOBAL.board[ix][iy+1].element, stone.element) )
-		attacker = GLOBAL.board[ix][iy+1];
-	
-	
-	if (attacker) {
-		convertStone( attacker, stone );
-		return true;
-	}
-	
-	return false;
-}
-
-function checkAttack(sx, sy) {
-	
-	if (!GLOBAL.board[sx][sy])
-		return;
-		
-	var attackStack = new Array();
-	
-	attackStack.push(GLOBAL.board[sx][sy]);
-	
-	while (attackStack.length) {
-		var stone = attackStack.shift();
-		var ix = stone.ix;
-		var iy = stone.iy;
-		
-		// left
-		if (ix>0 && GLOBAL.board[ix-1][iy] 
-			&& GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy] 
-			&& tileWinsTile(stone.element, GLOBAL.board[ix-1][iy].element) ) {
-				convertStone(stone, GLOBAL.board[ix-1][iy]);
-				attackStack.push(GLOBAL.board[ix-1][iy]);
-		}
-		
-		
-		// right
-		if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
-			&& GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix+1][iy].element) ) {
-				convertStone(stone, GLOBAL.board[ix+1][iy]);
-				attackStack.push(GLOBAL.board[ix+1][iy]);
-		}
-		
-		// up
-		if (iy>0 && GLOBAL.board[ix][iy-1] 
-			&& GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy-1].element) ) {
-				convertStone(stone, GLOBAL.board[ix][iy-1]);
-				attackStack.push(GLOBAL.board[ix][iy-1]);
-		}
-		
-		// down
-		if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
-			&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy+1].element) ) {
-				convertStone(stone, GLOBAL.board[ix][iy+1]);
-				attackStack.push(GLOBAL.board[ix][iy+1]);
-		}
-	
-	}
-}
-
-function tileWinsTile(elemAtk, elemDef) {
-	if (elemAtk == 0 && elemDef == 3) return true;
-	if (elemAtk == 1 && elemDef == 2) return true;
-	if (elemAtk == 2 && elemDef == 0) return true;
-	if (elemAtk == 3 && elemDef == 1) return true;
-	return false;
-}
-
-function colorWonBy(elem) {
-	switch(elem) {
-		case 0: return 3;
-		case 1: return 2;
-		case 2: return 0;
-		case 3: return 1;
-	}
-}
-
-function colorThatWins(elem) {
-	switch(elem) {
-		case 0: return 2;
-		case 1: return 3;
-		case 2: return 1;
-		case 3: return 0;
-	}
-}
-
-function convertStone(from, to) {
-	if (!GLOBAL.floodFill[to.ix][to.iy])
-		return;
-		
-	to.element = from.element;
-	to.owner = from.owner;
-	to.bgColor = from.bgColor;
-	GLOBAL.floodFill[to.ix][to.iy] = false;
-	
-	//drawStone(to, 2);
-	setTimeout(function(){drawStoneAnimated(to,0)}, GLOBAL.animationDelay);
-}
-
-//----------------------------------------------------------
-function computerPlay() {
-	var self = this;
-	var pn = GLOBAL.action.turn-1;
-	
-	self.computeStones = function() {
-		self.typeCount = [0,0,0,0];
-		self.availableCount = 0;
-		
-		var pileLimit = GLOBAL.coords.pile[pn].rows*GLOBAL.coords.pile[pn].cols;
-		for (var i=0;i<pileLimit; i++)
-			if (GLOBAL.pile[pn][i].visible) {
-				self.typeCount[GLOBAL.pile[pn][i].element]++;
-				self.availableCount++;
-			}
-	}
-	
-	self.computeEntropies = function() {
-		self.entropies = [0,0,0,0];
-		for (var i=0;i<4;i++) {
-			self.typeCount[i]--;
-			for (var j=0;j<4;j++)
-				if (self.typeCount[j]>0) {
-					var px = self.typeCount[j]/self.availableCount;
-					self.entropies[i] -= px*Math.log(px)/Math.log(2);
-				}
-			self.typeCount[i]++;
-		}
-	}
-	
-	self.computeBasicScores = function() {
-		self.options = new Array();
-		for (var ix=0;ix<GLOBAL.coords.board.cols;ix++)
-			for (var iy=0;iy<GLOBAL.coords.board.rows;iy++) {
-				if (GLOBAL.board[ix][iy])
-					continue;
-				for (var color=0;color<4;color++) {
-					var score = 0;
-					if (self.typeCount[color]<=0)
-						continue;
-					// count defense
-					if (self.isDefended(ix, iy, color, pn)) {
-						score = -1; // - self.countNeighbours(ix,iy,color, pn+1);
-					} else {
-						score = 1 + self.countNeighbours(ix,iy,colorWonBy(color),2-pn);
-					}
-					self.options.push([ix,iy,color,score]);
-				}					
-			}
-	}
-	
-	self.check = function(x,y,color,owner) {
-			if (x>=0 && x<GLOBAL.coords.board.cols && y>=0 && y<GLOBAL.coords.board.rows &&
-				GLOBAL.board[x][y] && GLOBAL.board[x][y].element == color && GLOBAL.board[x][y].owner == owner)
-					return true;
-			else return false;
-		}
-	
-	self.isDefended = function( ix, iy, color, owner )
-	{
-		// returns true if there is a neighbouring enemy tile that kills this one
-		var attackColor = colorThatWins(color);
-		return  self.check(ix-1, iy, attackColor, owner) ||
-				self.check(ix+1, iy, attackColor, owner) ||
-				self.check(ix, iy-1, attackColor, owner) ||
-				self.check(ix, iy+1, attackColor, owner);
-	}
-	
-	self.countNeighbours = function( x, y, color, owner)
-	{
-		// finds neighbours of this position with this color and owner
-		var neighbourPile = new Array();
-		var localMap = [];
-		for (var i=0;i<GLOBAL.coords.board.cols; i++) {
-			localMap[i] = [];
-			for (var j=0;j<GLOBAL.coords.board.rows; j++) {
-				localMap[i][j] = true;
-			}
-		}
-		var count = 0;
-		neighbourPile.push([x,y]);
-		
-		function checkNeighHelper(ix,iy) {
-			if (self.check(ix,iy,color,owner) && localMap[ix][iy]) {
-				count++;
-				neighbourPile.push([ix,iy]);
-				localMap[ix][iy] = false;
-			}
-		}
-		
-		while (neighbourPile.length>0) {
-			var pos = neighbourPile.shift();
-			var ix = pos[0];
-			var iy = pos[1];
-			checkNeighHelper(ix-1,iy);
-			checkNeighHelper(ix+1,iy);
-			checkNeighHelper(ix,iy-1);
-			checkNeighHelper(ix,iy+1);
-		}
-		return count;
-	}
-	
-	self.normalizeScores = function() 
-	{
-		var minScore = 0;
-		for (var i=0;i<self.options.length;i++) {
-			if (self.options[i][3] < minScore)
-				minScore = self.options[i][3];
-		}
-		
-		self.totalScore = 0;
-		for (var i=0; i<self.options.length;i++) {
-			self.options[i][3] += 1 - minScore; // make minimum 1
-			self.options[i][3] = Math.pow(self.options[i][3] * self.entropies[self.options[i][2]], 4);
-			self.totalScore += self.options[i][3];
-		}
-	}
-	
-	self.chooseOption = function() {
-		var prob = Math.random() * self.totalScore;
-		var choice = -1;
-		while (prob>0) {
-			choice++;
-			prob -= self.options[choice][3];
-		}
-		if (choice<0)
-			choice = 0;
-		if (choice >= self.options.length)
-			choice = self.options.length-1;
-			
-		return self.options[choice];
-	}
-	
-	self.playThis = function(mix,miy,elem) {
-		// find one stone in own pile
-		var index = -1;
-		while (index<GLOBAL.pile[pn].length) {
-			if ((GLOBAL.pile[pn][++index].element == elem) && (GLOBAL.pile[pn][index].visible))
-				break;
-		}
-		
-		// undraw stone in player pile
-		var stone = GLOBAL.pile[pn][index];
-		stone.visible = false;
-		stone.bgColor = "#FFFFFF";
-		drawStone(stone, pn);
-		
-		// move stone to board
-		var newStone = {
-			ix: mix,
-			iy: miy,
-			bgColor : 0,
-			visible : true,
-			element: stone.element,
-			owner : stone.owner
-			};
-	 	newStone.bgColor = colorForPlayer(pn);
-		drawStone(newStone, 2);
-		GLOBAL.board[mix][miy] = newStone;
-		
-		startFlood(mix, miy);
-		
-		countMarkers();
-		
-		if (--GLOBAL.stoneCount) {
-			showPlayer();
-		} else {
-			checkVictory();
-		}
-		
-	}
-	
-	
-	self.computeStones();
-	self.computeEntropies();
-	self.computeBasicScores();
-	self.normalizeScores();
-	var finalChoice = self.chooseOption();
-	self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
-	
-	
-	// for each of the available stones, count how many I eat - how many I loose
-	// store that score by now
-	
-	// when all positions have been given its initial score, normalize scores:
-	// for each possibility, add the minimum score + 1 (so that the new minimum is 1)
-	// square it (or other transformation?) and weight with entropy (maximize entropy)
-	
-	// choose a random number between 0 and the total sum of scores
-	// then find the chosen position
 }
