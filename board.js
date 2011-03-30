@@ -96,3 +96,59 @@ GLOBAL.Board = new function() {
 	
 	self.clean();
 }
+
+function clickedOnBoard() {
+	var data = GLOBAL.coords.board
+	var [mix,miy] = GLOBAL.Board.coordsOf(GLOBAL.mouse.x, GLOBAL.mouse.y);
+	
+	if (GLOBAL.action.turn == -1) {
+		prepareGame();
+		return;
+	}
+	// no selection?
+	if (GLOBAL.action.selection == -1)
+		return;
+		
+	// place taken?
+	if (GLOBAL.board[mix][miy])
+		return;
+	
+	// undraw stone in player pile
+	var pn = GLOBAL.action.turn - 1;
+	var stone = GLOBAL.pile[pn][GLOBAL.action.selection];
+	stone.visible = false;
+	stone.bgColor = "#FFFFFF";
+	drawStone(stone, pn);
+	
+	// move stone to board
+	var newStone = {
+		ix: mix,
+		iy: miy,
+		bgColor : 0,
+		visible : true,
+		element: stone.element,
+		owner : stone.owner
+		};
+ 	newStone.bgColor = colorForPlayer(pn);
+	drawStone(newStone, 2);
+	GLOBAL.board[mix][miy] = newStone;
+	
+	startFlood(mix, miy);
+	
+	GLOBAL.action.selection = -1;
+	countMarkers();
+	GLOBAL.action.turn = 3-GLOBAL.action.turn;
+	if (--GLOBAL.stoneCount) {
+		showPlayer();
+	} else {
+		checkVictory();
+	}
+	
+	if (GLOBAL.action.turn == 2) {
+		computerPlay();
+		if (GLOBAL.action.turn == 2) {
+			GLOBAL.action.turn = 1;
+			showPlayer();
+		}
+	}
+}

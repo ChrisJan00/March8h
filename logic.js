@@ -180,3 +180,19 @@ function checkVictory() {
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
 }
+
+function countMarkers() {
+	GLOBAL.counts = {};
+	GLOBAL.counts[0] = 0;
+	GLOBAL.counts[1] = 0;
+	for (var i=0; i<GLOBAL.coords.board.cols; i++)
+		for (var j=0; j<GLOBAL.coords.board.rows; j++) {
+			if (GLOBAL.board[i][j]) {
+				GLOBAL.counts[ GLOBAL.board[i][j].owner - 1 ]++;
+			}
+		}
+}
+
+function colorForPlayer(pn) {
+	return pn?"#FF8C00":"#9932CC";
+}

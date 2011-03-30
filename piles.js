@@ -1,5 +1,5 @@
-function chooseTiles(playernum) {
-	var pn = playernum-1;
+function chooseTiles(pn) {
+	var playernum = pn+1;
 	if (pn<0) return;
 	if (pn>1) return;
 	
