@@ -201,7 +201,7 @@ function clickedOnBoard() {
 	var mix = Math.floor((GLOBAL.mouse.x - data.x0)/data.side);
 	var miy = Math.floor((GLOBAL.mouse.y - data.y0)/data.side);
 	
-	if (GLOBAL.action.turn==-1) {
+	if (GLOBAL.action.turn == -1) {
 		prepareGame();
 		return;
 	}
@@ -246,7 +246,8 @@ function clickedOnBoard() {
 	
 	if (GLOBAL.action.turn == 2) {
 		computerPlay();
-		GLOBAL.action.turn = 1;
+		if (GLOBAL.action.turn == 2)
+			GLOBAL.action.turn = 1;
 	}
 }
 
@@ -612,6 +613,24 @@ function tileWinsTile(elemAtk, elemDef) {
 	return false;
 }
 
+function colorWonBy(elem) {
+	switch(elem) {
+		case 0: return 3;
+		case 1: return 2;
+		case 2: return 0;
+		case 3: return 1;
+	}
+}
+
+function colorThatWins(elem) {
+	switch(elem) {
+		case 0: return 2;
+		case 1: return 3;
+		case 2: return 1;
+		case 3: return 0;
+	}
+}
+
 function convertStone(from, to) {
 	if (!GLOBAL.floodFill[to.ix][to.iy])
 		return;
@@ -626,79 +645,192 @@ function convertStone(from, to) {
 
 //----------------------------------------------------------
 function computerPlay() {
+	var self = this;
 	var pn = GLOBAL.action.turn-1;
-	// for each position in the board, if it's an enemy position , floodfill to find the borders
-	// the score of that is equal to the amount of "eaten" pieces
-	// take defense into account (as in "don't play there")
-	var options = new Array();
 	
-	var checkSimilar = function(x,y,stone, floodPile, options) {
-		if (x<0 || x>=GLOBAL.coords.board.cols1 || y<0 || y>=GLOBAL.coords.board.rows)
-			return 0;
+	self.computeStones = function() {
+		self.typeCount = [0,0,0,0];
+		self.availableCount = 0;
 		
-		var otherStone = GLOBAL.board[x][y];
-		if (otherStone && GLOBAL.floodFill[x][y]
-			&& otherStone.owner==stone.owner && otherStone.element==stone.element) {
-			floodPile.push(otherStone);
-			GLOBAL.floodFill[x][y] = false;
-			return 1;
+		var pileLimit = GLOBAL.coords.pile[pn].rows*GLOBAL.coords.pile[pn].cols;
+		for (var i=0;i<pileLimit; i++)
+			if (GLOBAL.pile[pn][i].visible) {
+				self.typeCount[GLOBAL.pile[pn][i].element]++;
+				self.availableCount++;
+			}
+	}
+	
+	self.computeEntropies = function() {
+		self.entropies = [0,0,0,0];
+		for (var i=0;i<4;i++) {
+			self.typeCount[i]--;
+			for (var j=0;j<4;j++)
+				if (self.typeCount[j]>0) {
+					var px = self.typeCount[j]/self.availableCount;
+					self.entropies[i] -= px*Math.log(px)/Math.log(2);
+				}
+			self.typeCount[i]++;
 		}
-		// todo: in options I have to push more information (type of the new stone)
-		// also, consider if the new stone is available
-		// also, consider maximizing score (if there was this option already, see if I can get a better score for it)
-		// also, check enemy defense
-		if (!otherStone)
-			options.push({ix:x,iy:y});
-		GLOBAL.floodFill[x][y] = false;
-		return 0;
+	}
+	
+	self.computeBasicScores = function() {
+		self.options = new Array();
+		for (var ix=0;ix<GLOBAL.coords.board.cols;ix++)
+			for (var iy=0;iy<GLOBAL.coords.board.rows;iy++) {
+				if (GLOBAL.board[ix][iy])
+					continue;
+				for (var color=0;color<4;color++) {
+					var score = 0;
+					if (self.typeCount[color]<=0)
+						continue;
+					// count defense
+					if (self.isDefended(ix, iy, color, pn)) {
+						score = -1 - self.countNeighbours(ix,iy,color, pn+1);
+					} else {
+						score = 1 + self.countNeighbours(ix,iy,colorWonBy(color),2-pn);
+					}
+					self.options.push([ix,iy,color,score]);
+				}					
+			}
+	}
+	
+	self.check = function(x,y,color,owner) {
+			if (x>=0 && x<GLOBAL.coords.board.cols && y>=0 && y<GLOBAL.coords.board.rows &&
+				GLOBAL.board[x][y] && GLOBAL.board[x][y].element == color && GLOBAL.board[x][y].owner == owner)
+					return true;
+			else return false;
+		}
+	
+	self.isDefended = function( ix, iy, color, owner )
+	{
+		// returns true if there is a neighbouring enemy tile that kills this one
+		var attackColor = colorThatWins(color);
+		return  self.check(ix-1, iy, attackColor, owner) ||
+				self.check(ix+1, iy, attackColor, owner) ||
+				self.check(ix, iy-1, attackColor, owner) ||
+				self.check(ix, iy+1, attackColor, owner);
+	}
+	
+	self.countNeighbours = function( x, y, color, owner)
+	{
+		// finds neighbours of this position with this color and owner
+		var neighbourPile = new Array();
+		var localMap = [];
+		for (var i=0;i<GLOBAL.coords.board.cols; i++) {
+			localMap[i] = [];
+			for (var j=0;j<GLOBAL.coords.board.rows; j++) {
+				localMap[i][j] = true;
+			}
+		}
+		var count = 0;
+		neighbourPile.push([x,y]);
+		
+		function checkNeighHelper(ix,iy) {
+			if (self.check(ix,iy,color,owner) && localMap[ix][iy]) {
+				count++;
+				neighbourPile.push([ix,iy]);
+				localMap[ix][iy] = false;
+			}
+		}
+		
+		while (neighbourPile.length>0) {
+			var pos = neighbourPile.shift();
+			var ix = pos[0];
+			var iy = pos[1];
+			checkNeighHelper(ix-1,iy);
+			checkNeighHelper(ix+1,iy);
+			checkNeighHelper(ix,iy-1);
+			checkNeighHelper(ix,iy+1);
+		}
+		return count;
+	}
+	
+	self.normalizeScores = function() 
+	{
+		var minScore = 0;
+		for (var i=0;i<self.options.length;i++) {
+			if (self.options[i][3] < minScore)
+				minScore = self.options[i][3];
+		}
+		
+		self.totalScore = 0;
+		for (var i=0; i<self.options.length;i++) {
+			self.options[i][3] += 1 - minScore; // make minimum 1
+			self.options[i][3] = Math.pow(self.options[i][3] * self.entropies[self.options[i][2]], 4);
+			self.totalScore += self.options[i][3];
+		}
+	}
+	
+	self.chooseOption = function() {
+		var prob = Math.random() * self.totalScore;
+		var choice = -1;
+		while (prob>0) {
+			choice++;
+			prob -= self.options[choice][3];
+		}
+		if (choice<0)
+			choice = 0;
+		if (choice >= self.options.length)
+			choice = self.options.length-1;
+			
+		return self.options[choice];
+	}
+	
+	self.playThis = function(mix,miy,elem) {
+		// find one stone in own pile
+		var index = -1;
+		while (index<GLOBAL.pile[pn].length) {
+			if ((GLOBAL.pile[pn][++index].element == elem) && (GLOBAL.pile[pn][index].visible))
+				break;
+		}
+		
+		// undraw stone in player pile
+		var stone = GLOBAL.pile[pn][index];
+		stone.visible = false;
+		stone.bgColor = "#FFFFFF";
+		drawStone(stone, pn);
+		
+		// move stone to board
+		var newStone = {
+			ix: mix,
+			iy: miy,
+			bgColor : 0,
+			visible : true,
+			element: stone.element,
+			owner : stone.owner
+			};
+	 	newStone.bgColor = colorForPlayer(pn);
+		drawStone(newStone, 2);
+		GLOBAL.board[mix][miy] = newStone;
+		
+		startFlood(mix, miy);
+		
+		countMarkers();
+		
+		if (--GLOBAL.stoneCount) {
+			showPlayer();
+		} else {
+			checkVictory();
+		}
 		
 	}
 	
-	// find how many tiles of each type do I have
-	var pileLimit = GLOBAL.coords.pile[pn].rows*GLOBAL.coords.pile[pn].cols;
-	var typeCount = [0,0,0,0];
-	var availableCount = 0;
 	
-	for (var i=0;i<pileLimit; i++)
-		if (GLOBAL.pile[pn][i].visible) {
-			typeCount[GLOBAL.pile[pn][i].element]++;
-			availableCount++;
-		}
+	self.computeStones();
+	self.computeEntropies();
+	self.computeBasicScores();
+	self.normalizeScores();
+	var finalChoice = self.chooseOption();
+	self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
 	
-	resetFlood();
-	for (var i=0;i<GLOBAL.coords.board.rows;i++)
-		for (var j=0;j<GLOBAL.coords.board.cols;j++)
-			if (GLOBAL.board[i][j] && GLOBAL.board[i][j].owner != GLOBAL.action.turn && GLOBAL.floodFill[i][j]) {
-				// find neighbouring empty tiles
-
-				
-				var floodPile = new Array ();
-				floodPile.push(GLOBAL.board[i][j]);
-				GLOBAL.floodFill[i][j] = false;
-				
-				var optionsTmp = new Array();
-				var floodCount = 1;
-				while (floodPile.length) {
-					var stone = floodPile.shift();
-					// check
-					floodCount += checkSimilar(stone.ix,stone.iy-1,stone,floodPile,optionsTmp);
-					floodCount += checkSimilar(stone.ix,stone.iy+1,stone,floodPile,optionsTmp);
-					floodCount += checkSimilar(stone.ix-1,stone.iy,stone,floodPile,optionsTmp);
-					floodCount += checkSimilar(stone.ix+1,stone.iy,stone,floodPile,optionsTmp);
-				}
-				
-				// mark
-				while (optionsTmp.length) {
-					var option = optionsTmp.shift();
-					options.push({ix:option.ix, iy:option.iy, score:floodCount});
-				}
-				
-			}
-		
-	var yota = 2;
-	// if there is no good move left, then
-	// starting with my color that maximizes entropy
-	// look for the first empty position you can fill up that is not a suicide
-
-	// if there is no non-suicidal positions, then choose one at random
+	
+	// for each of the available stones, count how many I eat - how many I loose
+	// store that score by now
+	
+	// when all positions have been given its initial score, normalize scores:
+	// for each possibility, add the minimum score + 1 (so that the new minimum is 1)
+	// square it (or other transformation?) and weight with entropy (maximize entropy)
+	
+	// choose a random number between 0 and the total sum of scores
+	// then find the chosen position
 }
