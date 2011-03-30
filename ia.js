@@ -690,7 +690,7 @@ function computerPlay() {
 						continue;
 					// count defense
 					if (self.isDefended(ix, iy, color, pn)) {
-						score = -1 - self.countNeighbours(ix,iy,color, pn+1);
+						score = -1; // - self.countNeighbours(ix,iy,color, pn+1);
 					} else {
 						score = 1 + self.countNeighbours(ix,iy,colorWonBy(color),2-pn);
 					}
