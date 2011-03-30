@@ -9,13 +9,25 @@ function preload() {
 	GLOBAL.imageEarth.src = "graphics/earth.png";
 	GLOBAL.imageWind = new Image();
 	GLOBAL.imageWind.src = "graphics/air.png";
+	GLOBAL.fireAnimation = new Image();
+	GLOBAL.fireAnimation.src = "graphics/strip_fire-wind.png";
+	GLOBAL.earthAnimation = new Image();
+	GLOBAL.earthAnimation.src = "graphics/strip_earth-water.png";
+	GLOBAL.waterAnimation = new Image();
+	GLOBAL.waterAnimation.src = "graphics/strip_water-fire.png";
+	GLOBAL.airAnimation = new Image();
+	GLOBAL.airAnimation.src = "graphics/strip_wind-earth.png";
 }
 
 function imagesLoaded() {
 	return GLOBAL.imageFire.complete
 		&& GLOBAL.imageWater.complete 
 		&& GLOBAL.imageEarth.complete
-		&& GLOBAL.imageWind.complete;
+		&& GLOBAL.imageWind.complete
+		&& GLOBAL.fireAnimation.complete
+		&& GLOBAL.waterAnimation.complete
+		&& GLOBAL.earthAnimation.complete
+		&& GLOBAL.airAnimation.complete;
 }
 
 function prepareGame()
@@ -28,6 +40,8 @@ function prepareGame()
 	GLOBAL.bgContext = GLOBAL.bgCanvas.getContext("2d");
 	GLOBAL.canvasWidth = GLOBAL.gameCanvas.width;
 	GLOBAL.canvasHeight = GLOBAL.gameCanvas.height;
+	
+	GLOBAL.animationDelay = 250;
 	
 	GLOBAL.action = {
 		turn:1,
@@ -422,6 +436,45 @@ function drawStone(stone, where) {
 		}
 	}
 }
+
+function drawStoneAnimated(stone,frame)
+{
+	var x0, y0, ix, iy;
+	x0 = GLOBAL.coords.board.x0;
+	y0 = GLOBAL.coords.board.y0;
+	
+	ix = stone.ix;
+	iy = stone.iy;
+	
+	// draw background
+	var ctx = GLOBAL.gameContext;
+	ctx.fillStyle = stone.bgColor;
+	ctx.strokeStyle = "#000000";
+	ctx.beginPath();
+	ctx.moveTo(x0 + ix*50, y0+iy*50);
+	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50);
+	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50+50);
+	ctx.lineTo(x0 + ix*50, y0+iy*50+50);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+	
+	var whichAnimation;
+	switch(stone.element) {
+		case 0: whichAnimation = GLOBAL.fireAnimation; break;
+		case 1: whichAnimation = GLOBAL.earthAnimation; break;
+		case 2: whichAnimation = GLOBAL.waterAnimation; break;
+		case 3: whichAnimation = GLOBAL.airAnimation; break;
+	}
+	
+	var offset = frame * 50;
+	ctx.drawImage(whichAnimation, offset,0, 50, 50 ,ix*50 + x0,iy*50 + y0, 50, 50);
+	if (frame<3) {
+		setTimeout(function(){drawStoneAnimated(stone,frame+1)}, GLOBAL.animationDelay);
+	} else
+		drawStone(stone, 2);
+}
+
 function colorForPlayer(pn) {
 	return pn?"#FF8C00":"#9932CC";
 }
@@ -502,18 +555,19 @@ function startFlood(ix, iy) {
 			GLOBAL.floodFill[i][j] = true;
 	}
 	
-	checkDefense(ix, iy);
-	checkAttack(ix, iy);
+	var defended = checkDefense(ix, iy);
+	if (!defended)
+		checkAttack(ix, iy);
 }
 
 function checkDefense(ix, iy) {
 	
 	var stone = GLOBAL.board[ix][iy];
 	if (!stone)
-		return;
+		return false;
 		
 	if (!GLOBAL.floodFill[ix][iy])
-		return;
+		return false;
 		
 	var attacker = false;
 	
@@ -542,8 +596,11 @@ function checkDefense(ix, iy) {
 		attacker = GLOBAL.board[ix][iy+1];
 	
 	
-	if (attacker) 
+	if (attacker) {
 		convertStone( attacker, stone );
+		return true;
+	}		
+	return false;
 }
 
 function checkAttack(sx, sy) {
@@ -613,5 +670,6 @@ function convertStone(from, to) {
 	to.bgColor = from.bgColor;
 	GLOBAL.floodFill[to.ix][to.iy] = false;
 	
-	drawStone(to, 2);
+	//drawStone(to, 2);
+	setTimeout(function(){drawStoneAnimated(to,0)}, GLOBAL.animationDelay);
 }

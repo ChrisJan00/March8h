@@ -504,8 +504,9 @@ function waitForImages()
 function startFlood(ix, iy) {
 	resetFlood();
 	
-	checkDefense(ix, iy);
-	checkAttack(ix, iy);
+	var defended = checkDefense(ix, iy);
+	if (!defended)
+		checkAttack(ix, iy);
 }
 function resetFlood() {
 	GLOBAL.floodFill = {}
@@ -519,10 +520,10 @@ function checkDefense(ix, iy) {
 	
 	var stone = GLOBAL.board[ix][iy];
 	if (!stone)
-		return;
+		return false;
 		
 	if (!GLOBAL.floodFill[ix][iy])
-		return;
+		return false;
 		
 	var attacker = false;
 	
@@ -551,8 +552,12 @@ function checkDefense(ix, iy) {
 		attacker = GLOBAL.board[ix][iy+1];
 	
 	
-	if (attacker) 
+	if (attacker) {
 		convertStone( attacker, stone );
+		return true;
+	}
+	
+	return false;
 }
 
 function checkAttack(sx, sy) {
