@@ -32,6 +32,7 @@ function imagesLoaded() {
 
 function prepareGame()
 { 
+	document.getElementById("debugDiv").innerHTML = "preparegame";
 	GLOBAL.gameCanvas = document.getElementById("canvas1");
 	GLOBAL.gameContext = GLOBAL.gameCanvas.getContext("2d");
 	GLOBAL.bgCanvas = document.createElement('canvas');
@@ -103,6 +104,8 @@ function prepareGame()
 		y : 0,
 		button : false
 	};
+	
+	document.getElementById("debugDiv").innerHTML = "gamewasprepared";
 		
 }
 function connectMouse() {
