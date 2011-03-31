@@ -39,7 +39,7 @@ function computerPlay() {
 					if (GLOBAL.maximizeEntropy && self.typeCount[color]<self.maxCount)
 						continue;
 					// count defense
-					if (self.isDefended(ix, iy, color, pn)) {
+					if (GLOBAL.defenseMode && self.isDefended(ix, iy, color, pn)) {
 						score = 0; // - self.countNeighbours(ix,iy,color, pn+1);
 					} else {
 						score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),2-pn);

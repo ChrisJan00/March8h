@@ -8,7 +8,9 @@ GLOBAL.FloodCheck = function() {
 		
 		self.resetFloodMarkers();
 		
-		var defended = self.checkDefense(ix, iy);
+		var defended = false;
+		if (GLOBAL.defenseMode)
+			defended = self.checkDefense(ix, iy);
 		if (!defended)
 			self.checkAttack(ix, iy);
 			
