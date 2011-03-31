@@ -75,11 +75,12 @@ function prepareGame()
 	clearCanvas();
 	initPiles();
 	GLOBAL.BoardInstance.drawEmpty();
-
-	countMarkers();
-	showPlayer();
-	showOrder();
 	
+	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
+	GLOBAL.floodCheck.countMarkers();
+	showPlayer();
+	showOrder();	
+
 	// clicking on the board
 	GLOBAL.mouse = {
 		x : 0,
@@ -112,7 +113,7 @@ function mouseDown( ev ) {
  		turnIsReady = GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
  		
  	if (turnIsReady) {	
- 		countMarkers();
+ 		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = 3-GLOBAL.action.turn;
 		
 		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
@@ -123,6 +124,15 @@ function mouseDown( ev ) {
 		
 		if (GLOBAL.action.turn == 2) {
 			computerPlay();
+			
+			GLOBAL.floodCheck.countMarkers();
+		
+			if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
+				showPlayer();
+			} else {
+				checkVictory();
+			}
+			
 			if (GLOBAL.action.turn == 2) {
 				GLOBAL.action.turn = 1;
 				showPlayer();

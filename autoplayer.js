@@ -43,7 +43,7 @@ function computerPlay() {
 					if (self.isDefended(ix, iy, color, pn)) {
 						score = 0; // - self.countNeighbours(ix,iy,color, pn+1);
 					} else {
-						score = 1 + self.countNeighbours(ix,iy,colorWonBy(color),2-pn);
+						score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),2-pn);
 					}
 					self.options.push([ix,iy,color,score]);
 				}					
@@ -62,7 +62,7 @@ function computerPlay() {
 	self.isDefended = function( ix, iy, color, owner )
 	{
 		// returns true if there is a neighbouring enemy tile that kills this one
-		var attackColor = colorThatWins(color);
+		var attackColor = GLOBAL.floodCheck.colorThatWins(color);
 		return  self.check(ix-1, iy, attackColor, owner) ||
 				self.check(ix+1, iy, attackColor, owner) ||
 				self.check(ix, iy-1, attackColor, owner) ||
@@ -142,16 +142,10 @@ function computerPlay() {
 		GLOBAL.BoardInstance.set(mix,miy,stone);
 		GLOBAL.BoardInstance.redrawTile(mix,miy);
 		
-		startFlood(mix, miy);
+		//startFlood(mix, miy);
+		GLOBAL.floodCheck.checkFlood(mix, miy);
 		
-		countMarkers();
-		
-		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
-			showPlayer();
-		} else {
-			checkVictory();
-		}
-		
+		return true;
 	}
 	
 	
@@ -160,6 +154,6 @@ function computerPlay() {
 	self.computeBasicScores();
 	self.normalizeScores();
 	var finalChoice = self.chooseOption();
-	self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
+	return self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
 	
 }

@@ -154,6 +154,8 @@ GLOBAL.StoneHolder.prototype = {
 	},
 	
 	get : function(x,y) {
+		if (x<0 || x>=this.cols || y<0 || y>=this.rows)
+			return false;
 		return this.contents[x][y];
 	},
 	
@@ -221,7 +223,8 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	this.set(mix, miy, stone);
 	this.redrawTile(mix,miy);
 	
-	startFlood(mix, miy);
+	//startFlood(mix, miy);
+	GLOBAL.floodCheck.checkFlood(mix, miy);
 	
 	return true;
 }
