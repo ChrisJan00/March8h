@@ -21,6 +21,7 @@ GLOBAL.StoneHolder.prototype = {
 		this.height = this.side * numRows;
 		this.x1 = this.x0 + this.width;
 		this.y1 = this.y0 + this.height;
+		this.maxStones = this.cols * this.rows;
 		this.clearContents();
 	},
 		
@@ -194,7 +195,8 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	GLOBAL.action.selection = -1;
 	countMarkers();
 	GLOBAL.action.turn = 3-GLOBAL.action.turn;
-	if (--GLOBAL.stoneCount) {
+	
+	if (this.stoneCount < this.maxStones) {
 		showPlayer();
 	} else {
 		checkVictory();

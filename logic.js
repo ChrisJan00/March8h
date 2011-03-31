@@ -8,9 +8,9 @@ function startFlood(ix, iy) {
 }
 function resetFlood() {
 	GLOBAL.floodFill = {}
-	for (var i=0;i<GLOBAL.coords.board.cols;i++) {
+	for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
 		GLOBAL.floodFill[i] = {};
-		for (var j=0; j<GLOBAL.coords.board.rows; j++)
+		for (var j=0; j<GLOBAL.BoardInstance.rows; j++)
 			GLOBAL.floodFill[i][j] = true;
 	}
 }
@@ -32,7 +32,7 @@ function checkDefense(ix, iy) {
 		attacker = GLOBAL.BoardInstance.get(ix-1,iy);
 		
 	// right
-	else if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.BoardInstance.get(ix+1,iy) 
+	else if (ix<GLOBAL.BoardInstance.cols-1 && GLOBAL.BoardInstance.get(ix+1,iy) 
 		&& GLOBAL.BoardInstance.get(ix+1,iy).owner != stone.owner
 		&& tileWinsTile(GLOBAL.BoardInstance.get(ix+1,iy).element, stone.element) )
 		attacker = GLOBAL.BoardInstance.get(ix+1,iy);
@@ -44,7 +44,7 @@ function checkDefense(ix, iy) {
 		attacker = GLOBAL.BoardInstance.get(ix,iy-1);
 		
 	// down
-	else if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.BoardInstance.get(ix,iy+1) 
+	else if (iy<GLOBAL.BoardInstance.rows-1 && GLOBAL.BoardInstance.get(ix,iy+1) 
 		&& GLOBAL.BoardInstance.get(ix,iy+1).owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
 		&& tileWinsTile(GLOBAL.BoardInstance.get(ix,iy+1).element, stone.element) )
 		attacker = GLOBAL.BoardInstance.get(ix,iy+1);
@@ -82,7 +82,7 @@ function checkAttack(sx, sy) {
 		
 		
 		// right
-		if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.BoardInstance.get(ix+1,iy) 
+		if (ix<GLOBAL.BoardInstance.cols-1 && GLOBAL.BoardInstance.get(ix+1,iy) 
 			&& GLOBAL.BoardInstance.get(ix+1,iy).owner != stone.owner && GLOBAL.floodFill[ix+1][iy]
 			&& tileWinsTile(stone.element, GLOBAL.BoardInstance.get(ix+1,iy).element) ) {
 				convertStone(stone, GLOBAL.BoardInstance.get(ix+1,iy));
@@ -98,7 +98,7 @@ function checkAttack(sx, sy) {
 		}
 		
 		// down
-		if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.BoardInstance.get(ix,iy+1) 
+		if (iy<GLOBAL.BoardInstance.rows-1 && GLOBAL.BoardInstance.get(ix,iy+1) 
 			&& GLOBAL.BoardInstance.get(ix,iy+1).owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
 			&& tileWinsTile(stone.element, GLOBAL.BoardInstance.get(ix,iy+1).element) ) {
 				convertStone(stone, GLOBAL.BoardInstance.get(ix,iy+1));
@@ -185,8 +185,8 @@ function countMarkers() {
 	GLOBAL.counts = {};
 	GLOBAL.counts[0] = 0;
 	GLOBAL.counts[1] = 0;
-	for (var i=0; i<GLOBAL.coords.board.cols; i++)
-		for (var j=0; j<GLOBAL.coords.board.rows; j++) {
+	for (var i=0; i<GLOBAL.BoardInstance.cols; i++)
+		for (var j=0; j<GLOBAL.BoardInstance.rows; j++) {
 			if (GLOBAL.BoardInstance.get(i,j)) {
 				GLOBAL.counts[ GLOBAL.BoardInstance.get(i,j).owner - 1 ]++;
 			}

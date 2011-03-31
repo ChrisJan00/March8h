@@ -29,8 +29,8 @@ function computerPlay() {
 	
 	self.computeBasicScores = function() {
 		self.options = new Array();
-		for (var ix=0;ix<GLOBAL.coords.board.cols;ix++)
-			for (var iy=0;iy<GLOBAL.coords.board.rows;iy++) {
+		for (var ix=0;ix<GLOBAL.BoardInstance.cols;ix++)
+			for (var iy=0;iy<GLOBAL.BoardInstance.rows;iy++) {
 				if (GLOBAL.BoardInstance.get(ix,iy))
 					continue;
 				for (var color=0;color<4;color++) {
@@ -51,7 +51,7 @@ function computerPlay() {
 	}
 	
 	self.check = function(x,y,color,owner) {
-			if (x>=0 && x<GLOBAL.coords.board.cols && y>=0 && y<GLOBAL.coords.board.rows &&
+			if (x>=0 && x<GLOBAL.BoardInstance.cols && y>=0 && y<GLOBAL.BoardInstance.rows &&
 				GLOBAL.BoardInstance.get(x,y) && 
 				GLOBAL.BoardInstance.get(x,y).element == color && 
 				GLOBAL.BoardInstance.get(x,y).owner == owner)
@@ -74,9 +74,9 @@ function computerPlay() {
 		// finds neighbours of this position with this color and owner
 		var neighbourPile = new Array();
 		var localMap = [];
-		for (var i=0;i<GLOBAL.coords.board.cols; i++) {
+		for (var i=0;i<GLOBAL.BoardInstance.cols; i++) {
 			localMap[i] = [];
-			for (var j=0;j<GLOBAL.coords.board.rows; j++) {
+			for (var j=0;j<GLOBAL.BoardInstance.rows; j++) {
 				localMap[i][j] = true;
 			}
 		}
@@ -146,7 +146,7 @@ function computerPlay() {
 		
 		countMarkers();
 		
-		if (--GLOBAL.stoneCount) {
+		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
 			showPlayer();
 		} else {
 			checkVictory();

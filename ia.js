@@ -63,31 +63,6 @@ function prepareGame()
 	GLOBAL.BoardInstance = new GLOBAL.BoardClass();
 
 	GLOBAL.coords = {
-		pile : [
-			{
-				border : 10,
-				side : 50,
-				x0 : 25,
-				y0 : 10,
-				rows: 9,
-				cols: 2
-			},
-			{
-				border : 10,
-				side : 50,
-				x0 : 495,
-				y0 : 10,
-				rows: 9,
-				cols: 2
-			},
-		],
-		board : {
-			x0 : 160,
-			y0 : 70,
-			side : 50,
-			rows : 6,
-			cols : 6
-		},
 		text : {
 			x0: 160,
 			y0: 15,
@@ -96,8 +71,6 @@ function prepareGame()
 		}
 	};
 
-	GLOBAL.stoneCount = GLOBAL.coords.board.rows * GLOBAL.coords.board.cols;
-	
 	// start with an empty background
 	clearCanvas();
 	initPiles();
@@ -159,69 +132,6 @@ function clearCanvas() {
 	
 }
 
-function drawStone(stone, where) {
-	var x0, y0, ix, iy;
-	switch (where) {
-		case 2: { // board
-			x0 = GLOBAL.coords.board.x0;
-			y0 = GLOBAL.coords.board.y0;
-			break;
-		}
-		case 0: { // pile left
-			x0 = GLOBAL.coords.pile[0].x0;
-			y0 = GLOBAL.coords.pile[0].y0;
-			break;
-		}
-		case 1: { // pile right
-			x0 = GLOBAL.coords.pile[1].x0;
-			y0 = GLOBAL.coords.pile[1].y0;
-			break;
-		}
-	}
-	
-	ix = stone.ix;
-	iy = stone.iy;
-	
-	// draw background
-	var ctx = GLOBAL.gameContext;
-	if (where == 2) 
-		GLOBAL.BoardInstance.redrawTileBackground(ix, iy);
-	else {
-		ctx.fillStyle = stone.bgColor;
-		ctx.strokeStyle = "#000000";
-		ctx.beginPath();
-		ctx.moveTo(x0 + ix*50, y0+iy*50);
-		ctx.lineTo(x0 + ix*50 + 50, y0+iy*50);
-		ctx.lineTo(x0 + ix*50 + 50, y0+iy*50+50);
-		ctx.lineTo(x0 + ix*50, y0+iy*50+50);
-		ctx.closePath();
-		ctx.fill();
-		ctx.stroke();
-	}
-	
-	if (stone.visible) {
-		// draw stone
-		switch (stone.element){
-		case 0:{
-			ctx.drawImage(GLOBAL.imageFire,ix*50 + x0,iy*50 + y0);
-			break;
-			}
-		case 1:{
-			ctx.drawImage(GLOBAL.imageEarth,ix*50 + x0,iy*50 + y0);
-		 	break;
-			}
-		case 2:{
-			ctx.drawImage(GLOBAL.imageWater,ix*50 + x0,iy*50 + y0);
-		 	break;
-			}
-		case 3:{
-			ctx.drawImage(GLOBAL.imageWind,ix*50 + x0,iy*50 + y0);
-		 	break;
-			}
-		}
-	}
-}
-
 function drawStoneAnimated(stone,frame)
 {
  	var x0, y0, ix, iy;
@@ -248,7 +158,7 @@ function drawStoneAnimated(stone,frame)
  	if (frame<3) {
  		setTimeout(function(){drawStoneAnimated(stone,frame+1)}, GLOBAL.animationDelay);
  	} else
- 		drawStone(stone, 2);
+ 		setTimeout(function(){GLOBAL.BoardInstance.redrawTile(stone.ix, stone.iy)}, GLOBAL.animationDelay);
  }
 
 

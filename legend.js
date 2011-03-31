@@ -30,13 +30,13 @@ function showOrder() {
 		ctx.stroke();
 	}
 	
-	var s = GLOBAL.coords.board.side
-	var width = s * GLOBAL.coords.board.cols
+	var s = GLOBAL.BoardInstance.side
+	var width = s * GLOBAL.BoardInstance.cols
 	var b = Math.floor((width - 45 - 4*s)/10);
 	var al = 15;
-	var y = GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side
+	var y = GLOBAL.BoardInstance.y0 + GLOBAL.BoardInstance.rows * GLOBAL.BoardInstance.side
 	
-	var x0 = GLOBAL.coords.board.x0
+	var x0 = GLOBAL.BoardInstance.x0
 	var y0 = y + 5
 	var y1 = y + GLOBAL.imageFire.height/2 + 5
 	var ctx = GLOBAL.gameContext;
