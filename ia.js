@@ -49,6 +49,7 @@ function prepareGame()
 	};
 	GLOBAL.pile = {};
 	
+	GLOBAL.BoardInstance = new GLOBAL.BoardClass();
 
 	GLOBAL.coords = {
 		pile : [

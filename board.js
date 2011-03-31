@@ -1,4 +1,4 @@
-GLOBAL.BoardInstance = new function() {
+GLOBAL.BoardClass = function() {
 	var self = this;
 	
 	//document.getElementById("debugDiv").innerHTML = "boardinstance";
