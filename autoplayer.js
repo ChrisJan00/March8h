@@ -38,7 +38,7 @@ function computerPlay() {
 		self.options = new Array();
 		for (var ix=0;ix<GLOBAL.coords.board.cols;ix++)
 			for (var iy=0;iy<GLOBAL.coords.board.rows;iy++) {
-				if (GLOBAL.board[ix][iy])
+				if (GLOBAL.BoardInstance.get(ix,iy))
 					continue;
 				for (var color=0;color<4;color++) {
 					var score = 0;
@@ -59,7 +59,9 @@ function computerPlay() {
 	
 	self.check = function(x,y,color,owner) {
 			if (x>=0 && x<GLOBAL.coords.board.cols && y>=0 && y<GLOBAL.coords.board.rows &&
-				GLOBAL.board[x][y] && GLOBAL.board[x][y].element == color && GLOBAL.board[x][y].owner == owner)
+				GLOBAL.BoardInstance.get(x,y) && 
+				GLOBAL.BoardInstance.get(x,y).element == color && 
+				GLOBAL.BoardInstance.get(x,y).owner == owner)
 					return true;
 			else return false;
 		}
@@ -146,18 +148,8 @@ function computerPlay() {
 		stone.bgColor = "#FFFFFF";
 		drawStone(stone, pn);
 		
-		// move stone to board
-		var newStone = {
-			ix: mix,
-			iy: miy,
-			bgColor : 0,
-			visible : true,
-			element: stone.element,
-			owner : stone.owner
-			};
-	 	newStone.bgColor = colorForPlayer(pn);
-		drawStone(newStone, 2);
-		GLOBAL.board[mix][miy] = newStone;
+		GLOBAL.BoardInstance.set(mix,miy,stone);
+		GLOBAL.BoardInstance.redrawTile(mix,miy);
 		
 		startFlood(mix, miy);
 		

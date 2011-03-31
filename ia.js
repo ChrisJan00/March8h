@@ -1,3 +1,14 @@
+// Todo: Pile+Board prototypes
+// logic class
+// AI as a class?
+// blinking attacker
+// gradual flood
+// game mode menu
+// "restart/menu" at endgame
+// action.turn number
+// AI random starter
+// illuminate pile current turn
+// variable sizes
 
 function preload() {
 	//images
@@ -84,7 +95,7 @@ function prepareGame()
 			height: 52
 		}
 	};
-	initBoard();
+//	initBoard();
 	GLOBAL.stoneCount = GLOBAL.coords.board.rows * GLOBAL.coords.board.cols;
 	
 	// start with an empty background
@@ -112,12 +123,12 @@ function connectMouse() {
     GLOBAL.gameCanvas.addEventListener('mouseup',   mouseUp, false);
 }
 
-function initBoard() {
-	GLOBAL.board = {};
-	for (var i=0; i<GLOBAL.coords.board.cols; i++) {
-		GLOBAL.board[i] = {};
-	}
-}
+//function initBoard() {
+//	GLOBAL.board = {};
+//	for (var i=0; i<GLOBAL.coords.board.cols; i++) {
+//		GLOBAL.board[i] = {};
+//	}
+//}
 
 function randint(n) {
 	return Math.floor(Math.random() * n);
@@ -189,7 +200,7 @@ function drawStone(stone, where) {
 	// draw background
 	var ctx = GLOBAL.gameContext;
 	if (where == 2) 
-		GLOBAL.BoardInstance.deleteTile(ix, iy, stone.bgColor);
+		GLOBAL.BoardInstance.redrawTileBackground(ix, iy);
 	else {
 		ctx.fillStyle = stone.bgColor;
 		ctx.strokeStyle = "#000000";
@@ -237,7 +248,7 @@ function drawStoneAnimated(stone,frame)
  	
  	// draw background
  	var ctx = GLOBAL.gameContext;
- 	GLOBAL.BoardInstance.deleteTile(ix, iy, stone.bgColor);
+ 	GLOBAL.BoardInstance.redrawTileBackground(ix, iy);
  	
  	var whichAnimation;
  	switch(stone.element) {

@@ -16,7 +16,7 @@ function resetFlood() {
 }
 function checkDefense(ix, iy) {
 	
-	var stone = GLOBAL.board[ix][iy];
+	var stone = GLOBAL.BoardInstance.get(ix,iy);
 	if (!stone)
 		return false;
 		
@@ -26,28 +26,28 @@ function checkDefense(ix, iy) {
 	var attacker = false;
 	
 	// left
-	if (ix>0 && GLOBAL.board[ix-1][iy] 
-		&& GLOBAL.board[ix-1][iy].owner != stone.owner 
-		&& tileWinsTile(GLOBAL.board[ix-1][iy].element, stone.element) )
-		attacker = GLOBAL.board[ix-1][iy];
+	if (ix>0 && GLOBAL.BoardInstance.get(ix-1,iy) 
+		&& GLOBAL.BoardInstance.get(ix-1,iy).owner != stone.owner 
+		&& tileWinsTile(GLOBAL.BoardInstance.get(ix-1,iy).element, stone.element) )
+		attacker = GLOBAL.BoardInstance.get(ix-1,iy);
 		
 	// right
-	else if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
-		&& GLOBAL.board[ix+1][iy].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix+1][iy].element, stone.element) )
-		attacker = GLOBAL.board[ix+1][iy];
+	else if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.BoardInstance.get(ix+1,iy) 
+		&& GLOBAL.BoardInstance.get(ix+1,iy).owner != stone.owner
+		&& tileWinsTile(GLOBAL.BoardInstance.get(ix+1,iy).element, stone.element) )
+		attacker = GLOBAL.BoardInstance.get(ix+1,iy);
 		
 	// up
-	else if (iy>0 && GLOBAL.board[ix][iy-1] 
-		&& GLOBAL.board[ix][iy-1].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix][iy-1].element, stone.element) )
-		attacker = GLOBAL.board[ix][iy-1];
+	else if (iy>0 && GLOBAL.BoardInstance.get(ix,iy-1) 
+		&& GLOBAL.BoardInstance.get(ix,iy-1).owner != stone.owner
+		&& tileWinsTile(GLOBAL.BoardInstance.get(ix,iy-1).element, stone.element) )
+		attacker = GLOBAL.BoardInstance.get(ix,iy-1);
 		
 	// down
-	else if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
-		&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-		&& tileWinsTile(GLOBAL.board[ix][iy+1].element, stone.element) )
-		attacker = GLOBAL.board[ix][iy+1];
+	else if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.BoardInstance.get(ix,iy+1) 
+		&& GLOBAL.BoardInstance.get(ix,iy+1).owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
+		&& tileWinsTile(GLOBAL.BoardInstance.get(ix,iy+1).element, stone.element) )
+		attacker = GLOBAL.BoardInstance.get(ix,iy+1);
 	
 	
 	if (attacker) {
@@ -60,12 +60,12 @@ function checkDefense(ix, iy) {
 
 function checkAttack(sx, sy) {
 	
-	if (!GLOBAL.board[sx][sy])
+	if (!GLOBAL.BoardInstance.get(sx,sy))
 		return;
 		
 	var attackStack = new Array();
 	
-	attackStack.push(GLOBAL.board[sx][sy]);
+	attackStack.push(GLOBAL.BoardInstance.get(sx,sy));
 	
 	while (attackStack.length) {
 		var stone = attackStack.shift();
@@ -73,36 +73,36 @@ function checkAttack(sx, sy) {
 		var iy = stone.iy;
 		
 		// left
-		if (ix>0 && GLOBAL.board[ix-1][iy] 
-			&& GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy] 
-			&& tileWinsTile(stone.element, GLOBAL.board[ix-1][iy].element) ) {
-				convertStone(stone, GLOBAL.board[ix-1][iy]);
-				attackStack.push(GLOBAL.board[ix-1][iy]);
+		if (ix>0 && GLOBAL.BoardInstance.get(ix-1,iy) 
+			&& GLOBAL.BoardInstance.get(ix-1,iy).owner != stone.owner && GLOBAL.floodFill[ix-1][iy] 
+			&& tileWinsTile(stone.element, GLOBAL.BoardInstance.get(ix-1,iy).element) ) {
+				convertStone(stone, GLOBAL.BoardInstance.get(ix-1,iy));
+				attackStack.push(GLOBAL.BoardInstance.get(ix-1,iy));
 		}
 		
 		
 		// right
-		if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
-			&& GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix+1][iy].element) ) {
-				convertStone(stone, GLOBAL.board[ix+1][iy]);
-				attackStack.push(GLOBAL.board[ix+1][iy]);
+		if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.BoardInstance.get(ix+1,iy) 
+			&& GLOBAL.BoardInstance.get(ix+1,iy).owner != stone.owner && GLOBAL.floodFill[ix+1][iy]
+			&& tileWinsTile(stone.element, GLOBAL.BoardInstance.get(ix+1,iy).element) ) {
+				convertStone(stone, GLOBAL.BoardInstance.get(ix+1,iy));
+				attackStack.push(GLOBAL.BoardInstance.get(ix+1,iy));
 		}
 		
 		// up
-		if (iy>0 && GLOBAL.board[ix][iy-1] 
-			&& GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy-1].element) ) {
-				convertStone(stone, GLOBAL.board[ix][iy-1]);
-				attackStack.push(GLOBAL.board[ix][iy-1]);
+		if (iy>0 && GLOBAL.BoardInstance.get(ix,iy-1) 
+			&& GLOBAL.BoardInstance.get(ix,iy-1).owner != stone.owner && GLOBAL.floodFill[ix][iy-1]
+			&& tileWinsTile(stone.element, GLOBAL.BoardInstance.get(ix,iy-1).element) ) {
+				convertStone(stone, GLOBAL.BoardInstance.get(ix,iy-1));
+				attackStack.push(GLOBAL.BoardInstance.get(ix,iy-1));
 		}
 		
 		// down
-		if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
-			&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy+1].element) ) {
-				convertStone(stone, GLOBAL.board[ix][iy+1]);
-				attackStack.push(GLOBAL.board[ix][iy+1]);
+		if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.BoardInstance.get(ix,iy+1) 
+			&& GLOBAL.BoardInstance.get(ix,iy+1).owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
+			&& tileWinsTile(stone.element, GLOBAL.BoardInstance.get(ix,iy+1).element) ) {
+				convertStone(stone, GLOBAL.BoardInstance.get(ix,iy+1));
+				attackStack.push(GLOBAL.BoardInstance.get(ix,iy+1));
 		}
 	
 	}
@@ -187,8 +187,8 @@ function countMarkers() {
 	GLOBAL.counts[1] = 0;
 	for (var i=0; i<GLOBAL.coords.board.cols; i++)
 		for (var j=0; j<GLOBAL.coords.board.rows; j++) {
-			if (GLOBAL.board[i][j]) {
-				GLOBAL.counts[ GLOBAL.board[i][j].owner - 1 ]++;
+			if (GLOBAL.BoardInstance.get(i,j)) {
+				GLOBAL.counts[ GLOBAL.BoardInstance.get(i,j).owner - 1 ]++;
 			}
 		}
 }

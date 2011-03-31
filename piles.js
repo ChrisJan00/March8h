@@ -128,7 +128,8 @@ function chooseTiles(pn) {
 			visible: true,
 			selected: false,
 			element: 0,
-			owner : playernum
+			owner : playernum,
+			active : true
 		}
 		st.element = randint(4);
 		

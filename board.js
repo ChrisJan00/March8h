@@ -1,19 +1,30 @@
-GLOBAL.BoardClass = function() {
-	var self = this;
+GLOBAL.StoneHolder = function() {}
+GLOBAL.StoneHolder.prototype = {
+	x0 : 0,
+	y0 : 0,
+	side : 50,
+	rows : 1,
+	cols : 1,
+	width : 50,
+	height : 50,
+	x1 : 50,
+	y1 : 50,
+	contents : [],
 	
-	self.x0 = 160;
-	self.y0 = 70;
-	self.side = 50;
-	self.rows = 6;
-	self.cols = 6;
-	self.width = self.side * self.cols;
-	self.height = self.side * self.rows;
-	self.x1 = self.x0 + self.width;
-	self.y1 = self.y0 + self.height;
-	
+	setDimensions : function( numCols, numRows, x0, y0 ) {
+		this.x0 = x0;
+		this.y0 = y0;
+		this.cols = numCols;
+		this.rows = numRows;
+		this.width = this.side * numCols;
+		this.height = this.side * numRows;
+		this.x1 = this.x0 + this.width;
+		this.y1 = this.y0 + this.height;
+		this.clearContents();
+	},
 		
-	// draw functions
-	self.drawEmpty = function() {
+	drawEmpty : function() {
+		var self = this;
 		var ctx = GLOBAL.gameContext;
 		
 		ctx.fillStyle = "#FFFFFF";
@@ -39,72 +50,107 @@ GLOBAL.BoardClass = function() {
 			ctx.lineTo(self.x1, self.y0+i*self.side);
 			ctx.stroke();
 		}
-	}
+	},
 	
-	self.deleteTile = function(x,y, color) {
-		var mx = self.x0 + x * self.side;
-		var my = self.y0 + y * self.side;
+	redrawTileBackground : function(x,y) {
+		var color;
+		if ((!this.contents[x][y]) || (!this.contents[x][y].active))
+			color = "#FFFFFF";
+		else
+			color = this.contents[x][y].bgColor;
+				
+		var mx = this.x0 + x * this.side;
+		var my = this.y0 + y * this.side;
 		var ctx = GLOBAL.gameContext;
 		ctx.fillStyle = color;
 		ctx.strokeStyle = "#000000";
 		ctx.beginPath();
 		ctx.moveTo(mx, my);
-		ctx.lineTo(mx + self.side, my);
-		ctx.lineTo(mx + self.side, my + self.side);
-		ctx.lineTo(mx, my+self.side);
+		ctx.lineTo(mx + this.side, my);
+		ctx.lineTo(mx + this.side, my + this.side);
+		ctx.lineTo(mx, my+this.side);
 		ctx.closePath();
 		ctx.fill();
 		ctx.stroke();
-	}
+	},
 	
-	self.drawTile = function(x,y) {
-		drawStone(self.contents[x][y], 2);
-	}
-	
-	self.animateTile = function(x,y,tile) {
+	redrawTile : function(x,y) {
+		// if there is no tile, draw empty space
+		this.redrawTileBackground(x,y);
 		
-	}
+		stone = this.get(x,y);
+		if (stone && stone.visible) {
+			// draw stone
+			var ix = this.x0 + x * this.side;
+			var iy = this.y0 + y * this.side;
+			var img;
+			switch (stone.element) {
+				case 0:	img = GLOBAL.imageFire;
+					break;
+				case 1:	img = GLOBAL.imageEarth;
+				 	break;
+				case 2:	img = GLOBAL.imageWater;
+				 	break;
+				case 3:	img = GLOBAL.imageWind;
+				 	break;
+			}
+			
+			GLOBAL.gameContext.drawImage(img, ix, iy);
+		}
+	},
+	
+	animateTile : function(x,y,tile) {
+		
+	},
 	
 	// update functions
-	self.set = function(x,y, stone) {
+	set : function(x,y, stone) {
 		stone.ix = x;
 		stone.iy = y;
 		var newStone = {
 			ix: x,
 			iy: y,
-			bgColor : 0,
+			bgColor : "#FFFFFF",
 			visible : true,
+			active : stone.active,
 			element: stone.element,
 			owner : stone.owner
 		};
 	 	newStone.bgColor = colorForPlayer(stone.owner-1);
-		self.contents[x][y] = newStone;
-		GLOBAL.board[x][y] = newStone;
-	}
+		this.contents[x][y] = newStone;
+//		GLOBAL.board[x][y] = newStone;
+	},
 	
-	self.get = function(x,y) {
-		return self.contents[x][y];
-	}
+	get : function(x,y) {
+		return this.contents[x][y];
+	},
 	
-	self.clean = function() {
+	clearContents : function() {
+		var self = this;
 		self.contents = [];
 		for (var i=0;i<self.cols;i++)
 		self.contents[i] = [];
-	}
+	},
 	
-	self.isClicked = function( mouseX, mouseY ) {
+	isClicked : function( mouseX, mouseY ) {
+		var self = this;
 		return mouseX>=self.x0 && mouseX<self.x1 && mouseY>=self.y0 && mouseY<self.y1;
-	}
+	},
 	
-	self.coordsOf = function( mouseX, mouseY ) {
+	coordsOf : function( mouseX, mouseY ) {
+		var self = this;
 		if (!self.isClicked(mouseX,mouseY)) return [-1,-1];
 		var x = Math.floor((mouseX - self.x0)/self.side);
 		var y = Math.floor((mouseY - self.y0)/self.side);
 		return [ x , y ];
 	}
 	
-	self.clean();
 }
+
+GLOBAL.BoardClass = function() {
+	this.setDimensions(6,6, 160, 70);
+}
+GLOBAL.BoardClass.prototype = new GLOBAL.StoneHolder;
 
 function clickedOnBoard() {
 	var data = GLOBAL.coords.board
@@ -121,7 +167,7 @@ function clickedOnBoard() {
 		return;
 		
 	// place taken?
-	if (GLOBAL.board[mix][miy])
+	if (GLOBAL.BoardInstance.get(mix,miy))
 		return;
 	
 	// undraw stone in player pile
@@ -133,7 +179,7 @@ function clickedOnBoard() {
 	
 	// move stone to board
 	GLOBAL.BoardInstance.set(mix, miy, stone);
-	GLOBAL.BoardInstance.drawTile(mix,miy);
+	GLOBAL.BoardInstance.redrawTile(mix,miy);
 	
 	startFlood(mix, miy);
 	
