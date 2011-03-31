@@ -143,8 +143,7 @@ function convertStone(from, to) {
 	to.bgColor = from.bgColor;
 	GLOBAL.floodFill[to.ix][to.iy] = false;
 	
-	//drawStone(to, 2);
-	setTimeout(function(){drawStoneAnimated(to,0)}, GLOBAL.animationDelay);
+	GLOBAL.BoardInstance.startTileAnimation(to.ix, to.iy);
 }
 
 

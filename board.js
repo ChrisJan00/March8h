@@ -99,8 +99,39 @@ GLOBAL.StoneHolder.prototype = {
 		}
 	},
 	
-	animateTile : function(x,y,tile) {
-		
+	startTileAnimation : function(x,y) 
+	{
+		var self = this;
+		setTimeout(function(){self.animateTile(x, y, 0)}, GLOBAL.animationDelay);
+	},
+	
+	animateTile : function(x,y, frame) 
+	{
+ 		var stone = this.get(x,y);
+ 		
+ 		this.redrawTileBackground(x, y);
+ 
+  		var ctx = GLOBAL.gameContext;
+ 	
+	 	var whichAnimation;
+	 	switch(stone.element) {
+	 		case 0: whichAnimation = GLOBAL.fireAnimation; break;
+	 		case 1: whichAnimation = GLOBAL.earthAnimation; break;
+	 		case 2: whichAnimation = GLOBAL.waterAnimation; break;
+	 		case 3: whichAnimation = GLOBAL.airAnimation; break;
+	 	}
+ 	
+	 	var offset = frame * 50;
+	 	var ix = this.x0 + x * this.side;
+		var iy = this.y0 + y * this.side;
+			
+	 	ctx.drawImage(whichAnimation, offset, 0, this.side, this.side, ix, iy, this.side, this.side);
+		var self = this;
+	 	if (frame<3) {
+	 		setTimeout(function(){self.animateTile(x, y, frame+1)}, GLOBAL.animationDelay);
+	 	} else {
+	 		setTimeout(function(){self.redrawTile(stone.ix, stone.iy)}, GLOBAL.animationDelay);
+	 	}
 	},
 	
 	// update functions
@@ -168,19 +199,19 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	if (GLOBAL.action.turn == -1) {
 		prepareGame();
-		return;
+		return false;
 	}
 	
 	var currentPile = GLOBAL.Piles[GLOBAL.action.turn-1];
 	
 	// place taken?
 	if (this.get(mix,miy))
-		return;
+		return false;
 		
 	// no selection?
 	var stone = currentPile.selection;
 	if (!stone)
-		return;
+		return false;
 		
 	currentPile.del(stone.ix, stone.iy);
 	currentPile.unSelect();
@@ -192,22 +223,6 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	startFlood(mix, miy);
 	
-	GLOBAL.action.selection = -1;
-	countMarkers();
-	GLOBAL.action.turn = 3-GLOBAL.action.turn;
-	
-	if (this.stoneCount < this.maxStones) {
-		showPlayer();
-	} else {
-		checkVictory();
-	}
-	
-	if (GLOBAL.action.turn == 2) {
-		computerPlay();
-		if (GLOBAL.action.turn == 2) {
-			GLOBAL.action.turn = 1;
-			showPlayer();
-		}
-	}
+	return true;
 }
 

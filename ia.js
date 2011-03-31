@@ -103,12 +103,32 @@ function mouseDown( ev ) {
 	
 	mouseMove( ev );
 	
+	var turnIsReady = false;
 	if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
 		GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	else if (GLOBAL.Piles[1].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
 		GLOBAL.Piles[1].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	else if (GLOBAL.BoardInstance.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
- 		GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+ 		turnIsReady = GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+ 		
+ 	if (turnIsReady) {	
+ 		countMarkers();
+		GLOBAL.action.turn = 3-GLOBAL.action.turn;
+		
+		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
+			showPlayer();
+		} else {
+			checkVictory();
+		}
+		
+		if (GLOBAL.action.turn == 2) {
+			computerPlay();
+			if (GLOBAL.action.turn == 2) {
+				GLOBAL.action.turn = 1;
+				showPlayer();
+			}
+		}
+	}
 }
 
 function mouseUp( ev ) {
