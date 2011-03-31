@@ -114,7 +114,8 @@ GLOBAL.StoneHolder.prototype = {
 		var stone = this.get(x,y);
 		if (!stone) return;
 		
-		var color = frame%2? colorForPlayer(stone.owner-1) : colorForPlayerWeak(stone.owner-1);
+		var color = frame%2? colorForPlayer(stone.owner-1) : colorForPlayerStrong(stone.owner-1);
+		//var color = colorForPlayerStrong(stone.owner-1);
 		this.redrawTile(x,y,color);
 		frame--;
 		if (frame)

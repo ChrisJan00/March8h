@@ -78,6 +78,18 @@ GLOBAL.PileClass.prototype.drawFromScratch = function() {
 			this.redrawTile(ix,iy);
 }
 
+GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
+	var ctx = GLOBAL.gameContext;
+	var color = strong?colorForPlayer(this.owner-1):colorForPlayerWeak(this.owner-1);
+	ctx.fillStyle = color;
+	ctx.strokeStyle = color;
+	
+	ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border);
+	ctx.fillRect(this.x0-this.border, this.y0, this.border, this.height);
+	ctx.fillRect(this.x0-this.border, this.y1, this.width + 2*this.border, this.border);
+	ctx.fillRect(this.x1, this.y0, this.border, this.height);
+}
+
 GLOBAL.PileClass.prototype.countStoneTypes = function()
 {
 	var typeCount = [0,0,0,0];

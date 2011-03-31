@@ -162,23 +162,6 @@ function manageTurn()
 		}
 		
 	}
-		//if (GLOBAL.action.turn == 2) {
-		//	computerPlay();
-			
-		//	GLOBAL.floodCheck.countMarkers();
-		
-		//	if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
-		//		showPlayer();
-		//	} else {
-		//		checkVictory();
-		//	}
-			
-		//	if (GLOBAL.action.turn == 2) {
-		//		GLOBAL.action.turn = 1;
-		//		showPlayer();
-		//	}
-		//}
-	//}
 }
 
 function mouseUp( ev ) {

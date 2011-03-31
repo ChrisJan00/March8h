@@ -4,6 +4,11 @@ function colorForPlayer(pn) {
 }
 
 function colorForPlayerWeak(pn) {
+	//return pn?"#FFA940":"#AA66CC";
+	return pn?"#ffc680":"#b485cc";
+}
+
+function colorForPlayerStrong(pn) {
 	return pn?"#ff5400":"#6e0c9e";
 }
 
@@ -23,6 +28,9 @@ function showPlayer() {
 	var msg = (pn?"orange":"purple")+"'s turn";
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2 );
+	
+	GLOBAL.Piles[0].redrawBorder(GLOBAL.action.turn==1);
+	GLOBAL.Piles[1].redrawBorder(GLOBAL.action.turn==2);
 }
 
 function showOrder() {
@@ -90,4 +98,7 @@ function checkVictory() {
 	}
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
+	
+	GLOBAL.Piles[0].redrawBorder(true);
+	GLOBAL.Piles[1].redrawBorder(true);
 }
