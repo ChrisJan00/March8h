@@ -4,6 +4,6 @@ function countMarkers() {}
 function showPlayer() {}
 function showOrder() {}
 
-GLOBAL.Board = {}
-GLOBAL.Board.drawEmpty = function() {}
+GLOBAL.BoardInstance = {}
+GLOBAL.BoardInstance.drawEmpty = function() {}
 

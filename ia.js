@@ -32,7 +32,6 @@ function imagesLoaded() {
 
 function prepareGame()
 { 
-	document.getElementById("debugDiv").innerHTML = "preparegame";
 	GLOBAL.gameCanvas = document.getElementById("canvas1");
 	GLOBAL.gameContext = GLOBAL.gameCanvas.getContext("2d");
 	GLOBAL.bgCanvas = document.createElement('canvas');
@@ -89,7 +88,7 @@ function prepareGame()
 	
 	// start with an empty background
 	clearCanvas();
-	GLOBAL.Board.drawEmpty();
+	GLOBAL.BoardInstance.drawEmpty();
 	drawPile(0);
 	chooseTiles(0);
 	drawPile(1);
@@ -104,8 +103,6 @@ function prepareGame()
 		y : 0,
 		button : false
 	};
-	
-	document.getElementById("debugDiv").innerHTML = "gamewasprepared";
 		
 }
 function connectMouse() {
@@ -140,7 +137,7 @@ function mouseDown( ev ) {
 		 && GLOBAL.mouse.y >= GLOBAL.coords.pile[1].y0 
 		 && GLOBAL.mouse.y <= GLOBAL.coords.pile[1].y0 + GLOBAL.coords.pile[1].rows * GLOBAL.coords.pile[1].side)
 		clickedOnPile(1);
-	else if (GLOBAL.Board.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+	else if (GLOBAL.BoardInstance.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
  		clickedOnBoard();
 }
 
@@ -191,7 +188,7 @@ function drawStone(stone, where) {
 	// draw background
 	var ctx = GLOBAL.gameContext;
 	if (where == 2) 
-		GLOBAL.Board.deleteTile(ix, iy, stone.bgColor);
+		GLOBAL.BoardInstance.deleteTile(ix, iy, stone.bgColor);
 	else {
 		ctx.fillStyle = stone.bgColor;
 		ctx.strokeStyle = "#000000";
@@ -239,7 +236,7 @@ function drawStoneAnimated(stone,frame)
  	
  	// draw background
  	var ctx = GLOBAL.gameContext;
- 	GLOBAL.Board.deleteTile(ix, iy, stone.bgColor);
+ 	GLOBAL.BoardInstance.deleteTile(ix, iy, stone.bgColor);
  	
  	var whichAnimation;
  	switch(stone.element) {

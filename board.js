@@ -1,5 +1,7 @@
-GLOBAL.Board = new function() {
+GLOBAL.BoardInstance = new function() {
 	var self = this;
+	
+	//document.getElementById("debugDiv").innerHTML = "boardinstance";
 	
 	self.x0 = 160;
 	self.y0 = 70;
@@ -14,6 +16,7 @@ GLOBAL.Board = new function() {
 		
 	// draw functions
 	self.drawEmpty = function() {
+		document.getElementById("debugDiv").innerHTML = "drawEmpty";
 		var ctx = GLOBAL.gameContext;
 		
 		ctx.fillStyle = "#FFFFFF";
@@ -25,7 +28,7 @@ GLOBAL.Board = new function() {
 		ctx.closePath();
 		ctx.fill();	
 		
-		
+		document.getElementById("debugDiv").innerHTML = "erased";
 		ctx.strokeStyle = "#000000"
 		for (var i=0;i<=self.cols;i++) {
 			ctx.beginPath();
@@ -40,6 +43,7 @@ GLOBAL.Board = new function() {
 			ctx.lineTo(self.x1, self.y0+i*self.side);
 			ctx.stroke();
 		}
+		document.getElementById("debugDiv").innerHTML = "drawn";
 	}
 	
 	self.deleteTile = function(x,y, color) {
@@ -108,7 +112,7 @@ GLOBAL.Board = new function() {
 
 function clickedOnBoard() {
 	var data = GLOBAL.coords.board
-	var [mix,miy] = GLOBAL.Board.coordsOf(GLOBAL.mouse.x, GLOBAL.mouse.y);
+	var [mix,miy] = GLOBAL.BoardInstance.coordsOf(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	
 	if (GLOBAL.action.turn == -1) {
 		prepareGame();
@@ -130,8 +134,8 @@ function clickedOnBoard() {
 	drawStone(stone, pn);
 	
 	// move stone to board
-	GLOBAL.Board.set(mix, miy, stone);
-	GLOBAL.Board.drawTile(mix,miy);
+	GLOBAL.BoardInstance.set(mix, miy, stone);
+	GLOBAL.BoardInstance.drawTile(mix,miy);
 	
 	startFlood(mix, miy);
 	
