@@ -112,9 +112,9 @@ GLOBAL.FloodCheck = function() {
 				attackStack.push(victim);
 			}
 			
-			if (attackStack.length>0 && stone.ix==sx && stone.iy==sy) {
-				GLOBAL.BoardInstance.startTileBlinking(stone.ix, stone.iy);
-			}
+//			if (attackStack.length>0 && stone.ix==sx && stone.iy==sy) {
+//				GLOBAL.BoardInstance.startTileBlinking(stone.ix, stone.iy);
+//			}
 				
 		}
 	}

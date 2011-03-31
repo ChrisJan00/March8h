@@ -4,7 +4,6 @@ function computerPlay() {
 	var pn = GLOBAL.action.turn-1;
 	var decisionExp = 5;
 	
-	maximizeEntropy = false;
 	self.availableCount = GLOBAL.Piles[pn].stoneCount;
 	
 	self.computeStones = function() {
@@ -37,7 +36,7 @@ function computerPlay() {
 					var score = 0;
 					if (self.typeCount[color]<=0)
 						continue;
-					if (maximizeEntropy && self.typeCount[color]<self.maxCount)
+					if (GLOBAL.maximizeEntropy && self.typeCount[color]<self.maxCount)
 						continue;
 					// count defense
 					if (self.isDefended(ix, iy, color, pn)) {
