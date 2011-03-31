@@ -1,3 +1,14 @@
+// Todo: 
+// logic class
+// AI as a class?
+// blinking attacker
+// gradual flood
+// game mode menu
+// "restart/menu" at endgame
+// action.turn number
+// AI random starter
+// illuminate pile current turn
+// variable sizes
 
 function preload() {
 	//images
@@ -10,13 +21,13 @@ function preload() {
 	GLOBAL.imageWind = new Image();
 	GLOBAL.imageWind.src = "graphics/air.png";
 	GLOBAL.fireAnimation = new Image();
-	GLOBAL.fireAnimation.src = "graphics/strip_fire-wind.png";
-	GLOBAL.earthAnimation = new Image();
-	GLOBAL.earthAnimation.src = "graphics/strip_earth-water.png";
-	GLOBAL.waterAnimation = new Image();
-	GLOBAL.waterAnimation.src = "graphics/strip_water-fire.png";
-	GLOBAL.airAnimation = new Image();
-	GLOBAL.airAnimation.src = "graphics/strip_wind-earth.png";
+ 	GLOBAL.fireAnimation.src = "graphics/strip_fire-wind.png";
+ 	GLOBAL.earthAnimation = new Image();
+ 	GLOBAL.earthAnimation.src = "graphics/strip_earth-water.png";
+ 	GLOBAL.waterAnimation = new Image();
+ 	GLOBAL.waterAnimation.src = "graphics/strip_water-fire.png";
+ 	GLOBAL.airAnimation = new Image();
+ 	GLOBAL.airAnimation.src = "graphics/strip_wind-earth.png";
 }
 
 function imagesLoaded() {
@@ -25,9 +36,9 @@ function imagesLoaded() {
 		&& GLOBAL.imageEarth.complete
 		&& GLOBAL.imageWind.complete
 		&& GLOBAL.fireAnimation.complete
-		&& GLOBAL.waterAnimation.complete
-		&& GLOBAL.earthAnimation.complete
-		&& GLOBAL.airAnimation.complete;
+ 		&& GLOBAL.waterAnimation.complete
+ 		&& GLOBAL.earthAnimation.complete
+ 		&& GLOBAL.airAnimation.complete;
 }
 
 function prepareGame()
@@ -42,6 +53,7 @@ function prepareGame()
 	GLOBAL.canvasHeight = GLOBAL.gameCanvas.height;
 	
 	GLOBAL.animationDelay = 250;
+	GLOBAL.framesPerStrip = 4;
 	
 	GLOBAL.action = {
 		turn:1,
@@ -49,33 +61,9 @@ function prepareGame()
 	};
 	GLOBAL.pile = {};
 	
+	GLOBAL.BoardInstance = new GLOBAL.BoardClass();
 
 	GLOBAL.coords = {
-		pile : [
-			{
-				border : 10,
-				side : 50,
-				x0 : 25,
-				y0 : 10,
-				rows: 9,
-				cols: 2
-			},
-			{
-				border : 10,
-				side : 50,
-				x0 : 495,
-				y0 : 10,
-				rows: 9,
-				cols: 2
-			},
-		],
-		board : {
-			x0 : 160,
-			y0 : 70,
-			side : 50,
-			rows : 6,
-			cols : 6
-		},
 		text : {
 			x0: 160,
 			y0: 15,
@@ -83,76 +71,53 @@ function prepareGame()
 			height: 52
 		}
 	};
-	initBoard();
-	GLOBAL.stoneCount = GLOBAL.coords.board.rows * GLOBAL.coords.board.cols;
+
+	GLOBAL.computerEnabled = true;
+	GLOBAL.computerDelay = 1000;//1500;
+	GLOBAL.maximizeEntropy = false;
+	GLOBAL.defenseMode = true;
 	
 	// start with an empty background
-	clear();
-	drawBoard();
-	drawPile(0);
-	drawPile(1);
-	chooseTiles(1);
-	chooseTiles(2);
-	countMarkers();
-	showPlayer();
-	showOrder();
+	//clearCanvas();
+	initPiles();
+	//GLOBAL.BoardInstance.drawEmpty();
 	
+	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
+	GLOBAL.floodCheck.countMarkers();
+	//showPlayer();
+	//showOrder();	
+
 	// clicking on the board
 	GLOBAL.mouse = {
 		x : 0,
 		y : 0,
 		button : false
 	};
-		
+	
+	GLOBAL.exitOption = new GLOBAL.ExitOption();
+	
+	enableTurn();
 }
+
+function drawInitialGame() {
+	clearCanvas();
+	GLOBAL.Piles[0].drawFromScratch();
+	GLOBAL.Piles[1].drawFromScratch();
+	GLOBAL.BoardInstance.drawEmpty();
+	showPlayer();
+	showOrder();
+	GLOBAL.exitOption.redraw();
+	enableTurn();
+}
+
 function connectMouse() {
 	GLOBAL.gameCanvas.addEventListener('mousedown', mouseDown, false);
     GLOBAL.gameCanvas.addEventListener('mousemove', mouseMove, false);
     GLOBAL.gameCanvas.addEventListener('mouseup',   mouseUp, false);
 }
 
-function initBoard() {
-	GLOBAL.board = {};
-	for (var i=0; i<GLOBAL.coords.board.cols; i++) {
-		GLOBAL.board[i] = {};
-	}
-}
-
 function randint(n) {
 	return Math.floor(Math.random() * n);
-}
-
-function chooseTiles(playernum) {
-	var pn = playernum-1;
-	if (pn<0) return;
-	if (pn>1) return;
-	
-	var data = GLOBAL.coords.pile[pn];
-	GLOBAL.pile[pn] = new Array();
-	for (var i=0;i<data.rows*data.cols;i++) {
-		var st = {
-			ix : Math.floor(i/data.rows),
-			iy : Math.floor(i%data.rows),
-			bgColor : "#FFFFFF",
-			visible: true,
-			selected: false,
-			element: 0,
-			owner : playernum
-		}
-		st.element = randint(4);
-		
-		GLOBAL.pile[pn].push(st);
-		drawStone(st, pn);
-	}
-}
-
-function colorForCode(code) {
-	switch( code ) {
-			case 0: return "#FF0000"; break;
-			case 1: return "#00FF00"; break;
-			case 2: return "#0000FF"; break;
-			case 3: return "#FFFF00"; break;
-		}
 }
 
 function mouseDown( ev ) {
@@ -160,147 +125,68 @@ function mouseDown( ev ) {
 	
 	mouseMove( ev );
 	
-	if (GLOBAL.mouse.x >= GLOBAL.coords.pile[0].x0 
-		 && GLOBAL.mouse.x <= GLOBAL.coords.pile[0].x0 + GLOBAL.coords.pile[0].cols * GLOBAL.coords.pile[0].side
-		 && GLOBAL.mouse.y >= GLOBAL.coords.pile[0].y0 
-		 && GLOBAL.mouse.y <= GLOBAL.coords.pile[0].y0 + GLOBAL.coords.pile[0].rows * GLOBAL.coords.pile[0].side)
-		clickedOnPile(0);
-	else if (GLOBAL.mouse.x >= GLOBAL.coords.pile[1].x0 
-		 && GLOBAL.mouse.x <= GLOBAL.coords.pile[1].x0 + GLOBAL.coords.pile[1].cols * GLOBAL.coords.pile[1].side
-		 && GLOBAL.mouse.y >= GLOBAL.coords.pile[1].y0 
-		 && GLOBAL.mouse.y <= GLOBAL.coords.pile[1].y0 + GLOBAL.coords.pile[1].rows * GLOBAL.coords.pile[1].side)
-		clickedOnPile(1);
-	else if (GLOBAL.mouse.x >= GLOBAL.coords.board.x0 
-		 && GLOBAL.mouse.x <= GLOBAL.coords.board.x0 + GLOBAL.coords.board.cols * GLOBAL.coords.board.side
-		 && GLOBAL.mouse.y >= GLOBAL.coords.board.y0 
-		 && GLOBAL.mouse.y <= GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side)
-		clickedOnBoard();
-}
-
-function clickedOnPile(pilenum) {
-	var data = GLOBAL.coords.pile[pilenum];
-	var mix = Math.floor((GLOBAL.mouse.x - data.x0)/data.side);
-	var miy = Math.floor((GLOBAL.mouse.y - data.y0) / data.side);
-	var index = mix*data.rows + miy;
-
-	if (GLOBAL.action.turn != pilenum+1)
+	if (GLOBAL.menu.active) {
+		GLOBAL.menu.mouseDown(ev);
 		return;
+	}
 		
-	var pn = pilenum;
-	var oldIndex = GLOBAL.action.selection;
-	if (GLOBAL.action.selection != -1) {
-		var oldStone = GLOBAL.pile[pn][GLOBAL.action.selection];
-		if (oldStone.visible) {
-			GLOBAL.action.selection = -1;
-			oldStone.selected = false;
-			oldStone.bgColor = "#FFFFFF";
-			drawStone(oldStone, pilenum);
-		}
-	}
 	
-	if (oldIndex != index) {
-		var newStone = GLOBAL.pile[pn][index];
-		if (newStone.visible) {
-			GLOBAL.action.selection = index;
-			newStone.selected = true;
-			newStone.bgColor = colorForPlayer(pn);
-			drawStone(newStone, pilenum);
-		}
-	}
-}
-
-function clickedOnBoard() {
-	var data = GLOBAL.coords.board
-	var mix = Math.floor((GLOBAL.mouse.x - data.x0)/data.side);
-	var miy = Math.floor((GLOBAL.mouse.y - data.y0)/data.side);
+	GLOBAL.exitOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	
-	if (GLOBAL.action.turn==-1) {
+	if (!GLOBAL.turnEnabled)
+		return;
+	
+	if (GLOBAL.action.turn == -1) {
 		prepareGame();
+		drawInitialGame();
 		return;
 	}
-	// no selection?
-	if (GLOBAL.action.selection == -1)
-		return;
+	
+	if (GLOBAL.action.turn==1 || !GLOBAL.computerEnabled)
+		manageTurn();
+	
+}
+
+function enableTurn()
+{
+	GLOBAL.turnEnabled = true;
+	GLOBAL.exitOption.activate();
+	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 2) {
+		setTimeout(manageTurn, GLOBAL.computerDelay);
+	}
+}
+
+function disableTurn()
+{
+	GLOBAL.turnEnabled = false;
+}
+
+function manageTurn()
+{
+	var turnIsReady = false;
+	
+	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 2) {
+		turnIsReady = computerPlay();
+	} else {
+		if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+			GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+		else if (GLOBAL.Piles[1].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+			GLOBAL.Piles[1].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+		else if (GLOBAL.BoardInstance.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+	 		turnIsReady = GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+ 	}
+ 		
+ 	if (turnIsReady) {	
+ 		GLOBAL.floodCheck.countMarkers();
+		GLOBAL.action.turn = 3-GLOBAL.action.turn;
 		
-	// place taken?
-	if (GLOBAL.board[mix][miy])
-		return;
-	
-	// undraw stone in player pile
-	var pn = GLOBAL.action.turn - 1;
-	var stone = GLOBAL.pile[pn][GLOBAL.action.selection];
-	stone.visible = false;
-	stone.bgColor = "#FFFFFF";
-	drawStone(stone, pn);
-	
-	// move stone to board
-	var newStone = {
-		ix: mix,
-		iy: miy,
-		bgColor : 0,
-		visible : true,
-		element: stone.element,
-		owner : stone.owner
-		};
- 	newStone.bgColor = colorForPlayer(pn);
-	drawStone(newStone, 2);
-	GLOBAL.board[mix][miy] = newStone;
-	
-	startFlood(mix, miy);
-	
-	GLOBAL.action.selection = -1;
-	countMarkers();
-	GLOBAL.action.turn = 3-GLOBAL.action.turn;
-	if (--GLOBAL.stoneCount) {
-		showPlayer();
-	} else {
-		checkVictory();
-	}
-}
-
-function countMarkers() {
-	GLOBAL.counts = {};
-	GLOBAL.counts[0] = 0;
-	GLOBAL.counts[1] = 0;
-	for (var i=0; i<GLOBAL.coords.board.cols; i++)
-		for (var j=0; j<GLOBAL.coords.board.rows; j++) {
-			if (GLOBAL.board[i][j]) {
-				GLOBAL.counts[ GLOBAL.board[i][j].owner - 1 ]++;
-			}
+		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
+			showPlayer();
+		} else {
+			checkVictory();
 		}
-}
-
-function checkVictory() {
-	var data = GLOBAL.coords.text
-	GLOBAL.action.turn = -1;
-	var counts = GLOBAL.counts;
-	var victory1 = counts[0]>counts[1];
-	
-	var ctx = GLOBAL.gameContext;
-	ctx.fillStyle = "#FFFFFF";
-	ctx.fillRect(data.x0,data.y0,data.width,data.height);
-	var pn = GLOBAL.action.turn - 1;
-	ctx.font = "bold 24px sans-serif";
-	
-	ctx.fillStyle = colorForPlayer(0);
-	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(1);
-	ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(pn);
-	
-	var msg;
-	if (counts[0]>counts[1]) {
-		ctx.fillStyle = colorForPlayer(0);
-		msg = "purple won!";
-	} else if (counts[0] < counts[1]) {
-		ctx.fillStyle = colorForPlayer(1);
-		msg = "orange won!";
-	} else {
-		ctx.fillStyle = "#000000";
-		msg = "Tie game";
+		
 	}
-	var msglen = ctx.measureText(msg);
-	ctx.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
 }
 
 function mouseUp( ev ) {
@@ -318,216 +204,10 @@ function mouseMove( ev ) {
 
 }
 
-function clear() {
+function clearCanvas() {
 	GLOBAL.gameContext.fillStyle = "#FFFFFF";
 	GLOBAL.gameContext.fillRect(0, 0, GLOBAL.gameCanvas.width, GLOBAL.gameCanvas.height);
 	
-}
-function drawBoard()
-{
-	var data = GLOBAL.coords.board
-	var x0 = data.x0;
-	var y0 = data.y0;
-	var side = data.side;
-	var ctx = GLOBAL.gameContext;
-	ctx.strokeStyle = "#000000"
-	for (var i=0;i<=data.cols;i++) {
-		ctx.beginPath();
-		ctx.moveTo(x0 + i*side, y0);
-		ctx.lineTo(x0 + i*side, y0 + side*data.rows);
-		ctx.stroke();
-	}
-	
-	for (var i=0;i<=data.rows;i++) {
-		ctx.beginPath();
-		ctx.moveTo(x0, y0+i*side);
-		ctx.lineTo(x0 + side*data.cols, y0+i*side);
-		ctx.stroke();
-	}
-}
-
-function drawPile(n) 
-{
-	var data = GLOBAL.coords.pile[n];
-	var x0 = data.x0;
-	var y0 = data.y0;
-	var side = data.side;
-	var border = data.border;
-	var ctx = GLOBAL.gameContext;
-	var width = side*data.cols;
-	var height = side*data.rows;
-	
-	ctx.fillStyle = colorForPlayer(n);
-	ctx.fillRect(x0-border, y0 - border, width + 2*border, height + 2*border);
-	ctx.fillStyle = "#FFFFFF";
-	ctx.fillRect(x0,y0,width,height);
-	
-	ctx.strokeStyle = "#000000"
-	for (var i=0;i<=data.rows;i++) {
-		ctx.beginPath();
-		ctx.moveTo(x0, y0+i*side);
-		ctx.lineTo(x0 + side*data.cols, y0+i*side);
-		ctx.stroke();
-	}
-	
-	for (var i=0;i<=data.cols;i++) {
-		ctx.beginPath();
-		ctx.moveTo(x0 + i*side, y0);
-		ctx.lineTo(x0 + i*side, y0 + side*data.rows);
-		ctx.stroke();
-	}
-}
-
-function drawStone(stone, where) {
-	var x0, y0, ix, iy;
-	switch (where) {
-		case 2: { // board
-			x0 = GLOBAL.coords.board.x0;
-			y0 = GLOBAL.coords.board.y0;
-			break;
-		}
-		case 0: { // pile left
-			x0 = GLOBAL.coords.pile[0].x0;
-			y0 = GLOBAL.coords.pile[0].y0;
-			break;
-		}
-		case 1: { // pile right
-			x0 = GLOBAL.coords.pile[1].x0;
-			y0 = GLOBAL.coords.pile[1].y0;
-			break;
-		}
-	}
-	
-	ix = stone.ix;
-	iy = stone.iy;
-	
-	// draw background
-	var ctx = GLOBAL.gameContext;
-	ctx.fillStyle = stone.bgColor;
-	ctx.strokeStyle = "#000000";
-	ctx.beginPath();
-	ctx.moveTo(x0 + ix*50, y0+iy*50);
-	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50);
-	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50+50);
-	ctx.lineTo(x0 + ix*50, y0+iy*50+50);
-	ctx.closePath();
-	ctx.fill();
-	ctx.stroke();
-	
-	if (stone.visible) {
-		// draw stone
-		switch (stone.element){
-		case 0:{
-			ctx.drawImage(GLOBAL.imageFire,ix*50 + x0,iy*50 + y0);
-			break;
-			}
-		case 1:{
-			ctx.drawImage(GLOBAL.imageEarth,ix*50 + x0,iy*50 + y0);
-		 	break;
-			}
-		case 2:{
-			ctx.drawImage(GLOBAL.imageWater,ix*50 + x0,iy*50 + y0);
-		 	break;
-			}
-		case 3:{
-			ctx.drawImage(GLOBAL.imageWind,ix*50 + x0,iy*50 + y0);
-		 	break;
-			}
-		}
-	}
-}
-
-function drawStoneAnimated(stone,frame)
-{
-	var x0, y0, ix, iy;
-	x0 = GLOBAL.coords.board.x0;
-	y0 = GLOBAL.coords.board.y0;
-	
-	ix = stone.ix;
-	iy = stone.iy;
-	
-	// draw background
-	var ctx = GLOBAL.gameContext;
-	ctx.fillStyle = stone.bgColor;
-	ctx.strokeStyle = "#000000";
-	ctx.beginPath();
-	ctx.moveTo(x0 + ix*50, y0+iy*50);
-	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50);
-	ctx.lineTo(x0 + ix*50 + 50, y0+iy*50+50);
-	ctx.lineTo(x0 + ix*50, y0+iy*50+50);
-	ctx.closePath();
-	ctx.fill();
-	ctx.stroke();
-	
-	var whichAnimation;
-	switch(stone.element) {
-		case 0: whichAnimation = GLOBAL.fireAnimation; break;
-		case 1: whichAnimation = GLOBAL.earthAnimation; break;
-		case 2: whichAnimation = GLOBAL.waterAnimation; break;
-		case 3: whichAnimation = GLOBAL.airAnimation; break;
-	}
-	
-	var offset = frame * 50;
-	ctx.drawImage(whichAnimation, offset,0, 50, 50 ,ix*50 + x0,iy*50 + y0, 50, 50);
-	if (frame<3) {
-		setTimeout(function(){drawStoneAnimated(stone,frame+1)}, GLOBAL.animationDelay);
-	} else
-		drawStone(stone, 2);
-}
-
-function colorForPlayer(pn) {
-	return pn?"#FF8C00":"#9932CC";
-}
-function showPlayer() {
-	var data = GLOBAL.coords.text
-	var ctx = GLOBAL.gameContext;
-	ctx.fillStyle = "#FFFFFF";
-	ctx.fillRect(data.x0,data.y0,data.width,data.height);
-	var pn = GLOBAL.action.turn - 1;
-	ctx.font = "bold 24px sans-serif";
-	ctx.fillStyle = colorForPlayer(0);
-	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(1);
-	ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(pn);
-	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
-	var msg = (pn?"orange":"purple")+"'s turn";
-	var msglen = ctx.measureText(msg);
-	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2 );
-}
-
-function showOrder() {
-	// only arrows pointing to the right by now
-	var drawArrow = function(xfrom,yfrom,xto,yto) {
-		var ctx = GLOBAL.gameContext;
-		ctx.strokeStyle = "#000000";
-		ctx.beginPath();
-		ctx.moveTo(xfrom,yfrom);
-		ctx.lineTo(xto,yto);
-		ctx.lineTo(xto-6,yto-6);
-		ctx.moveTo(xto-6,yto+6);
-		ctx.lineTo(xto,yto);
-		ctx.stroke();
-	}
-	
-	var s = GLOBAL.coords.board.side
-	var width = s * GLOBAL.coords.board.cols
-	var b = Math.floor((width - 45 - 4*s)/10);
-	var al = 15;
-	var y = GLOBAL.coords.board.y0 + GLOBAL.coords.board.rows * GLOBAL.coords.board.side
-	
-	var x0 = GLOBAL.coords.board.x0
-	var y0 = y + 5
-	var y1 = y + GLOBAL.imageFire.height/2 + 5
-	var ctx = GLOBAL.gameContext;
-
-	ctx.drawImage(GLOBAL.imageFire, x0 + 2*b , y0);
-	drawArrow( x0 + 3*b + s, y1, x0 + 3*b + s + al, y1 );
-	ctx.drawImage(GLOBAL.imageWind, x0 + 4*b + s + al, y0);
-	drawArrow( x0 + 5*b + 2*s + al, y1, x0 + 5*b + 2*s + 2*al, y1 );
-	ctx.drawImage(GLOBAL.imageEarth, x0 + 6*b + 2*s + 2*al , y0);
-	drawArrow(x0 + 7*b + 3*s + 2*al, y1, x0 + 7*b + 3*s + 3*al, y1 );
-	ctx.drawImage(GLOBAL.imageWater, x0 + 8*b + 3*s + 3*al , y0);
 }
 
 function startGame()
@@ -543,133 +223,10 @@ function waitForImages()
 	else {
 		prepareGame();
 		connectMouse();
+		GLOBAL.menu = new GLOBAL.GameMenu();
+		GLOBAL.menu.create();
+		GLOBAL.menu.show();
+		//drawInitialGame();
+		//connectMouse();
 	}
-}
-
-//---------------------------------------------------------------------------------------------
-function startFlood(ix, iy) {
-	GLOBAL.floodFill = {}
-	for (var i=0;i<GLOBAL.coords.board.cols;i++) {
-		GLOBAL.floodFill[i] = {};
-		for (var j=0; j<GLOBAL.coords.board.rows; j++)
-			GLOBAL.floodFill[i][j] = true;
-	}
-	
-	var defended = checkDefense(ix, iy);
-	if (!defended)
-		checkAttack(ix, iy);
-}
-
-function checkDefense(ix, iy) {
-	
-	var stone = GLOBAL.board[ix][iy];
-	if (!stone)
-		return false;
-		
-	if (!GLOBAL.floodFill[ix][iy])
-		return false;
-		
-	var attacker = false;
-	
-	// left
-	if (ix>0 && GLOBAL.board[ix-1][iy] 
-		&& GLOBAL.board[ix-1][iy].owner != stone.owner 
-		&& tileWinsTile(GLOBAL.board[ix-1][iy].element, stone.element) )
-		attacker = GLOBAL.board[ix-1][iy];
-		
-	// right
-	else if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
-		&& GLOBAL.board[ix+1][iy].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix+1][iy].element, stone.element) )
-		attacker = GLOBAL.board[ix+1][iy];
-		
-	// up
-	else if (iy>0 && GLOBAL.board[ix][iy-1] 
-		&& GLOBAL.board[ix][iy-1].owner != stone.owner
-		&& tileWinsTile(GLOBAL.board[ix][iy-1].element, stone.element) )
-		attacker = GLOBAL.board[ix][iy-1];
-		
-	// down
-	else if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
-		&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-		&& tileWinsTile(GLOBAL.board[ix][iy+1].element, stone.element) )
-		attacker = GLOBAL.board[ix][iy+1];
-	
-	
-	if (attacker) {
-		convertStone( attacker, stone );
-		return true;
-	}		
-	return false;
-}
-
-function checkAttack(sx, sy) {
-	
-	if (!GLOBAL.board[sx][sy])
-		return;
-		
-	var attackStack = new Array();
-	
-	attackStack.push(GLOBAL.board[sx][sy]);
-	
-	while (attackStack.length) {
-		var stone = attackStack.shift();
-		var ix = stone.ix;
-		var iy = stone.iy;
-		
-		// left
-		if (ix>0 && GLOBAL.board[ix-1][iy] 
-			&& GLOBAL.board[ix-1][iy].owner != stone.owner && GLOBAL.floodFill[ix-1][iy] 
-			&& tileWinsTile(stone.element, GLOBAL.board[ix-1][iy].element) ) {
-				convertStone(stone, GLOBAL.board[ix-1][iy]);
-				attackStack.push(GLOBAL.board[ix-1][iy]);
-		}
-		
-		
-		// right
-		if (ix<GLOBAL.coords.board.cols-1 && GLOBAL.board[ix+1][iy] 
-			&& GLOBAL.board[ix+1][iy].owner != stone.owner && GLOBAL.floodFill[ix+1][iy]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix+1][iy].element) ) {
-				convertStone(stone, GLOBAL.board[ix+1][iy]);
-				attackStack.push(GLOBAL.board[ix+1][iy]);
-		}
-		
-		// up
-		if (iy>0 && GLOBAL.board[ix][iy-1] 
-			&& GLOBAL.board[ix][iy-1].owner != stone.owner && GLOBAL.floodFill[ix][iy-1]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy-1].element) ) {
-				convertStone(stone, GLOBAL.board[ix][iy-1]);
-				attackStack.push(GLOBAL.board[ix][iy-1]);
-		}
-		
-		// down
-		if (iy<GLOBAL.coords.board.rows-1 && GLOBAL.board[ix][iy+1] 
-			&& GLOBAL.board[ix][iy+1].owner != stone.owner && GLOBAL.floodFill[ix][iy+1]
-			&& tileWinsTile(stone.element, GLOBAL.board[ix][iy+1].element) ) {
-				convertStone(stone, GLOBAL.board[ix][iy+1]);
-				attackStack.push(GLOBAL.board[ix][iy+1]);
-		}
-	
-	}
-}
-
-function tileWinsTile(elemAtk, elemDef) {
-	if (elemAtk == 0 && elemDef == 3) return true;
-	if (elemAtk == 1 && elemDef == 2) return true;
-	if (elemAtk == 2 && elemDef == 0) return true;
-	if (elemAtk == 3 && elemDef == 1) return true;
-	return false;
-}
-
-function convertStone(from, to) {
-	if (!GLOBAL.floodFill[to.ix][to.iy])
-		return;
-		
-	to.element = from.element;
-	to.owner = from.owner;
-	to.bgColor = from.bgColor;
-	GLOBAL.floodFill[to.ix][to.iy] = false;
-	
-	//drawStone(to, 2);
-	setTimeout(function(){drawStoneAnimated(to,0)}, GLOBAL.animationDelay);
 }

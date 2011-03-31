@@ -35,9 +35,9 @@ GLOBAL.OptionBox.prototype = {
 	}
 }
 
-GLOBAL.PlayerOption = function() {
-	this.x0 = 610;
-	this.y0 = 15;
+GLOBAL.PlayerOption = function(x,y) {
+	this.x0 = x?x:610;
+	this.y0 = y?y:15;
 }
 GLOBAL.PlayerOption.prototype = new GLOBAL.OptionBox;
 GLOBAL.PlayerOption.prototype.activate = function() {
@@ -47,9 +47,9 @@ GLOBAL.PlayerOption.prototype.activate = function() {
 	}
 	GLOBAL.computerEnabled = !this.option;
 }
-GLOBAL.ComputerEasyOption = function() {
-	this.x0 = 610;
-	this.y0 = 60;
+GLOBAL.ComputerEasyOption = function(x,y) {
+	this.x0 = x?x:610;
+	this.y0 = y?y:60;
 }
 GLOBAL.ComputerEasyOption.prototype = new GLOBAL.OptionBox;
 GLOBAL.ComputerEasyOption.prototype.activate = function() {
@@ -61,9 +61,9 @@ GLOBAL.ComputerEasyOption.prototype.activate = function() {
 	}
 	GLOBAL.computerEnabled = this.option;
 }
-GLOBAL.ComputerMediumOption = function() {
-	this.x0 = 610;
-	this.y0 = 105;
+GLOBAL.ComputerMediumOption = function(x,y) {
+	this.x0 = x?x:610;
+	this.y0 = y?y:105;
 }
 GLOBAL.ComputerMediumOption.prototype = new GLOBAL.OptionBox;
 GLOBAL.ComputerMediumOption.prototype.activate = function() {
@@ -75,9 +75,9 @@ GLOBAL.ComputerMediumOption.prototype.activate = function() {
 	}
 	GLOBAL.computerEnabled = this.option;
 }
-GLOBAL.DefenseModeOption = function() {
-	this.x0 = 610;
-	this.y0 = 150;
+GLOBAL.DefenseModeOption = function(x,y) {
+	this.x0 = x? x:610;
+	this.y0 = y? y:150;
 }
 GLOBAL.DefenseModeOption.prototype = new GLOBAL.OptionBox;
 GLOBAL.DefenseModeOption.prototype.activate = function() {

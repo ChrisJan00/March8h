@@ -120,7 +120,7 @@ function initPiles()
 	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 2);
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
-	GLOBAL.Piles[0].drawFromScratch();
-	GLOBAL.Piles[1].drawFromScratch();
+	//GLOBAL.Piles[0].drawFromScratch();
+	//GLOBAL.Piles[1].drawFromScratch();
 }
 

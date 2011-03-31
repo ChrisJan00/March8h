@@ -78,14 +78,14 @@ function prepareGame()
 	GLOBAL.defenseMode = true;
 	
 	// start with an empty background
-	clearCanvas();
+	//clearCanvas();
 	initPiles();
-	GLOBAL.BoardInstance.drawEmpty();
+	//GLOBAL.BoardInstance.drawEmpty();
 	
 	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
 	GLOBAL.floodCheck.countMarkers();
-	showPlayer();
-	showOrder();	
+	//showPlayer();
+	//showOrder();	
 
 	// clicking on the board
 	GLOBAL.mouse = {
@@ -105,6 +105,22 @@ function prepareGame()
 	enableTurn();
 		
 }
+
+function drawInitialGame() {
+	clearCanvas();
+	GLOBAL.Piles[0].drawFromScratch();
+	GLOBAL.Piles[1].drawFromScratch();
+	GLOBAL.BoardInstance.drawEmpty();
+	showPlayer();
+	showOrder();
+	enableTurn();
+	
+	GLOBAL.playerOption.redraw();
+	GLOBAL.computerEasyOption.redraw();
+	GLOBAL.computerMediumOption.redraw();
+	GLOBAL.defenseModeOption.redraw();
+}
+
 function connectMouse() {
 	GLOBAL.gameCanvas.addEventListener('mousedown', mouseDown, false);
     GLOBAL.gameCanvas.addEventListener('mousemove', mouseMove, false);
@@ -130,6 +146,7 @@ function mouseDown( ev ) {
 	
 	if (GLOBAL.action.turn == -1) {
 		prepareGame();
+		drawInitialGame();
 		return;
 	}
 	
@@ -212,6 +229,7 @@ function waitForImages()
 		setTimeout(waitForImages, 500);
 	else {
 		prepareGame();
+		drawInitialGame();
 		connectMouse();
 	}
 }

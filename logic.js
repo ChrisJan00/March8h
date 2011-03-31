@@ -133,7 +133,7 @@ GLOBAL.FloodCheck = function() {
 		
 		var delay = to.step*GLOBAL.animationDelay;
 		setTimeout(function(){GLOBAL.BoardInstance.startTileAnimation(to.ix, to.iy);}, delay);
-		self.turnDelay = Math.max(self.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+1) + delay);
+		self.turnDelay = Math.max(self.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2) + delay);
 	}
 	
 	self.tileWinsTile = function(elemAtk, elemDef) {
