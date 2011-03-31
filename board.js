@@ -58,8 +58,8 @@ GLOBAL.Board = new function() {
 		ctx.stroke();
 	}
 	
-	self.drawTile = function(x,y,tile) {
-		
+	self.drawTile = function(x,y) {
+		drawStone(self.contents[x][y], 2);
 	}
 	
 	self.animateTile = function(x,y,tile) {
@@ -68,7 +68,16 @@ GLOBAL.Board = new function() {
 	
 	// update functions
 	self.set = function(x,y, stone) {
-		self.contents[x][y] = stone;
+		var newStone = {
+			ix: x,
+			iy: y,
+			bgColor : 0,
+			visible : true,
+			element: stone.element,
+			owner : stone.owner
+		};
+	 	newStone.bgColor = colorForPlayer(stone.owner-1);
+		self.contents[x][y] = newStone;
 		stone.ix = x;
 		stone.iy = y;
 	}
@@ -121,17 +130,8 @@ function clickedOnBoard() {
 	drawStone(stone, pn);
 	
 	// move stone to board
-	var newStone = {
-		ix: mix,
-		iy: miy,
-		bgColor : 0,
-		visible : true,
-		element: stone.element,
-		owner : stone.owner
-		};
- 	newStone.bgColor = colorForPlayer(pn);
-	drawStone(newStone, 2);
-	GLOBAL.board[mix][miy] = newStone;
+	GLOBAL.Board.set(mix, miy, stone);
+	GLOBAL.Board.drawTile(mix,miy);
 	
 	startFlood(mix, miy);
 	

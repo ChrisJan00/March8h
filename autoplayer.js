@@ -2,6 +2,9 @@
 function computerPlay() {
 	var self = this;
 	var pn = GLOBAL.action.turn-1;
+	var decisionExp = 5;
+	
+	maximizeEntropy = false;
 	
 	self.computeStones = function() {
 		self.typeCount = [0,0,0,0];
@@ -17,7 +20,10 @@ function computerPlay() {
 	
 	self.computeEntropies = function() {
 		self.entropies = [0,0,0,0];
+		self.maxCount = 0;
 		for (var i=0;i<4;i++) {
+			if (self.typeCount[i]>self.maxCount)
+				self.maxCount = self.typeCount[i];
 			self.typeCount[i]--;
 			for (var j=0;j<4;j++)
 				if (self.typeCount[j]>0) {
@@ -38,9 +44,11 @@ function computerPlay() {
 					var score = 0;
 					if (self.typeCount[color]<=0)
 						continue;
+					if (maximizeEntropy && self.typeCount[color]<self.maxCount)
+						continue;
 					// count defense
 					if (self.isDefended(ix, iy, color, pn)) {
-						score = -1; // - self.countNeighbours(ix,iy,color, pn+1);
+						score = 0; // - self.countNeighbours(ix,iy,color, pn+1);
 					} else {
 						score = 1 + self.countNeighbours(ix,iy,colorWonBy(color),2-pn);
 					}
@@ -101,17 +109,10 @@ function computerPlay() {
 	}
 	
 	self.normalizeScores = function() 
-	{
-		var minScore = 0;
-		for (var i=0;i<self.options.length;i++) {
-			if (self.options[i][3] < minScore)
-				minScore = self.options[i][3];
-		}
-		
+	{	
 		self.totalScore = 0;
 		for (var i=0; i<self.options.length;i++) {
-			self.options[i][3] += 1 - minScore; // make minimum 1
-			self.options[i][3] = Math.pow(self.options[i][3] * self.entropies[self.options[i][2]], 4);
+			self.options[i][3] = Math.pow((self.options[i][3]+1) * self.entropies[self.options[i][2]] * 0.5, decisionExp);
 			self.totalScore += self.options[i][3];
 		}
 	}
