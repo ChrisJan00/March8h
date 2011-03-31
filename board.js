@@ -1,8 +1,6 @@
 GLOBAL.BoardClass = function() {
 	var self = this;
 	
-	//document.getElementById("debugDiv").innerHTML = "boardinstance";
-	
 	self.x0 = 160;
 	self.y0 = 70;
 	self.side = 50;
@@ -16,7 +14,6 @@ GLOBAL.BoardClass = function() {
 		
 	// draw functions
 	self.drawEmpty = function() {
-		document.getElementById("debugDiv").innerHTML = "drawEmpty";
 		var ctx = GLOBAL.gameContext;
 		
 		ctx.fillStyle = "#FFFFFF";
@@ -28,7 +25,6 @@ GLOBAL.BoardClass = function() {
 		ctx.closePath();
 		ctx.fill();	
 		
-		document.getElementById("debugDiv").innerHTML = "erased";
 		ctx.strokeStyle = "#000000"
 		for (var i=0;i<=self.cols;i++) {
 			ctx.beginPath();
@@ -43,7 +39,6 @@ GLOBAL.BoardClass = function() {
 			ctx.lineTo(self.x1, self.y0+i*self.side);
 			ctx.stroke();
 		}
-		document.getElementById("debugDiv").innerHTML = "drawn";
 	}
 	
 	self.deleteTile = function(x,y, color) {
@@ -72,6 +67,8 @@ GLOBAL.BoardClass = function() {
 	
 	// update functions
 	self.set = function(x,y, stone) {
+		stone.ix = x;
+		stone.iy = y;
 		var newStone = {
 			ix: x,
 			iy: y,
@@ -82,8 +79,7 @@ GLOBAL.BoardClass = function() {
 		};
 	 	newStone.bgColor = colorForPlayer(stone.owner-1);
 		self.contents[x][y] = newStone;
-		stone.ix = x;
-		stone.iy = y;
+		GLOBAL.board[x][y] = newStone;
 	}
 	
 	self.get = function(x,y) {
@@ -112,7 +108,9 @@ GLOBAL.BoardClass = function() {
 
 function clickedOnBoard() {
 	var data = GLOBAL.coords.board
-	var [mix,miy] = GLOBAL.BoardInstance.coordsOf(GLOBAL.mouse.x, GLOBAL.mouse.y);
+	var boardCoords = GLOBAL.BoardInstance.coordsOf(GLOBAL.mouse.x, GLOBAL.mouse.y);
+	var mix = boardCoords[0];
+	var miy = boardCoords[1];
 	
 	if (GLOBAL.action.turn == -1) {
 		prepareGame();

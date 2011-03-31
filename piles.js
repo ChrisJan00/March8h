@@ -143,8 +143,8 @@ function initPiles()
 	GLOBAL.Piles[0] = new GLOBAL.Pile();
 	GLOBAL.Piles[1] = new GLOBAL.Pile();
 	
-	Piles[1].bgColor = colorForPlayer(1);
-	Piles[1].setPos(495,10);
+	GLOBAL.Piles[1].bgColor = colorForPlayer(1);
+	GLOBAL.Piles[1].setPos(495,10);
 }
 
 initPiles();
