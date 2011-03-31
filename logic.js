@@ -3,11 +3,16 @@ GLOBAL.FloodCheck = function() {
 	var self = this;
 	
 	self.checkFlood = function(ix,iy) {
+		self.turnDelay = 0;
+		disableTurn();
+		
 		self.resetFloodMarkers();
 		
 		var defended = self.checkDefense(ix, iy);
 		if (!defended)
 			self.checkAttack(ix, iy);
+			
+		setTimeout(enableTurn, self.turnDelay);
 	}
 	
 	self.resetFloodMarkers = function() {
@@ -56,7 +61,9 @@ GLOBAL.FloodCheck = function() {
 			attacker = self.getAttacker(ix,iy+1, stone);
 		
 		if (attacker) {
+			self.turnDelay = GLOBAL.animationDelay * (GLOBAL.framesPerStrip+1);
 			self.convertStone( attacker, stone );
+			GLOBAL.BoardInstance.startTileBlinking(attacker.ix, attacker.iy);
 			return true;
 		}
 		
@@ -68,8 +75,12 @@ GLOBAL.FloodCheck = function() {
 		if (!GLOBAL.BoardInstance.get(sx,sy))
 			return;
 			
+		var floodDelay = 0;
+			
 		var attackStack = new Array();
 		
+		var initialStep = -1;
+		GLOBAL.BoardInstance.get(sx,sy).step = initialStep;
 		attackStack.push(GLOBAL.BoardInstance.get(sx,sy));
 		
 		while (attackStack.length) {
@@ -100,6 +111,11 @@ GLOBAL.FloodCheck = function() {
 				self.convertStone(stone,victim);
 				attackStack.push(victim);
 			}
+			
+			if (attackStack.length>0 && stone.ix==sx && stone.iy==sy) {
+				GLOBAL.BoardInstance.startTileBlinking(stone.ix, stone.iy);
+			}
+				
 		}
 	}
 	
@@ -110,9 +126,12 @@ GLOBAL.FloodCheck = function() {
 		to.element = from.element;
 		to.owner = from.owner;
 		to.bgColor = from.bgColor;
+		to.step = from.step+1;
 		self.floodFill[to.ix][to.iy] = false;
 		
-		GLOBAL.BoardInstance.startTileAnimation(to.ix, to.iy);
+		var delay = to.step*GLOBAL.animationDelay;
+		setTimeout(function(){GLOBAL.BoardInstance.startTileAnimation(to.ix, to.iy);}, delay);
+		self.turnDelay = Math.max(self.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+1) + delay);
 	}
 	
 	self.tileWinsTile = function(elemAtk, elemDef) {

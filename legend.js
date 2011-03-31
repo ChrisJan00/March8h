@@ -1,7 +1,11 @@
 
 function colorForPlayer(pn) {
-		return pn?"#FF8C00":"#9932CC";
-	}
+	return pn?"#FF8C00":"#9932CC";
+}
+
+function colorForPlayerWeak(pn) {
+	return pn?"#ff5400":"#6e0c9e";
+}
 
 function showPlayer() {
 	var data = GLOBAL.coords.text

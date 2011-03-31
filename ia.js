@@ -53,6 +53,7 @@ function prepareGame()
 	GLOBAL.canvasHeight = GLOBAL.gameCanvas.height;
 	
 	GLOBAL.animationDelay = 250;
+	GLOBAL.framesPerStrip = 4;
 	
 	GLOBAL.action = {
 		turn:1,
@@ -71,6 +72,9 @@ function prepareGame()
 		}
 	};
 
+	GLOBAL.computerEnabled = true;
+	GLOBAL.computerDelay = 1000;//1500;
+	
 	// start with an empty background
 	clearCanvas();
 	initPiles();
@@ -87,6 +91,8 @@ function prepareGame()
 		y : 0,
 		button : false
 	};
+	
+	enableTurn();
 		
 }
 function connectMouse() {
@@ -104,13 +110,46 @@ function mouseDown( ev ) {
 	
 	mouseMove( ev );
 	
+	if (!GLOBAL.turnEnabled)
+		return;
+	
+	if (GLOBAL.action.turn == -1) {
+		prepareGame();
+		return;
+	}
+	
+	if (GLOBAL.action.turn==1 || !GLOBAL.computerEnabled)
+		manageTurn();
+	
+}
+
+function enableTurn()
+{
+	GLOBAL.turnEnabled = true;
+	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 2) {
+		setTimeout(manageTurn, GLOBAL.computerDelay);
+	}
+}
+
+function disableTurn()
+{
+	GLOBAL.turnEnabled = false;
+}
+
+function manageTurn()
+{
 	var turnIsReady = false;
-	if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
-		GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
-	else if (GLOBAL.Piles[1].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
-		GLOBAL.Piles[1].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
-	else if (GLOBAL.BoardInstance.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
- 		turnIsReady = GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+	
+	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 2) {
+		turnIsReady = computerPlay();
+	} else {
+		if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+			GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+		else if (GLOBAL.Piles[1].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+			GLOBAL.Piles[1].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+		else if (GLOBAL.BoardInstance.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+	 		turnIsReady = GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+ 	}
  		
  	if (turnIsReady) {	
  		GLOBAL.floodCheck.countMarkers();
@@ -122,23 +161,24 @@ function mouseDown( ev ) {
 			checkVictory();
 		}
 		
-		if (GLOBAL.action.turn == 2) {
-			computerPlay();
-			
-			GLOBAL.floodCheck.countMarkers();
-		
-			if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
-				showPlayer();
-			} else {
-				checkVictory();
-			}
-			
-			if (GLOBAL.action.turn == 2) {
-				GLOBAL.action.turn = 1;
-				showPlayer();
-			}
-		}
 	}
+		//if (GLOBAL.action.turn == 2) {
+		//	computerPlay();
+			
+		//	GLOBAL.floodCheck.countMarkers();
+		
+		//	if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
+		//		showPlayer();
+		//	} else {
+		//		checkVictory();
+		//	}
+			
+		//	if (GLOBAL.action.turn == 2) {
+		//		GLOBAL.action.turn = 1;
+		//		showPlayer();
+		//	}
+		//}
+	//}
 }
 
 function mouseUp( ev ) {
@@ -161,36 +201,6 @@ function clearCanvas() {
 	GLOBAL.gameContext.fillRect(0, 0, GLOBAL.gameCanvas.width, GLOBAL.gameCanvas.height);
 	
 }
-
-function drawStoneAnimated(stone,frame)
-{
- 	var x0, y0, ix, iy;
- 	x0 = GLOBAL.coords.board.x0;
- 	y0 = GLOBAL.coords.board.y0;
- 	
- 	ix = stone.ix;
- 	iy = stone.iy;
- 	
- 	// draw background
- 	var ctx = GLOBAL.gameContext;
- 	GLOBAL.BoardInstance.redrawTileBackground(ix, iy);
- 	
- 	var whichAnimation;
- 	switch(stone.element) {
- 		case 0: whichAnimation = GLOBAL.fireAnimation; break;
- 		case 1: whichAnimation = GLOBAL.earthAnimation; break;
- 		case 2: whichAnimation = GLOBAL.waterAnimation; break;
- 		case 3: whichAnimation = GLOBAL.airAnimation; break;
- 	}
- 	
- 	var offset = frame * 50;
- 	ctx.drawImage(whichAnimation, offset,0, 50, 50 ,ix*50 + x0,iy*50 + y0, 50, 50);
- 	if (frame<3) {
- 		setTimeout(function(){drawStoneAnimated(stone,frame+1)}, GLOBAL.animationDelay);
- 	} else
- 		setTimeout(function(){GLOBAL.BoardInstance.redrawTile(stone.ix, stone.iy)}, GLOBAL.animationDelay);
- }
-
 
 function startGame()
 {

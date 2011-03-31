@@ -54,10 +54,13 @@ GLOBAL.StoneHolder.prototype = {
 		}
 	},
 	
-	redrawTileBackground : function(x,y) {
+	redrawTileBackground : function(x,y, col) {
 		var color = "#FFFFFF";
 		if (this.contents[x][y] && this.contents[x][y].active)
 			color = this.contents[x][y].bgColor;
+			
+		if (col)
+			color = col;
 				
 		var mx = this.x0 + x * this.side;
 		var my = this.y0 + y * this.side;
@@ -74,9 +77,9 @@ GLOBAL.StoneHolder.prototype = {
 		ctx.stroke();
 	},
 	
-	redrawTile : function(x,y) {
+	redrawTile : function(x,y,col) {
 		// if there is no tile, draw empty space
-		this.redrawTileBackground(x,y);
+		this.redrawTileBackground(x,y,col);
 		
 		stone = this.get(x,y);
 		if (stone && stone.visible) {
@@ -97,6 +100,27 @@ GLOBAL.StoneHolder.prototype = {
 			
 			GLOBAL.gameContext.drawImage(img, ix, iy);
 		}
+	},
+	
+	startTileBlinking : function(x,y) 
+	{
+		var self = this;
+		setTimeout(function(){self.blinkTile(x,y,GLOBAL.framesPerStrip * 2)}, GLOBAL.animationDelay/2);
+	},
+	
+	blinkTile : function(x,y,frame) 
+	{
+		var self = this;
+		var stone = this.get(x,y);
+		if (!stone) return;
+		
+		var color = frame%2? colorForPlayer(stone.owner-1) : colorForPlayerWeak(stone.owner-1);
+		this.redrawTile(x,y,color);
+		frame--;
+		if (frame)
+			setTimeout(function(){self.blinkTile(x,y,frame)}, GLOBAL.animationDelay);
+		else
+			this.redrawTile(x,y);
 	},
 	
 	startTileAnimation : function(x,y) 
@@ -127,7 +151,7 @@ GLOBAL.StoneHolder.prototype = {
 			
 	 	ctx.drawImage(whichAnimation, offset, 0, this.side, this.side, ix, iy, this.side, this.side);
 		var self = this;
-	 	if (frame<3) {
+	 	if (frame<GLOBAL.framesPerStrip-1) {
 	 		setTimeout(function(){self.animateTile(x, y, frame+1)}, GLOBAL.animationDelay);
 	 	} else {
 	 		setTimeout(function(){self.redrawTile(stone.ix, stone.iy)}, GLOBAL.animationDelay);
@@ -198,11 +222,6 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	var posInBoard = this.coordsOf( mx, my );
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
-	
-	if (GLOBAL.action.turn == -1) {
-		prepareGame();
-		return false;
-	}
 	
 	var currentPile = GLOBAL.Piles[GLOBAL.action.turn-1];
 	
