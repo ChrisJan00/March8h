@@ -10,6 +10,7 @@ GLOBAL.StoneHolder.prototype = {
 	x1 : 50,
 	y1 : 50,
 	contents : [],
+	stoneCount : 0,
 	
 	setDimensions : function( numCols, numRows, x0, y0 ) {
 		this.x0 = x0;
@@ -53,10 +54,8 @@ GLOBAL.StoneHolder.prototype = {
 	},
 	
 	redrawTileBackground : function(x,y) {
-		var color;
-		if ((!this.contents[x][y]) || (!this.contents[x][y].active))
-			color = "#FFFFFF";
-		else
+		var color = "#FFFFFF";
+		if (this.contents[x][y] && this.contents[x][y].active)
 			color = this.contents[x][y].bgColor;
 				
 		var mx = this.x0 + x * this.side;
@@ -117,12 +116,20 @@ GLOBAL.StoneHolder.prototype = {
 			owner : stone.owner
 		};
 	 	newStone.bgColor = colorForPlayer(stone.owner-1);
+	 	if (!this.contents[x][y])
+	 		this.stoneCount++;
 		this.contents[x][y] = newStone;
-//		GLOBAL.board[x][y] = newStone;
 	},
 	
 	get : function(x,y) {
 		return this.contents[x][y];
+	},
+	
+	del : function(x,y) {
+		if (this.contents[x][y]) {
+			this.contents[x][y] = false;
+			this.stoneCount--;
+		}
 	},
 	
 	clearContents : function() {
@@ -152,34 +159,35 @@ GLOBAL.BoardClass = function() {
 }
 GLOBAL.BoardClass.prototype = new GLOBAL.StoneHolder;
 
-function clickedOnBoard() {
-	var data = GLOBAL.coords.board
-	var boardCoords = GLOBAL.BoardInstance.coordsOf(GLOBAL.mouse.x, GLOBAL.mouse.y);
-	var mix = boardCoords[0];
-	var miy = boardCoords[1];
+GLOBAL.BoardClass.prototype.manageClicked = function( mx, my ) 
+{
+	var posInBoard = this.coordsOf( mx, my );
+	var mix = posInBoard[0];
+	var miy = posInBoard[1];
 	
 	if (GLOBAL.action.turn == -1) {
 		prepareGame();
 		return;
 	}
-	// no selection?
-	if (GLOBAL.action.selection == -1)
+	
+	var currentPile = GLOBAL.Piles[GLOBAL.action.turn-1];
+	
+	// place taken?
+	if (this.get(mix,miy))
 		return;
 		
-	// place taken?
-	if (GLOBAL.BoardInstance.get(mix,miy))
+	// no selection?
+	var stone = currentPile.selection;
+	if (!stone)
 		return;
-	
-	// undraw stone in player pile
-	var pn = GLOBAL.action.turn - 1;
-	var stone = GLOBAL.pile[pn][GLOBAL.action.selection];
-	stone.visible = false;
-	stone.bgColor = "#FFFFFF";
-	drawStone(stone, pn);
+		
+	currentPile.del(stone.ix, stone.iy);
+	currentPile.unSelect();
+	currentPile.redrawTile(stone.ix, stone.iy);
 	
 	// move stone to board
-	GLOBAL.BoardInstance.set(mix, miy, stone);
-	GLOBAL.BoardInstance.redrawTile(mix,miy);
+	this.set(mix, miy, stone);
+	this.redrawTile(mix,miy);
 	
 	startFlood(mix, miy);
 	
@@ -200,3 +208,4 @@ function clickedOnBoard() {
 		}
 	}
 }
+

@@ -1,4 +1,4 @@
-// Todo: Pile+Board prototypes
+// Todo: 
 // logic class
 // AI as a class?
 // blinking attacker
@@ -95,16 +95,14 @@ function prepareGame()
 			height: 52
 		}
 	};
-//	initBoard();
+
 	GLOBAL.stoneCount = GLOBAL.coords.board.rows * GLOBAL.coords.board.cols;
 	
 	// start with an empty background
 	clearCanvas();
+	initPiles();
 	GLOBAL.BoardInstance.drawEmpty();
-	drawPile(0);
-	chooseTiles(0);
-	drawPile(1);
-	chooseTiles(1);
+
 	countMarkers();
 	showPlayer();
 	showOrder();
@@ -123,13 +121,6 @@ function connectMouse() {
     GLOBAL.gameCanvas.addEventListener('mouseup',   mouseUp, false);
 }
 
-//function initBoard() {
-//	GLOBAL.board = {};
-//	for (var i=0; i<GLOBAL.coords.board.cols; i++) {
-//		GLOBAL.board[i] = {};
-//	}
-//}
-
 function randint(n) {
 	return Math.floor(Math.random() * n);
 }
@@ -139,18 +130,12 @@ function mouseDown( ev ) {
 	
 	mouseMove( ev );
 	
-	if (GLOBAL.mouse.x >= GLOBAL.coords.pile[0].x0 
-		 && GLOBAL.mouse.x <= GLOBAL.coords.pile[0].x0 + GLOBAL.coords.pile[0].cols * GLOBAL.coords.pile[0].side
-		 && GLOBAL.mouse.y >= GLOBAL.coords.pile[0].y0 
-		 && GLOBAL.mouse.y <= GLOBAL.coords.pile[0].y0 + GLOBAL.coords.pile[0].rows * GLOBAL.coords.pile[0].side)
-		clickedOnPile(0);
-	else if (GLOBAL.mouse.x >= GLOBAL.coords.pile[1].x0 
-		 && GLOBAL.mouse.x <= GLOBAL.coords.pile[1].x0 + GLOBAL.coords.pile[1].cols * GLOBAL.coords.pile[1].side
-		 && GLOBAL.mouse.y >= GLOBAL.coords.pile[1].y0 
-		 && GLOBAL.mouse.y <= GLOBAL.coords.pile[1].y0 + GLOBAL.coords.pile[1].rows * GLOBAL.coords.pile[1].side)
-		clickedOnPile(1);
+	if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+		GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+	else if (GLOBAL.Piles[1].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
+		GLOBAL.Piles[1].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	else if (GLOBAL.BoardInstance.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
- 		clickedOnBoard();
+ 		GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 }
 
 function mouseUp( ev ) {

@@ -5,17 +5,10 @@ function computerPlay() {
 	var decisionExp = 5;
 	
 	maximizeEntropy = false;
+	self.availableCount = GLOBAL.Piles[pn].stoneCount;
 	
 	self.computeStones = function() {
-		self.typeCount = [0,0,0,0];
-		self.availableCount = 0;
-		
-		var pileLimit = GLOBAL.coords.pile[pn].rows*GLOBAL.coords.pile[pn].cols;
-		for (var i=0;i<pileLimit; i++)
-			if (GLOBAL.pile[pn][i].visible) {
-				self.typeCount[GLOBAL.pile[pn][i].element]++;
-				self.availableCount++;
-			}
+		self.typeCount = GLOBAL.Piles[pn].countStoneTypes();
 	}
 	
 	self.computeEntropies = function() {
@@ -136,17 +129,15 @@ function computerPlay() {
 	
 	self.playThis = function(mix,miy,elem) {
 		// find one stone in own pile
-		var index = -1;
-		while (index<GLOBAL.pile[pn].length) {
-			if ((GLOBAL.pile[pn][++index].element == elem) && (GLOBAL.pile[pn][index].visible))
-				break;
-		}
 		
-		// undraw stone in player pile
-		var stone = GLOBAL.pile[pn][index];
-		stone.visible = false;
-		stone.bgColor = "#FFFFFF";
-		drawStone(stone, pn);
+		var currentPile = GLOBAL.Piles[pn];
+		
+		//currentPile.selection = GLOBAL.Piles[pn].getStoneByElement(elem);
+		var stone = currentPile.getStoneByElement(elem);
+		currentPile.del(stone.ix, stone.iy);
+		currentPile.redrawTile(stone.ix, stone.iy);
+		stone.active = true;
+
 		
 		GLOBAL.BoardInstance.set(mix,miy,stone);
 		GLOBAL.BoardInstance.redrawTile(mix,miy);
