@@ -1,12 +1,13 @@
 //---------------------------------------------------------------------------------------------
 GLOBAL.FloodCheck = function() {
 	var self = this;
+	self.board = GLOBAL.BoardInstance;
 	
 	self.checkFlood = function(ix,iy) {
 		self.turnDelay = 0;
 		disableTurn();
 		
-		self.resetFloodMarkers();
+		self.board = GLOBAL.BoardInstance;
 		
 		var defended = false;
 		if (GLOBAL.defenseMode) {
@@ -21,119 +22,115 @@ GLOBAL.FloodCheck = function() {
 		setTimeout(enableTurn, self.turnDelay);
 	}
 	
-	self.resetFloodMarkers = function() {
-		self.floodFill = {}
+	self.getNewFloodMarkers = function() {
+		var floodFill = {}
 		for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
-			self.floodFill[i] = {};
+			floodFill[i] = {};
 			for (var j=0; j<GLOBAL.BoardInstance.rows; j++)
-				self.floodFill[i][j] = true;
+				floodFill[i][j] = true;
 		}
+		return floodFill;
 	}
 	
-	self.getAttacker = function(ix,iy, stone) {
-		var candidate = GLOBAL.BoardInstance.get(ix,iy);
-		if (ix>=0 && ix<GLOBAL.BoardInstance.cols && iy>=0 && iy<GLOBAL.BoardInstance.rows &&
-			candidate && candidate.owner != stone.owner &&
-			self.tileWinsTile(candidate.element, stone.element) )
-			return candidate;
-		return false;
-	}
-	
-	self.getVictim = function(ix,iy, stone) {
-		var candidate = GLOBAL.BoardInstance.get(ix,iy);
-		if (ix>=0 && ix<GLOBAL.BoardInstance.cols && iy>=0 && iy<GLOBAL.BoardInstance.rows &&
-			candidate && candidate.owner != stone.owner && 
-			self.floodFill[ix][iy] && self.tileWinsTile(stone.element, candidate.element) )
-			return candidate;
-		return false;
-	}
-	
-	self.checkDefense = function(ix, iy) {
-		var stone = GLOBAL.BoardInstance.get(ix,iy);
+	self.findDefender = function(ix, iy) {
+		var stone = self.board.get(ix,iy);
 		if (!stone)
 			return false;
-			
-		if (!self.floodFill[ix][iy])
-			return false;
-			
+		
+		function getDefender(x,y) {
+			var candidate = self.board.get(x,y);
+			if (candidate && candidate.owner == ownerWanted && candidate.element == elemWanted)
+				return candidate;
+			else
+				return false;
+		}
+		
 		var attacker = false;
+		elemWanted = self.colorThatWins(stone.element);
+		ownerWanted = 1-stone.owner;
 		
-		attacker = self.getAttacker(ix-1,iy, stone);
-		if (!attacker)
-			attacker = self.getAttacker(ix+1,iy, stone);
-		if (!attacker)
-			attacker = self.getAttacker(ix,iy-1, stone);
-		if (!attacker)
-			attacker = self.getAttacker(ix,iy+1, stone);
-		
-		if (attacker) {
+		return getDefender(ix-1,iy) ||
+				   getDefender(ix+1,iy) || 
+				   getDefender(ix,iy-1) ||
+				   getDefender(ix,iy+1);
+	}
+	
+	self.checkDefense = function(x,y) {
+		defender = self.findDefender(x,y);
+		if (defender) {
 			self.turnDelay = Math.max(self.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2));
-			self.convertStone( attacker, stone );
-			GLOBAL.BoardInstance.startTileBlinking(attacker.ix, attacker.iy);
+			self.convertStone( defender, stone );
+			GLOBAL.BoardInstance.startTileBlinking(defender.ix, defender.iy);
 			return true;
 		}
 		
 		return false;
 	}
 	
-	self.checkAttack = function(sx, sy) {
-	
-		if (!GLOBAL.BoardInstance.get(sx,sy))
+	self.findAttacks = function(sx, sy, stone) {
+		var masterStone = self.board.get(sx,sy);
+		if (!masterStone)
 			return;
 			
-		var floodDelay = 0;
+		function parsePosition(ix,iy) {
+			var victim = self.board.get(ix,iy);
+			if (victim && victim.owner == ownerWanted && victim.element == elemWanted && 
+				floodMarkers[ix][iy]) {
+				attackStack.push(victim);
+				resultStack.push(victim);
+				floodMarkers[ix][iy] = false;
+			}
+		}
 			
 		var attackStack = new Array();
+		var resultStack = new Array();
 		
-		var initialStep = -1;
-		GLOBAL.BoardInstance.get(sx,sy).step = initialStep;
-		attackStack.push(GLOBAL.BoardInstance.get(sx,sy));
+		var floodMarkers = self.getNewFloodMarkers();
+		
+		masterStone.step = -1;
+		attackStack.push(masterStone);
+		
+		var elemWanted = self.colorWonBy(masterStone.element);
+		var ownerWanted = 1-masterStone.owner;
 		
 		while (attackStack.length) {
 			var stone = attackStack.shift();
 			var ix = stone.ix;
 			var iy = stone.iy;
 			
-			var victim = self.getVictim(ix-1,iy, stone);
-			if (victim) {
-				self.convertStone(stone,victim);
-				attackStack.push(victim);
-			}
-			
-			victim = self.getVictim(ix+1,iy, stone);
-			if (victim) {
-				self.convertStone(stone,victim);
-				attackStack.push(victim);
-			}
-			
-			victim = self.getVictim(ix,iy-1, stone);
-			if (victim) {
-				self.convertStone(stone,victim);
-				attackStack.push(victim);
-			}
-			
-			victim = self.getVictim(ix,iy+1, stone);
-			if (victim) {
-				self.convertStone(stone,victim);
-				attackStack.push(victim);
-			}
-			
-//			if (attackStack.length>0 && stone.ix==sx && stone.iy==sy) {
-//				GLOBAL.BoardInstance.startTileBlinking(stone.ix, stone.iy);
-//			}
-				
+			parsePosition(ix-1, iy);
+			parsePosition(ix+1, iy);
+			parsePosition(ix, iy+1);
+			parsePosition(ix, iy-1);
+		}
+		
+		return resultStack;
+	}
+	
+	self.checkAttack  = function(sx,sy) {
+		var victimList = self.findAttacks(sx,sy);
+		var stone = self.board.get(sx,sy);
+		while (victimList.length) {
+			var victim = victimList.shift();
+			self.convertStone(stone,victim);
 		}
 	}
 	
+	self.countAttacks = function(x,y, board) {
+		self.board = board || GLOBAL.BoardInstance;
+		return self.findAttacks(x,y).length;
+	}
+	
+	self.countDefenses = function(x,y, board) {
+		self.board = board || GLOBAL.BoardInstance;
+		return self.findDefender(x,y)?1:0;
+	}
+	
 	self.convertStone = function(from, to) {
-		if (!self.floodFill[to.ix][to.iy])
-			return;
-			
 		to.element = from.element;
 		to.owner = from.owner;
 		to.bgColor = from.bgColor;
 		to.step = from.step+1;
-		self.floodFill[to.ix][to.iy] = false;
 		
 		var delay = to.step*GLOBAL.animationDelay;
 		setTimeout(function(){GLOBAL.BoardInstance.startTileAnimation(to.ix, to.iy);}, delay);
@@ -172,8 +169,8 @@ GLOBAL.FloodCheck = function() {
 		GLOBAL.counts[1] = 0;
 		for (var i=0; i<GLOBAL.BoardInstance.cols; i++)
 			for (var j=0; j<GLOBAL.BoardInstance.rows; j++) {
-				if (GLOBAL.BoardInstance.get(i,j)) {
-					GLOBAL.counts[ GLOBAL.BoardInstance.get(i,j).owner ]++;
+				if (self.board.get(i,j)) {
+					GLOBAL.counts[ self.board.get(i,j).owner ]++;
 				}
 			}
 	}
