@@ -63,7 +63,7 @@ GLOBAL.FloodCheck = function() {
 			attacker = self.getAttacker(ix,iy+1, stone);
 		
 		if (attacker) {
-			self.turnDelay = GLOBAL.animationDelay * (GLOBAL.framesPerStrip+1);
+			self.turnDelay = GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2);
 			self.convertStone( attacker, stone );
 			GLOBAL.BoardInstance.startTileBlinking(attacker.ix, attacker.iy);
 			return true;

@@ -106,6 +106,16 @@ function prepareGame()
 		
 }
 
+function restartGame() {
+	GLOBAL.action.turn = 1;
+	GLOBAL.action.selection = -1;
+	GLOBAL.BoardInstance.clearContents();
+	GLOBAL.Piles[0].chooseTiles();
+	GLOBAL.Piles[1].chooseTiles();
+	GLOBAL.floodCheck.countMarkers();
+	enableTurn();
+}
+
 function drawInitialGame() {
 	clearCanvas();
 	GLOBAL.Piles[0].drawFromScratch();
@@ -145,7 +155,7 @@ function mouseDown( ev ) {
 		return;
 	
 	if (GLOBAL.action.turn == -1) {
-		prepareGame();
+		restartGame();
 		drawInitialGame();
 		return;
 	}

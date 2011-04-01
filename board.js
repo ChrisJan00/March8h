@@ -196,6 +196,7 @@ GLOBAL.StoneHolder.prototype = {
 		self.contents = [];
 		for (var i=0;i<self.cols;i++)
 		self.contents[i] = [];
+		self.stoneCount = 0;
 	},
 	
 	isClicked : function( mouseX, mouseY ) {
