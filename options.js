@@ -59,7 +59,7 @@ GLOBAL.ComputerEasyOption.prototype.activate = function() {
 		GLOBAL.maximizeEntropy = false;
 		
 	}
-	GLOBAL.computerEnabled = this.option;
+	GLOBAL.computerEnabled = this.option || GLOBAL.computerMediumOption.option;
 }
 GLOBAL.ComputerMediumOption = function(x,y) {
 	this.x0 = x?x:610;
@@ -73,7 +73,7 @@ GLOBAL.ComputerMediumOption.prototype.activate = function() {
 		GLOBAL.maximizeEntropy = true;
 		
 	}
-	GLOBAL.computerEnabled = this.option;
+	GLOBAL.computerEnabled = this.option || GLOBAL.computerEasyOption.option;
 }
 GLOBAL.DefenseModeOption = function(x,y) {
 	this.x0 = x? x:610;

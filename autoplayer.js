@@ -38,11 +38,18 @@ function computerPlay() {
 						continue;
 					if (GLOBAL.maximizeEntropy && self.typeCount[color]<self.maxCount)
 						continue;
-					// count defense
-					if (GLOBAL.defenseMode && self.isDefended(ix, iy, color, pn)) {
-						score = 0; // - self.countNeighbours(ix,iy,color, pn);
+					// rate move
+					if (GLOBAL.defenseMode) {
+						if (self.isDefended(ix, iy, color, pn)) {
+							score = 0; // - self.countNeighbours(ix,iy,color, pn);
+						} else {
+							score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),1-pn);
+						}
 					} else {
 						score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),1-pn);
+						if (self.isDefended(ix,iy,color,pn)) {
+							score--;
+						}
 					}
 					self.options.push([ix,iy,color,score]);
 				}					

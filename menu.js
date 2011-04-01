@@ -38,7 +38,7 @@ GLOBAL.GameMenu = function() {
 		ctx.fillText("Player VS Player", 150, 120);
 		ctx.fillText("Player VS Computer (Easy)", 150, 170);
 		ctx.fillText("Player VS Computer (Medium)", 150, 220);
-		ctx.fillText("Advanced mode", 150, 270);
+		ctx.fillText("Defense mode", 150, 270);
 		ctx.fillText("Start Game", 150, 370);
 		
 		

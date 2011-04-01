@@ -9,10 +9,14 @@ GLOBAL.FloodCheck = function() {
 		self.resetFloodMarkers();
 		
 		var defended = false;
-		if (GLOBAL.defenseMode)
-			defended = self.checkDefense(ix, iy);
-		if (!defended)
+		if (GLOBAL.defenseMode) {
+			var defended = self.checkDefense(ix, iy);
+			if (!defended)
+				self.checkAttack(ix, iy);
+		} else {
 			self.checkAttack(ix, iy);
+			self.checkDefense(ix, iy);
+		}
 			
 		setTimeout(enableTurn, self.turnDelay);
 	}
@@ -63,7 +67,7 @@ GLOBAL.FloodCheck = function() {
 			attacker = self.getAttacker(ix,iy+1, stone);
 		
 		if (attacker) {
-			self.turnDelay = GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2);
+			self.turnDelay = Math.max(self.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2));
 			self.convertStone( attacker, stone );
 			GLOBAL.BoardInstance.startTileBlinking(attacker.ix, attacker.iy);
 			return true;
