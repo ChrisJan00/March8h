@@ -32,17 +32,18 @@ GLOBAL.FloodCheck = function() {
 		return floodFill;
 	}
 	
-	self.findDefender = function(ix, iy) {
-		var stone = self.board.get(ix,iy);
-		if (!stone)
-			return false;
-		
+	self.findDefender = function(ix, iy, fakeStone) {
 		function getDefender(x,y) {
 			var candidate = self.board.get(x,y);
 			if (candidate && candidate.owner == ownerWanted && candidate.element == elemWanted)
 				return candidate;
 			else
 				return false;
+		}
+		
+		var stone = self.board.get(ix,iy) || fakeStone;
+		if (!stone) {
+			return false;
 		}
 		
 		var attacker = false;
@@ -67,11 +68,7 @@ GLOBAL.FloodCheck = function() {
 		return false;
 	}
 	
-	self.findAttacks = function(sx, sy, stone) {
-		var masterStone = self.board.get(sx,sy);
-		if (!masterStone)
-			return;
-			
+	self.findAttacks = function(sx, sy, fakeStone) {
 		function parsePosition(ix,iy) {
 			var victim = self.board.get(ix,iy);
 			if (victim && victim.owner == ownerWanted && victim.element == elemWanted && 
@@ -81,13 +78,15 @@ GLOBAL.FloodCheck = function() {
 				floodMarkers[ix][iy] = false;
 			}
 		}
-			
+		
+		var masterStone = self.board.get(sx,sy) || fakeStone;
+		if (!masterStone) 
+				return false;
+
 		var attackStack = new Array();
 		var resultStack = new Array();
-		
 		var floodMarkers = self.getNewFloodMarkers();
 		
-		masterStone.step = -1;
 		attackStack.push(masterStone);
 		
 		var elemWanted = self.colorWonBy(masterStone.element);
@@ -109,21 +108,23 @@ GLOBAL.FloodCheck = function() {
 	
 	self.checkAttack  = function(sx,sy) {
 		var victimList = self.findAttacks(sx,sy);
+		
 		var stone = self.board.get(sx,sy);
+		stone.step = -1;
 		while (victimList.length) {
 			var victim = victimList.shift();
 			self.convertStone(stone,victim);
 		}
 	}
 	
-	self.countAttacks = function(x,y, board) {
+	self.countAttacks = function(x,y, board, fakeStone) {
 		self.board = board || GLOBAL.BoardInstance;
-		return self.findAttacks(x,y).length;
+		return self.findAttacks(x,y, fakeStone).length;
 	}
 	
-	self.countDefenses = function(x,y, board) {
+	self.countDefenses = function(x,y, board, fakeStone) {
 		self.board = board || GLOBAL.BoardInstance;
-		return self.findDefender(x,y)?1:0;
+		return self.findDefender(x,y, fakeStone)?1:0;
 	}
 	
 	self.convertStone = function(from, to) {

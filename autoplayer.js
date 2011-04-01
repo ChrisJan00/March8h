@@ -41,12 +41,12 @@ function computerPlay() {
 					// rate move
 					if (GLOBAL.defenseMode) {
 						if (self.isDefended(ix, iy, color, pn)) {
-							score = 0; // - self.countNeighbours(ix,iy,color, pn);
+							score = 0;
 						} else {
-							score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),1-pn);
+							score = 1 + self.countAttacks(ix,iy,color,pn);
 						}
 					} else {
-						score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),1-pn);
+						score = 1 + self.countAttacks(ix,iy,color,pn);
 						if (self.isDefended(ix,iy,color,pn)) {
 							score--;
 						}
@@ -75,38 +75,16 @@ function computerPlay() {
 				self.check(ix, iy+1, attackColor, owner);
 	}
 	
-	self.countNeighbours = function( x, y, color, owner)
+	self.countAttacks = function( x, y, color, _owner )
 	{
-		// finds neighbours of this position with this color and owner
-		var neighbourPile = new Array();
-		var localMap = [];
-		for (var i=0;i<GLOBAL.BoardInstance.cols; i++) {
-			localMap[i] = [];
-			for (var j=0;j<GLOBAL.BoardInstance.rows; j++) {
-				localMap[i][j] = true;
-			}
-		}
-		var count = 0;
-		neighbourPile.push([x,y]);
-		
-		function checkNeighHelper(ix,iy) {
-			if (self.check(ix,iy,color,owner) && localMap[ix][iy]) {
-				count++;
-				neighbourPile.push([ix,iy]);
-				localMap[ix][iy] = false;
-			}
+		var fakeStone = {
+			ix : x,
+			iy : y,
+			owner : _owner,
+			element : color
 		}
 		
-		while (neighbourPile.length>0) {
-			var pos = neighbourPile.shift();
-			var ix = pos[0];
-			var iy = pos[1];
-			checkNeighHelper(ix-1,iy);
-			checkNeighHelper(ix+1,iy);
-			checkNeighHelper(ix,iy-1);
-			checkNeighHelper(ix,iy+1);
-		}
-		return count;
+		return GLOBAL.floodCheck.countAttacks(x,y, GLOBAL.BoardInstance, fakeStone);
 	}
 	
 	self.normalizeScores = function() 
