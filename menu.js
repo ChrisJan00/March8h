@@ -38,9 +38,8 @@ GLOBAL.GameMenu = function() {
 		ctx.fillText("Player VS Player", 150, 120);
 		ctx.fillText("Player VS Computer (Easy)", 150, 170);
 		ctx.fillText("Player VS Computer (Medium)", 150, 220);
-		ctx.fillText("Defense mode", 150, 270);
+		ctx.fillText("off: Attack, then Defense", 150, 270);
 		ctx.fillText("Start Game", 150, 370);
-		
 		
 		GLOBAL.playerOption.redraw();
 		GLOBAL.computerEasyOption.redraw();
@@ -63,6 +62,18 @@ GLOBAL.GameMenu = function() {
 		self.startGameOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	}
 	
+}
+
+GLOBAL.DefenseModeOption.prototype.activate = function() {
+	GLOBAL.defenseMode = this.option;
+	var ctx = GLOBAL.gameContext;
+	ctx.fillStyle = "#FFFFFF";
+	ctx.fillRect(150,250,200,40);
+	ctx.fillStyle = "#000000";
+	if (this.option)
+		ctx.fillText("on: Defense, then Attack", 150, 270);
+	else
+		ctx.fillText("off: Attack, then Defense", 150, 270);
 }
 
 GLOBAL.StartGameOption = function(x,y) {
