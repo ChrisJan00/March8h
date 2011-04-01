@@ -1,13 +1,7 @@
 // Todo: 
-// logic class
 // AI as a class?
-// blinking attacker
-// gradual flood
-// game mode menu
-// "restart/menu" at endgame
 // action.turn number
 // AI random starter
-// illuminate pile current turn
 // variable sizes
 
 function preload() {
@@ -57,9 +51,7 @@ function prepareGame()
 	
 	GLOBAL.action = {
 		turn:1,
-		selection:-1
 	};
-	GLOBAL.pile = {};
 	
 	GLOBAL.BoardInstance = new GLOBAL.BoardClass();
 
@@ -77,16 +69,11 @@ function prepareGame()
 	GLOBAL.maximizeEntropy = false;
 	GLOBAL.defenseMode = true;
 	
-	// start with an empty background
-	//clearCanvas();
 	initPiles();
-	//GLOBAL.BoardInstance.drawEmpty();
 	
 	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
 	GLOBAL.floodCheck.countMarkers();
-	//showPlayer();
-	//showOrder();	
-
+	
 	// clicking on the board
 	GLOBAL.mouse = {
 		x : 0,
@@ -101,7 +88,6 @@ function prepareGame()
 
 function restartGame() {
 	GLOBAL.action.turn = 1;
-	GLOBAL.action.selection = -1;
 	GLOBAL.BoardInstance.clearContents();
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
