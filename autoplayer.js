@@ -148,6 +148,8 @@ function computerPlay() {
 		GLOBAL.BoardInstance.set(mix,miy,stone);
 		GLOBAL.BoardInstance.redrawTile(mix,miy);
 		
+		GLOBAL.BoardInstance.startBorderAnimation(mix,miy);
+	
 		//startFlood(mix, miy);
 		GLOBAL.floodCheck.checkFlood(mix, miy);
 		

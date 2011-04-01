@@ -11,6 +11,8 @@ GLOBAL.StoneHolder.prototype = {
 	y1 : 50,
 	contents : [],
 	stoneCount : 0,
+	borderTileSide : 6,
+	borderAnimationDelay : 150,
 	
 	setDimensions : function( numCols, numRows, x0, y0 ) {
 		this.x0 = x0;
@@ -29,28 +31,26 @@ GLOBAL.StoneHolder.prototype = {
 		var self = this;
 		var ctx = GLOBAL.gameContext;
 		
-		ctx.fillStyle = "#FFFFFF";
-		ctx.beginPath();
-		ctx.moveTo(self.x0,self.y0);
-		ctx.lineTo(self.x0,self.y1);
-		ctx.lineTo(self.x1,self.y1);
-		ctx.lineTo(self.x1,self.y0);
-		ctx.closePath();
-		ctx.fill();	
-		
-		ctx.strokeStyle = "#000000"
-		for (var i=0;i<=self.cols;i++) {
-			ctx.beginPath();
-			ctx.moveTo(self.x0 + i*self.side, self.y0);
-			ctx.lineTo(self.x0 + i*self.side, self.y1);
-			ctx.stroke();
-		}
-		
-		for (var i=0;i<=self.rows;i++) {
-			ctx.beginPath();
-			ctx.moveTo(self.x0, self.y0+i*self.side);
-			ctx.lineTo(self.x1, self.y0+i*self.side);
-			ctx.stroke();
+		for (var j=0;j<2;j++) {
+			if (j==1) ctx = GLOBAL.bgContext;
+			ctx.fillStyle = "#FFFFFF";
+			ctx.fillRect(self.x0 - self.borderTileSide, self.y0 - self.borderTileSide,
+				self.width + 2*self.borderTileSide, self.height + 2*self.borderTileSide);
+			
+			ctx.strokeStyle = "#000000"
+			for (var i=0;i<=self.cols;i++) {
+				ctx.beginPath();
+				ctx.moveTo(self.x0 + i*self.side, self.y0);
+				ctx.lineTo(self.x0 + i*self.side, self.y1);
+				ctx.stroke();
+			}
+			
+			for (var i=0;i<=self.rows;i++) {
+				ctx.beginPath();
+				ctx.moveTo(self.x0, self.y0+i*self.side);
+				ctx.lineTo(self.x1, self.y0+i*self.side);
+				ctx.stroke();
+			}
 		}
 	},
 	
@@ -64,17 +64,21 @@ GLOBAL.StoneHolder.prototype = {
 				
 		var mx = this.x0 + x * this.side;
 		var my = this.y0 + y * this.side;
+
 		var ctx = GLOBAL.gameContext;
-		ctx.fillStyle = color;
-		ctx.strokeStyle = "#000000";
-		ctx.beginPath();
-		ctx.moveTo(mx, my);
-		ctx.lineTo(mx + this.side, my);
-		ctx.lineTo(mx + this.side, my + this.side);
-		ctx.lineTo(mx, my+this.side);
-		ctx.closePath();
-		ctx.fill();
-		ctx.stroke();
+		for (var i=0;i<2;i++) {
+			if (i==1) ctx = GLOBAL.bgContext;
+			ctx.fillStyle = color;
+			ctx.strokeStyle = "#000000";
+			ctx.beginPath();
+			ctx.moveTo(mx, my);
+			ctx.lineTo(mx + this.side, my);
+			ctx.lineTo(mx + this.side, my + this.side);
+			ctx.lineTo(mx, my+this.side);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+		}
 	},
 	
 	redrawTile : function(x,y,col) {
@@ -99,6 +103,7 @@ GLOBAL.StoneHolder.prototype = {
 			}
 			
 			GLOBAL.gameContext.drawImage(img, ix, iy);
+			GLOBAL.bgContext.drawImage(img,ix,iy);
 		}
 	},
 	
@@ -151,12 +156,48 @@ GLOBAL.StoneHolder.prototype = {
 		var iy = this.y0 + y * this.side;
 			
 	 	ctx.drawImage(whichAnimation, offset, 0, this.side, this.side, ix, iy, this.side, this.side);
+	 	GLOBAL.bgContext.drawImage(whichAnimation,offset, 0, this.side, this.side, ix, iy, this.side, this.side);
 		var self = this;
 	 	if (frame<GLOBAL.framesPerStrip-1) {
 	 		setTimeout(function(){self.animateTile(x, y, frame+1)}, GLOBAL.animationDelay);
 	 	} else {
 	 		setTimeout(function(){self.redrawTile(stone.ix, stone.iy)}, GLOBAL.animationDelay);
 	 	}
+	},
+	
+	startBorderAnimation: function(x,y) {
+		this.borderAnimation(x,y, this.borderTileSide);
+	},
+	
+	borderAnimation: function(x,y,frame) {
+		var ix = this.x0 + x*this.side;
+		var iy = this.y0 + y*this.side;
+		
+		var borderSide = this.side + this.borderTileSide*2;
+		var ctx = GLOBAL.gameContext;
+		
+		// delete old border
+		ctx.drawImage(GLOBAL.bgCanvas,
+			ix - this.borderTileSide,
+			iy - this.borderTileSide,
+			borderSide, borderSide,
+			ix - this.borderTileSide,
+			iy - this.borderTileSide,
+			borderSide, borderSide );
+			
+		if (frame == 0)
+			return;
+			
+		// draw new border
+		ctx.fillStyle = "rgba(0,0,0,0.5)";
+		ctx.strokeStyle = "rgba(0,0,0,0.5)";
+		ctx.fillRect(ix-frame, iy-frame, this.side+2*frame, frame);
+		ctx.fillRect(ix-frame, iy, frame, this.side);
+		ctx.fillRect(ix-frame, iy+this.side, this.side+2*frame, frame);
+		ctx.fillRect(ix+this.side, iy, frame, this.side);
+		
+		var self = this;
+		setTimeout(function(){self.borderAnimation(x,y,frame-1)}, self.borderAnimationDelay);
 	},
 	
 	// update functions
@@ -243,6 +284,8 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	// move stone to board
 	this.set(mix, miy, stone);
 	this.redrawTile(mix,miy);
+	
+	this.startBorderAnimation(mix,miy);
 	
 	//startFlood(mix, miy);
 	GLOBAL.floodCheck.checkFlood(mix, miy);
