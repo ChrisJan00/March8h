@@ -169,7 +169,7 @@ GLOBAL.FloodCheck = function() {
 		for (var i=0; i<GLOBAL.BoardInstance.cols; i++)
 			for (var j=0; j<GLOBAL.BoardInstance.rows; j++) {
 				if (GLOBAL.BoardInstance.get(i,j)) {
-					GLOBAL.counts[ GLOBAL.BoardInstance.get(i,j).owner - 1 ]++;
+					GLOBAL.counts[ GLOBAL.BoardInstance.get(i,j).owner ]++;
 				}
 			}
 	}

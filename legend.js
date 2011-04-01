@@ -17,7 +17,7 @@ function showPlayer() {
 	var ctx = GLOBAL.gameContext;
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
-	var pn = GLOBAL.action.turn -1;
+	var pn = GLOBAL.action.turn;
 	ctx.font = "bold 24px sans-serif";
 	ctx.fillStyle = colorForPlayer(0);
 	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
@@ -29,8 +29,8 @@ function showPlayer() {
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2 );
 	
-	GLOBAL.Piles[0].redrawBorder(GLOBAL.action.turn==1);
-	GLOBAL.Piles[1].redrawBorder(GLOBAL.action.turn==2);
+	GLOBAL.Piles[0].redrawBorder(GLOBAL.action.turn==0);
+	GLOBAL.Piles[1].redrawBorder(GLOBAL.action.turn==1);
 }
 
 function showOrder() {
@@ -76,7 +76,7 @@ function checkVictory() {
 	var ctx = GLOBAL.gameContext;
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
-	var pn = GLOBAL.action.turn - 1;
+	var pn = GLOBAL.action.turn;
 	ctx.font = "bold 24px sans-serif";
 	
 	ctx.fillStyle = colorForPlayer(0);

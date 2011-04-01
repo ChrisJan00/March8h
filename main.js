@@ -1,6 +1,5 @@
 // Todo: 
 // AI as a class?
-// action.turn number
 // AI random starter
 // variable sizes
 
@@ -50,7 +49,7 @@ function prepareGame()
 	GLOBAL.framesPerStrip = 4;
 	
 	GLOBAL.action = {
-		turn:1,
+		turn:0,
 	};
 	
 	GLOBAL.BoardInstance = new GLOBAL.BoardClass();
@@ -87,7 +86,7 @@ function prepareGame()
 }
 
 function restartGame() {
-	GLOBAL.action.turn = 1;
+	GLOBAL.action.turn = 0;
 	GLOBAL.BoardInstance.clearContents();
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
@@ -138,7 +137,7 @@ function mouseDown( ev ) {
 		return;
 	}
 	
-	if (GLOBAL.action.turn==1 || !GLOBAL.computerEnabled)
+	if (GLOBAL.action.turn==0 || !GLOBAL.computerEnabled)
 		manageTurn();
 	
 }
@@ -147,7 +146,7 @@ function enableTurn()
 {
 	GLOBAL.turnEnabled = true;
 	GLOBAL.exitOption.activate();
-	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 2) {
+	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
 		setTimeout(manageTurn, GLOBAL.computerDelay);
 	}
 }
@@ -161,7 +160,7 @@ function manageTurn()
 {
 	var turnIsReady = false;
 	
-	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 2) {
+	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
 		turnIsReady = computerPlay();
 	} else {
 		if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
@@ -174,7 +173,7 @@ function manageTurn()
  		
  	if (turnIsReady) {	
  		GLOBAL.floodCheck.countMarkers();
-		GLOBAL.action.turn = 3-GLOBAL.action.turn;
+		GLOBAL.action.turn = 1-GLOBAL.action.turn;
 		
 		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
 			showPlayer();

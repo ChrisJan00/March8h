@@ -33,7 +33,7 @@ GLOBAL.PileClass.prototype.manageClicked = function( mx, my )
 	if (newStone && (oldStone != newStone) && newStone.visible) {
 			newStone.selected = true;
 			newStone.active = true;
-			newStone.bgColor = colorForPlayer(this.owner-1);
+			newStone.bgColor = colorForPlayer(this.owner);
 			this.redrawTile(mix, miy);
 			this.selection = newStone;
 	}
@@ -69,7 +69,7 @@ GLOBAL.PileClass.prototype.chooseTiles = function( )
 GLOBAL.PileClass.prototype.drawFromScratch = function() {
 	var ctx = GLOBAL.gameContext;
 	
-	ctx.fillStyle = colorForPlayer(this.owner-1);
+	ctx.fillStyle = colorForPlayer(this.owner);
 	ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.height + 2*this.border);
 	
 	this.drawEmpty();
@@ -80,7 +80,7 @@ GLOBAL.PileClass.prototype.drawFromScratch = function() {
 
 GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
 	var ctx = GLOBAL.gameContext;
-	var color = strong?colorForPlayer(this.owner-1):colorForPlayerWeak(this.owner-1);
+	var color = strong?colorForPlayer(this.owner):colorForPlayerWeak(this.owner);
 	ctx.fillStyle = color;
 	ctx.strokeStyle = color;
 	
@@ -116,11 +116,9 @@ GLOBAL.PileClass.prototype.getStoneByElement = function(elem)
 function initPiles()
 {
 	GLOBAL.Piles = [];
-	GLOBAL.Piles[0] = new GLOBAL.PileClass(25, 10, 1);
-	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 2);
+	GLOBAL.Piles[0] = new GLOBAL.PileClass(25, 10, 0);
+	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 1);
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
-	//GLOBAL.Piles[0].drawFromScratch();
-	//GLOBAL.Piles[1].drawFromScratch();
 }
 

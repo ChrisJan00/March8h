@@ -1,7 +1,7 @@
 //----------------------------------------------------------
 function computerPlay() {
 	var self = this;
-	var pn = GLOBAL.action.turn-1;
+	var pn = GLOBAL.action.turn;
 	var decisionExp = 5;
 	
 	self.availableCount = GLOBAL.Piles[pn].stoneCount;
@@ -40,9 +40,9 @@ function computerPlay() {
 						continue;
 					// count defense
 					if (GLOBAL.defenseMode && self.isDefended(ix, iy, color, pn)) {
-						score = 0; // - self.countNeighbours(ix,iy,color, pn+1);
+						score = 0; // - self.countNeighbours(ix,iy,color, pn);
 					} else {
-						score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),2-pn);
+						score = 1 + self.countNeighbours(ix,iy,GLOBAL.floodCheck.colorWonBy(color),1-pn);
 					}
 					self.options.push([ix,iy,color,score]);
 				}					

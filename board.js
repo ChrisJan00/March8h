@@ -114,8 +114,8 @@ GLOBAL.StoneHolder.prototype = {
 		var stone = this.get(x,y);
 		if (!stone) return;
 		
-		var color = frame%2? colorForPlayer(stone.owner-1) : colorForPlayerStrong(stone.owner-1);
-		//var color = colorForPlayerStrong(stone.owner-1);
+		var color = frame%2? colorForPlayer(stone.owner) : colorForPlayerStrong(stone.owner);
+		//var color = colorForPlayerStrong(stone.owner);
 		this.redrawTile(x,y,color);
 		frame--;
 		if (frame)
@@ -172,7 +172,7 @@ GLOBAL.StoneHolder.prototype = {
 			element: stone.element,
 			owner : stone.owner
 		};
-	 	newStone.bgColor = colorForPlayer(stone.owner-1);
+	 	newStone.bgColor = colorForPlayer(stone.owner);
 	 	if (!this.contents[x][y])
 	 		this.stoneCount++;
 		this.contents[x][y] = newStone;
@@ -225,7 +225,7 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
 	
-	var currentPile = GLOBAL.Piles[GLOBAL.action.turn-1];
+	var currentPile = GLOBAL.Piles[GLOBAL.action.turn];
 	
 	// place taken?
 	if (this.get(mix,miy))
