@@ -35,6 +35,7 @@ GLOBAL.OptionBox.prototype = {
 	}
 }
 
+//----------------------------------------
 GLOBAL.PlayerOption = function(x,y) {
 	this.x0 = x?x:610;
 	this.y0 = y?y:15;
@@ -44,9 +45,13 @@ GLOBAL.PlayerOption.prototype.activate = function() {
 	if (this.option) {
 		GLOBAL.computerEasyOption.set(false);
 		GLOBAL.computerMediumOption.set(false);
+		GLOBAL.computerHardOption.set(false);
 	}
 	GLOBAL.computerEnabled = !this.option;
 }
+
+//-----------------------------------------
+
 GLOBAL.ComputerEasyOption = function(x,y) {
 	this.x0 = x?x:610;
 	this.y0 = y?y:60;
@@ -56,11 +61,13 @@ GLOBAL.ComputerEasyOption.prototype.activate = function() {
 	if (this.option) {
 		GLOBAL.playerOption.set(false);
 		GLOBAL.computerMediumOption.set(false);
+		GLOBAL.computerHardOption.set(false);
 		GLOBAL.maximizeEntropy = false;
-		
+		GLOBAL.computerEnabled = true;	
 	}
-	GLOBAL.computerEnabled = this.option || GLOBAL.computerMediumOption.option;
 }
+
+//-----------------------------------------
 GLOBAL.ComputerMediumOption = function(x,y) {
 	this.x0 = x?x:610;
 	this.y0 = y?y:105;
@@ -70,11 +77,27 @@ GLOBAL.ComputerMediumOption.prototype.activate = function() {
 	if (this.option) {
 		GLOBAL.playerOption.set(false);
 		GLOBAL.computerEasyOption.set(false);
+		GLOBAL.computerHardOption.set(false);
 		GLOBAL.maximizeEntropy = true;
-		
+		GLOBAL.computerEnabled = true;
 	}
-	GLOBAL.computerEnabled = this.option || GLOBAL.computerEasyOption.option;
 }
+
+GLOBAL.ComputerHardOption = function(x,y) {
+	this.x0 = x?x:610;
+	this.y0 = y?y:150;
+}
+GLOBAL.ComputerHardOption.prototype = new GLOBAL.OptionBox;
+GLOBAL.ComputerHardOption.prototype.activate = function() {
+	if (this.option) {
+		GLOBAL.playerOption.set(false);
+		GLOBAL.computerEasyOption.set(false);
+		GLOBAL.computerMediumOption.set(false);
+		GLOBAL.computerEnabled = true;
+	}
+	GLOBAL.computerHard = this.option;
+}
+//-------------------------------------------
 GLOBAL.DefenseModeOption = function(x,y) {
 	this.x0 = x? x:610;
 	this.y0 = y? y:150;

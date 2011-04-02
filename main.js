@@ -67,11 +67,15 @@ function prepareGame()
 	GLOBAL.computerDelay = 1000;//1500;
 	GLOBAL.maximizeEntropy = false;
 	GLOBAL.defenseMode = true;
+	GLOBAL.computerHard = false;
+	GLOBAL.computerChoice = [0,0,0];
+	
+	GLOBAL.hardAI = new GLOBAL.AlphaBeta();
 	
 	initPiles();
 	
 	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
-	GLOBAL.floodCheck.countMarkers();
+	//GLOBAL.floodCheck.countMarkers();
 	
 	// clicking on the board
 	GLOBAL.mouse = {
@@ -82,7 +86,7 @@ function prepareGame()
 	
 	GLOBAL.exitOption = new GLOBAL.ExitOption();
 	
-	enableTurn();
+	//restartGame();
 }
 
 function restartGame() {
@@ -91,6 +95,8 @@ function restartGame() {
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
 	GLOBAL.floodCheck.countMarkers();
+	if (GLOBAL.computerEnabled && GLOBAL.computerHard)
+		GLOBAL.hardAI.start();
 	enableTurn();
 }
 
@@ -145,9 +151,13 @@ function mouseDown( ev ) {
 function enableTurn()
 {
 	GLOBAL.turnEnabled = true;
+	GLOBAL.turnDelay = 0;
 	GLOBAL.exitOption.activate();
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		setTimeout(manageTurn, GLOBAL.computerDelay);
+		if (GLOBAL.computerHard)
+			manageTurn(); // don't wait for now
+		else
+			setTimeout(manageTurn, GLOBAL.computerDelay);
 	}
 }
 
@@ -159,9 +169,16 @@ function disableTurn()
 function manageTurn()
 {
 	var turnIsReady = false;
+	GLOBAL.turnDelay = 0;
+		
 	
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		turnIsReady = computerPlay();
+		if (GLOBAL.computerHard)
+			GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
+		else
+			GLOBAL.computerChoice = computerPlay();
+		var c = GLOBAL.computerChoice;
+		turnIsReady = computerMove(c[0],c[1],c[2], 1);
 	} else {
 		if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
 			GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
@@ -176,11 +193,21 @@ function manageTurn()
 		GLOBAL.action.turn = 1-GLOBAL.action.turn;
 		
 		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
+//			if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
+//				if (GLOBAL.computerHard)
+//					GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
+//				else
+//					GLOBAL.computerChoice = computerPlay();
+//			}
 			showPlayer();
 		} else {
 			checkVictory();
 		}
-		
+	}
+	
+	if (GLOBAL.turnDelay>0) {
+		disableTurn();
+		setTimeout(enableTurn, GLOBAL.turnDelay);
 	}
 }
 
@@ -217,6 +244,7 @@ function waitForImages()
 		setTimeout(waitForImages, 500);
 	else {
 		prepareGame();
+		//restartGame();
 		connectMouse();
 		GLOBAL.menu = new GLOBAL.GameMenu();
 		GLOBAL.menu.create();

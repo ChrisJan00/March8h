@@ -111,7 +111,18 @@ function computerPlay() {
 		return self.options[choice];
 	}
 	
-	self.playThis = function(mix,miy,elem) {
+	
+	self.computeStones();
+	self.computeEntropies();
+	self.computeBasicScores();
+	self.normalizeScores();
+	return self.chooseOption();
+	//var finalChoice = self.chooseOption();
+	//return self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
+	
+}
+
+function computerMove(mix,miy,elem, pn) {
 		// find one stone in own pile
 		
 		var currentPile = GLOBAL.Piles[pn];
@@ -133,13 +144,3 @@ function computerPlay() {
 		
 		return true;
 	}
-	
-	
-	self.computeStones();
-	self.computeEntropies();
-	self.computeBasicScores();
-	self.normalizeScores();
-	var finalChoice = self.chooseOption();
-	return self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
-	
-}

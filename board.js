@@ -166,6 +166,7 @@ GLOBAL.StoneHolder.prototype = {
 	},
 	
 	startBorderAnimation: function(x,y) {
+		GLOBAL.turnDelay = Math.max(GLOBAL.turnDelay, (this.borderTileSide+1)*this.borderAnimationDelay);
 		this.borderAnimation(x,y, this.borderTileSide);
 	},
 	
@@ -290,6 +291,9 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	//startFlood(mix, miy);
 	GLOBAL.floodCheck.checkFlood(mix, miy);
 	
+	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
+		GLOBAL.hardAI.reportPlayed(mix,miy,stone.element, GLOBAL.action.turn);
+	}
 	return true;
 }
 

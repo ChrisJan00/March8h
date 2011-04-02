@@ -118,7 +118,7 @@ function initPiles()
 	GLOBAL.Piles = [];
 	GLOBAL.Piles[0] = new GLOBAL.PileClass(25, 10, 0);
 	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 1);
-	GLOBAL.Piles[0].chooseTiles();
-	GLOBAL.Piles[1].chooseTiles();
+	//GLOBAL.Piles[0].chooseTiles();
+	//GLOBAL.Piles[1].chooseTiles();
 }
 
