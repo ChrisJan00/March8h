@@ -70,8 +70,19 @@ function prepareGame()
 	GLOBAL.computerHard = false;
 	GLOBAL.computerChoice = [0,0,0];
 	
-	GLOBAL.hardAI = new GLOBAL.AlphaBeta();
+	//GLOBAL.hardAI = new GLOBAL.AlphaBeta();
 	
+	GLOBAL.hardAIWorker = new Worker("hardai.js");
+	GLOBAL.hardAIWorker.onmessage = function(event) {
+		GLOBAL.computerChoice = event.data;
+		manageTurn();
+	}
+	GLOBAL.hardAIWorker.onerror = function(event) {
+		throw event.data;
+	}
+	GLOBAL.hardAIWorker.postMessage([0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]);
+	
+	//AiWorker.onmessage({data:[0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]});
 	initPiles();
 	
 	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
@@ -95,8 +106,15 @@ function restartGame() {
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
 	GLOBAL.floodCheck.countMarkers();
-	if (GLOBAL.computerEnabled && GLOBAL.computerHard)
-		GLOBAL.hardAI.start();
+	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
+		
+		GLOBAL.hardAIWorker.postMessage([1, countPiles()]);
+		GLOBAL.hardAIWorker.postMessage([2, GLOBAL.defenseMode]);
+		
+		//AiWorker.onmessage({data:[1,countPiles()]});
+		//AiWorker.onmessage({data:[2,GLOBAL.defenseMode]});
+		//GLOBAL.hardAI.start();
+	}
 	enableTurn();
 }
 
@@ -152,9 +170,10 @@ function enableTurn()
 	GLOBAL.turnDelay = 0;
 	GLOBAL.exitOption.activate();
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		if (GLOBAL.computerHard)
-			manageTurn(); // don't wait for now
-		else
+		if (GLOBAL.computerHard) {
+			// wait for the worker message
+			//manageTurn(); // don't wait for now
+		} else
 			setTimeout(manageTurn, GLOBAL.computerDelay);
 	}
 }
@@ -171,8 +190,10 @@ function manageTurn()
 		
 	
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		if (GLOBAL.computerHard)
-			GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
+		if (GLOBAL.computerHard) {
+			// got from the message
+			//GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
+		}
 		else
 			GLOBAL.computerChoice = computerPlay();
 		var c = GLOBAL.computerChoice;

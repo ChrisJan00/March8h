@@ -1,18 +1,216 @@
-// start with element with bigger count?
-// start with board that cutted beta before?
 
-GLOBAL.AlphaBeta = function() {
+var AiWorker = self;
+//var AiWorker = {};
+AiWorker.onmessage = function(event) {
+	var msg = event.data;
+	switch(event.data[0])
+	{
+		case 0: {// board size
+			// data[1] contains [cols, rows];
+			AlphaBeta.setBoardSize(event.data[1]);
+			break;
+		}
+		case 1: {// pile contents
+			// data[1] containts list of two piles, each as [elem1,elem2,elem3,elem4]
+			AlphaBeta.setPileContents(event.data[1])
+			break;
+		}
+		case 2: { // start game
+			floodCheck.defenseMode = event.data[1];
+			AlphaBeta.start();
+			break;
+		}
+		case 3: {// player played
+			// x, y, element, player (=0)
+			AlphaBeta.reportPlayed(event.data[1], event.data[2], event.data[3], event.data[4]);
+			break;
+		}
+		case 4: { // request move
+			var choice = AlphaBeta.computerPlay();
+			AiWorker.postMessage(choice);
+			break;
+		}
+	}	
+}
+
+//AiWorker.postMessage = function(data) {
+//		GLOBAL.computerChoice = data;
+//		setTimeout(manageTurn, 1500);
+//}
+
+floodCheck = new function() {
+	var self = this;
+	self.board = [];
+	self.floodMarkers = [];
+	self.defenseMode = false;
+	
+	self.checkFlood = function(ix, iy, board) {
+		self.board = board;
+		
+		if (self.defenseMode) {
+			var defended = self.checkDefense(ix, iy);
+			if (!defended)
+				self.checkAttack(ix, iy);
+		} else {
+			self.checkAttack(ix, iy);
+			self.checkDefense(ix, iy);
+		}
+	}
+	
+	self.resetFloodMarkers = function() {
+		for (var i=0;i<self.board.cols;i++) {
+			if (!self.floodMarkers[i])
+				self.floodMarkers[i] = [];
+			for (var j=0; j<self.board.rows; j++)
+				self.floodMarkers[i][j] = true;
+		}
+	}
+	
+	self.findDefender = function(ix, iy, fakeStone) {
+		function getDefender(x,y) {
+			var candidate = self.board[x]?self.board[x][y]:null;
+			if (candidate && candidate.owner == ownerWanted && candidate.element == elemWanted)
+				return candidate;
+			else
+				return false;
+		}
+		
+		var stone = self.board[ix][iy] || fakeStone;
+		if (!stone) {
+			return false;
+		}
+		
+		var attacker = false;
+		elemWanted = self.colorThatWins(stone.element);
+		ownerWanted = 1-stone.owner;
+		
+		return getDefender(ix-1,iy) ||
+			   getDefender(ix+1,iy) || 
+			   getDefender(ix,iy-1) ||
+			   getDefender(ix,iy+1);
+	}
+	
+	self.checkDefense = function(x,y) {
+		var stone = self.board[x][y];
+		defender = self.findDefender(x,y);
+		if (defender) {
+			self.convertStone( defender, stone );
+			return true;
+		}
+		
+		return false;
+	}
+	
+	self.findAttacks = function(sx, sy, fakeStone) {
+		function parsePosition(ix,iy) {
+			var victim = self.board[ix]?self.board[ix][iy]:null;
+			if (victim && victim.owner == ownerWanted && victim.element == elemWanted && 
+				self.floodMarkers[ix][iy]) {
+				victim.step = step+1;
+				attackStack.push(victim);
+				resultStack.push(victim);
+				self.floodMarkers[ix][iy] = false;
+			}
+		}
+		
+		var masterStone = self.board[sx][sy] || fakeStone;
+		if (!masterStone) 
+				return false;
+
+		var attackStack = new Array();
+		var resultStack = new Array();
+		self.resetFloodMarkers();
+		
+		attackStack.push(masterStone);
+		masterStone.step = -1;
+		var elemWanted = self.colorWonBy(masterStone.element);
+		var ownerWanted = 1-masterStone.owner;
+		var step = masterStone.step;
+		
+		while (attackStack.length) {
+			var stone = attackStack.shift();
+			var ix = stone.ix;
+			var iy = stone.iy;
+			step = stone.step;
+			
+			parsePosition(ix-1, iy);
+			parsePosition(ix+1, iy);
+			parsePosition(ix, iy+1);
+			parsePosition(ix, iy-1);
+		}
+		
+		return resultStack;
+	}
+	
+	self.checkAttack  = function(sx,sy) {
+		var victimList = self.findAttacks(sx,sy);
+		
+		var stone = self.board[sx][sy];
+		while (victimList.length) {
+			var victim = victimList.shift();
+			self.convertStone(stone,victim);
+		}
+	}
+	
+	self.countAttacks = function(x,y, board, fakeStone) {
+		self.board = board;
+		return self.findAttacks(x,y, fakeStone).length;
+	}
+	
+	self.countDefenses = function(x,y, board, fakeStone) {
+		self.board = board;
+		return self.findDefender(x,y, fakeStone)?1:0;
+	}
+	
+	self.convertStone = function(from, to) {
+		to.element = from.element;
+		to.owner = from.owner;
+		to.bgColor = from.bgColor;
+	}
+	
+	self.tileWinsTile = function(elemAtk, elemDef) {
+		if (elemAtk == 0 && elemDef == 3) return true;
+		if (elemAtk == 1 && elemDef == 2) return true;
+		if (elemAtk == 2 && elemDef == 0) return true;
+		if (elemAtk == 3 && elemDef == 1) return true;
+		return false;
+	}
+	
+	self.colorWonBy = function(elem) {
+		switch(elem) {
+			case 0: return 3;
+			case 1: return 2;
+			case 2: return 0;
+			case 3: return 1;
+		}
+	}
+	
+	self.colorThatWins = function(elem) {
+		switch(elem) {
+			case 0: return 2;
+			case 1: return 3;
+			case 2: return 1;
+			case 3: return 0;
+		}
+	}
+
+}
+
+AlphaBeta = new function() {
 	var self = this;
 	self.hashedNodes = [];
 	self.pIndex = 1;
-	self.maxTurns = GLOBAL.BoardInstance.cols * GLOBAL.BoardInstance.rows;
-	self.hashSize = self.maxTurns * self.maxTurns * 4;
 	self.currentNode = 0; //self.generateRootNode();
+	self.rows = 6;
+	self.cols = 6;
+	self.useCache = false;
 	
 	self.cloneBoard = function(oldClone) {
 		var newClone = [];
-		for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
-			for (var j=0; j<GLOBAL.BoardInstance.rows; j++) {
+		newClone.rows = self.rows;
+		newClone.cols = self.cols;
+		for (var i=0;i<self.cols;i++) {
+			for (var j=0; j<self.rows; j++) {
 				var stone = oldClone[i] && oldClone[i][j];
 				if (stone) {
 					if (!newClone[i]) newClone[i] = [];
@@ -29,19 +227,47 @@ GLOBAL.AlphaBeta = function() {
 	}
 	
 	self.evaluateNode = function(node) {
+		// new heuristic: consider entropy
 		if (node.score)
 			return;
 			
 		var clone = node.clone;
 		var score = 0;
-		for (var x=0;x<GLOBAL.BoardInstance.cols;x++)
-			for (var y=0; y<GLOBAL.BoardInstance.rows; y++) {
+		for (var x=0;x<self.cols;x++)
+			for (var y=0; y<self.rows; y++) {
 				var stone = node.clone[x]?node.clone[x][y]:false;
 				if (stone)
 					score += (stone.owner == self.pIndex? 1 : -1);
 				}
 		node.score = score;
+		
+		// uncomment this for disabling entropy evaluation:
+		return;
+			
+		// entropy combination
+		var entropies = [0,0];
+		var totalPieces = [0,0];
+		for (var i=0;i<4;i++) {
+			totalPieces[0] += node.piles[0][i];
+			totalPieces[1] += node.piles[1][i];
+		}
+		for (var i=0;i<4;i++) {
+			if (node.piles[0][i]>0) {
+				var px = node.piles[0][i]/totalPieces[0];
+				entropies[0] -= px*Math.log(px)/Math.log(2);
+			}
+			if (node.piles[1][i]>0) {
+				var px = node.piles[1][i]/totalPieces[1];
+				entropies[1] -= px*Math.log(px)/Math.log(2);
+			}
+		}
+		
+		var entropyScore = (entropies[self.pIndex]-entropies[1-self.pIndex]) * self.maxTurns / 2;
+	
+		// entropy balance now counts 50%
+		node.score = score + entropyScore;
 	}
+	
 	
 	self.alphabeta = function(node, depth, alpha, beta, player) {
 		if (depth==0 || node.turn == 0) {
@@ -115,10 +341,10 @@ GLOBAL.AlphaBeta = function() {
 		factory.increasePosition = function() {
 			// next position
 			factory.x++;
-			if (factory.x >= GLOBAL.BoardInstance.cols) {
+			if (factory.x >= self.cols) {
 				factory.x = 0;
 				factory.y++;
-				if (factory.y >= GLOBAL.BoardInstance.rows) {
+				if (factory.y >= self.rows) {
 					return false;
 				}
 			}
@@ -162,8 +388,8 @@ GLOBAL.AlphaBeta = function() {
 					if (!factory.increaseElement())
 						return true;
 					else {
-						factory.x = 0;
-						factory.y = 0;
+						factory.x = factory.baseNode.initialX;
+						factory.y = factory.baseNode.initialY;
 					}		
 				} while (factory.baseNode.piles[factory.player][factory.element]<=0);
 			} while (factory.baseNode.clone[factory.x] && factory.baseNode.clone[factory.x][factory.y]);
@@ -172,8 +398,11 @@ GLOBAL.AlphaBeta = function() {
 		}
 		
 		factory.nextNoCreate = function() {
+			if (!self.useCache)
+				return false;
 			var retval = false;
 			while (true) {
+				
 				if (factory.element >= 4)
 					return false;
 					
@@ -189,12 +418,13 @@ GLOBAL.AlphaBeta = function() {
 						if (!factory.increaseElement())
 							return retval;
 						else {
-							factory.x = 0;
-							factory.y = 0;
+							factory.x = factory.baseNode.initialX;
+							factory.y = factory.baseNode.initialY;
 						}		
 					} while (factory.baseNode.piles[factory.player][factory.element]<=0);
 				} while (factory.baseNode.clone[factory.x] && factory.baseNode.clone[factory.x][factory.y]);
-			
+				if (retval)
+					return true;
 			}
 		}
 		
@@ -206,11 +436,13 @@ GLOBAL.AlphaBeta = function() {
 	}
 	
 	self.getFromCache = function(_x, _y, _element, _turn, _player, _parentNode) {
-		var hash = self.getHashFor(_x, _y, _element, _turn, _parentNode.hash);
-		if (self.hashedNodes[hash]) {
-			return self.hashedNodes[hash];
+		if (self.useCache) {
+			var hash = self.getHashFor(_x, _y, _element, _turn, _parentNode.hash);
+			if (self.hashedNodes[hash]) {
+				return self.hashedNodes[hash];
+			}
 		}
-			
+		
 		// create node
 		var node = {
 			x : _x,
@@ -222,7 +454,9 @@ GLOBAL.AlphaBeta = function() {
 			initialX : _parentNode.initialX,
 			initialY : _parentNode.initialY
 		}
+		
 		node.clone = self.cloneBoard(_parentNode.clone);
+		
 		if (!node.clone[_x])
 			node.clone[_x] = [];
 		node.clone[_x][_y] = {
@@ -231,20 +465,23 @@ GLOBAL.AlphaBeta = function() {
 			element : _element,
 			owner : _player,
 		};
-		GLOBAL.floodCheck.silentCheckFlood(_x, _y, node.clone);
+		
+		floodCheck.checkFlood(_x, _y, node.clone);
 		node.piles = self.clonePiles(_parentNode.piles);
 		node.piles[_player][_element]--;
 
-		node.hash = hash;	
-		// node is ready, store it in the cache and return it
-		self.hashedNodes[hash] = node;
+		if (self.useCache) {
+			node.hash = hash;	
+			self.hashedNodes[hash] = node;
+		}
 		return node;
 	}
 	
 	self.getHashFor = function(x, y, element, turn, parentHash) {
+		if (!self.useCache) return 0;
 		var hash = turn;
-		hash = (hash*GLOBAL.BoardInstance.cols) + x;
-		hash = (hash*GLOBAL.BoardInstance.rows) + y;
+		hash = (hash*self.cols) + x;
+		hash = (hash*self.rows) + y;
 		hash = (hash * 4) + element;
 		
 		var hashList;
@@ -283,37 +520,31 @@ GLOBAL.AlphaBeta = function() {
 				initialY : 0
 			}
 		rootNode.clone = [];
-		rootNode.piles = self.countPiles();
+		rootNode.piles = self.piles;
 		return rootNode;
 	}
 	
+	// todo: fix the prunning loop
 	self.reportPlayed = function(x,y,element,player) {
 		var oldNode = self.currentNode;
 		// find the child in the cache
 		var newNode = self.getFromCache(x,y,element,oldNode.turn-1, player, oldNode);
-		self.pruneHash(oldNode, newNode);
-		self.hashedNodes[oldNode.hash] = null;
+		if (self.useCache) {
+			self.pruneHash(oldNode, newNode);
+			self.hashedNodes[oldNode.hash] = null;
+		}
 		self.currentNode = newNode;
 	}
 	
 	self.depthEstimation = function(turn) {
 		//return Math.max(2, Math.min( 10, Math.floor(14 * Math.exp(-turn/28.0) ) ) );
-		return 3;
+		//return 3;
+		//var baseEstimation = Math.floor(14 * Math.exp(-turn/9));
+		var baseEstimation = Math.floor(17 * Math.exp(-turn/13));
+		var enhanced = 2*baseEstimation + 1;
+		//var baseEstimation = Math.floor(28 * Math.exp(-turn/9)+1);
+		return (Math.max(1, Math.min(13, enhanced)));
 		//return Math.max(2, Math.min( 14, Math.floor(75 * Math.exp(-turn/9.0) ) ) );
-	}
-	
-	self.countPiles = function() {
-		var pileCount = [];
-		for (var pileNum=0;pileNum<2; pileNum++) {
-			pileCount[pileNum] = [0,0,0,0];
-			for (var x=0;x<GLOBAL.Piles[pileNum].cols;x++)
-				for (var y=0;y<GLOBAL.Piles[pileNum].rows;y++) {
-					var stone = GLOBAL.Piles[pileNum][x][y];
-					if (stone)
-						pileCount[pileNum][stone.element]++;
-				}
-		}
-		return pileCount;
 	}
 	
 	self.clonePiles = function(parentPiles) {
@@ -324,13 +555,21 @@ GLOBAL.AlphaBeta = function() {
 		return pileCount;
 	}
 	
+	self.setBoardSize = function(data) {
+		self.rows = data[1];
+		self.cols = data[0];
+	}
+	
+	self.setPileContents = function(data) {
+		self.piles = data;
+	}
+	
 	self.start = function() {
+		self.maxTurns = self.cols * self.rows;
+		self.hashSize = self.maxTurns * self.maxTurns * 4;
 		self.hashedNodes = [];
 		self.currentNode = self.generateRootNode();
 	}
 
 }
 
-// begin (after piles are full): start()
-// tell player: reportPlayed(x,y,element, playernumber)
-// ask computer: computerPlay();

@@ -120,3 +120,16 @@ function initPiles()
 	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 1);
 }
 
+function countPiles() {
+	var pileCount = [];
+	for (var pileNum=0;pileNum<2; pileNum++) {
+		pileCount[pileNum] = [0,0,0,0];
+		for (var x=0;x<GLOBAL.Piles[pileNum].cols;x++)
+			for (var y=0;y<GLOBAL.Piles[pileNum].rows;y++) {
+				var stone = GLOBAL.Piles[pileNum][x][y];
+				if (stone)
+					pileCount[pileNum][stone.element]++;
+			}
+	}
+	return pileCount;
+}

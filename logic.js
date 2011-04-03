@@ -28,10 +28,10 @@ GLOBAL.FloodCheck = function() {
 	}
 	
 	self.resetFloodMarkers = function() {
-		for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
+		for (var i=0;i<self.board.cols;i++) {
 			if (!self.floodMarkers[i])
 				self.floodMarkers[i] = [];
-			for (var j=0; j<GLOBAL.BoardInstance.rows; j++)
+			for (var j=0; j<self.board.rows; j++)
 				self.floodMarkers[i][j] = true;
 		}
 	}
@@ -179,8 +179,8 @@ GLOBAL.FloodCheck = function() {
 		GLOBAL.counts = [];
 		GLOBAL.counts[0] = 0;
 		GLOBAL.counts[1] = 0;
-		for (var i=0; i<GLOBAL.BoardInstance.cols; i++)
-			for (var j=0; j<GLOBAL.BoardInstance.rows; j++) {
+		for (var i=0; i<self.board.cols; i++)
+			for (var j=0; j<self.board.rows; j++) {
 				if (self.board[i][j]) {
 					GLOBAL.counts[ self.board[i][j].owner ]++;
 				}
