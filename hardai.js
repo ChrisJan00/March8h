@@ -1,7 +1,6 @@
 // start with element with bigger count?
 // start with board that cutted beta before?
 
-
 GLOBAL.AlphaBeta = function() {
 	var self = this;
 	self.hashedNodes = [];
@@ -10,62 +9,21 @@ GLOBAL.AlphaBeta = function() {
 	self.hashSize = self.maxTurns * self.maxTurns * 4;
 	self.currentNode = 0; //self.generateRootNode();
 	
-	self.BoardClone = function() {};
-	self.BoardClone.prototype = {
-		get : function(x,y) {
-			if (x<0 || x>=GLOBAL.BoardInstance.cols || y<0 || y>=GLOBAL.BoardInstance.rows)
-				return false;
-			return this[x][y];
-			
-		},
-		set : function(x,y, stone) {
-			if (x<0 || x>=GLOBAL.BoardInstance.cols || y<0 || y>=GLOBAL.BoardInstance.rows)
-				return;
-			this[x][y] = {
-				ix: stone.ix,
-				iy: stone.iy,
-				owner: stone.owner,
-				element: stone.element
-			}
-		}
-	}
-	
-	self.cloneFromMaster = function() {
-		var newClone = new self.BoardClone();
-		for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
-			newClone[i] = [];
-			for (var j=0; j<GLOBAL.BoardInstance.rows; j++)
-			{
-				var stone = GLOBAL.BoardInstance.get(i,j);
-				if (stone)
-					newClone.set(i,j, {
-						ix : stone.ix,
-						iy : stone.iy,
-						elem: stone.element,
-						owner: stone.owner
-					} );
-			}
-		}
-		return newClone;
-	}
-	
 	self.cloneBoard = function(oldClone) {
-		var newClone = new self.BoardClone();
+		var newClone = [];
 		for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
-			newClone[i] = [];
-			for (var j=0; j<GLOBAL.BoardInstance.rows; j++)
-				if (oldClone.get(i,j))
-					newClone.set(i, j, oldClone.get(i,j) );
-		}
-		return newClone;
-	}
-	
-	self.getEmptyClone = function() {
-		var newClone = new self.BoardClone();
-		for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
-			newClone[i] = [];
-//			for (var j=0; j<GLOBAL.BoardInstance.rows; j++)
-//				newClone[i][j] = false;
+			for (var j=0; j<GLOBAL.BoardInstance.rows; j++) {
+				var stone = oldClone[i] && oldClone[i][j];
+				if (stone) {
+					if (!newClone[i]) newClone[i] = [];
+					newClone[i][j] = {
+						ix: stone.ix,
+						iy: stone.iy,
+						owner: stone.owner,
+						element: stone.element
+					};
+				}
+			}
 		}
 		return newClone;
 	}
@@ -78,7 +36,7 @@ GLOBAL.AlphaBeta = function() {
 		var score = 0;
 		for (var x=0;x<GLOBAL.BoardInstance.cols;x++)
 			for (var y=0; y<GLOBAL.BoardInstance.rows; y++) {
-				var stone = node.clone.get(x,y);
+				var stone = node.clone[x]?node.clone[x][y]:false;
 				if (stone)
 					score += (stone.owner == self.pIndex? 1 : -1);
 				}
@@ -174,7 +132,7 @@ GLOBAL.AlphaBeta = function() {
 					return;
 			}
 			
-			while (factory.baseNode.clone.get(factory.x, factory.y)) {
+			while (factory.baseNode.clone[factory.x] && factory.baseNode.clone[factory.x][factory.y]) {
 				if (!factory.increasePosition())
 					return;
 			}
@@ -192,6 +150,9 @@ GLOBAL.AlphaBeta = function() {
 		}
 		
 		factory.next = function() {
+			if (factory.element >= 4)
+				return false;
+				
 			factory.lastNode = self.getFromCache(factory.x, factory.y, 
 			factory.element, factory.turn, factory.player, factory.baseNode);
 				
@@ -199,31 +160,42 @@ GLOBAL.AlphaBeta = function() {
 			do {
 				if (!factory.increasePosition()) do {
 					if (!factory.increaseElement())
-						return false;
+						return true;
 					else {
 						factory.x = 0;
 						factory.y = 0;
 					}		
 				} while (factory.baseNode.piles[factory.player][factory.element]<=0);
-			} while (factory.baseNode.clone.get(factory.x, factory.y));
+			} while (factory.baseNode.clone[factory.x] && factory.baseNode.clone[factory.x][factory.y]);
 			
 			return true;
 		}
 		
 		factory.nextNoCreate = function() {
-			do {
-				if (!factory.increasePosition())
-					// if we checked all possible, signal end
+			var retval = false;
+			while (true) {
+				if (factory.element >= 4)
 					return false;
-			} while (factory.baseNode.clone.get(factory.x, factory.y));
+					
+				var hash = self.getHashFor(factory.x, factory.y, factory.element, factory.turn, factory.baseNode.hash);
+				if (self.hashedNodes[hash]) {
+					factory.lastNode =  self.hashedNodes[hash];
+					retval = true;
+				}
+				
+				// find an empty position
+				do {
+					if (!factory.increasePosition()) do {
+						if (!factory.increaseElement())
+							return retval;
+						else {
+							factory.x = 0;
+							factory.y = 0;
+						}		
+					} while (factory.baseNode.piles[factory.player][factory.element]<=0);
+				} while (factory.baseNode.clone[factory.x] && factory.baseNode.clone[factory.x][factory.y]);
 			
-			var hash = self.getHashFor(factory.x, factory.y, factory.element, factory.turn, factory.baseNode.hash);
-			if (self.hashedNodes[hash]) {
-				factory.lastNode =  self.hashedNodes[hash];
-				return true;
 			}
-			
-			return false;
 		}
 		
 		factory.current = function() {
@@ -251,12 +223,14 @@ GLOBAL.AlphaBeta = function() {
 			initialY : _parentNode.initialY
 		}
 		node.clone = self.cloneBoard(_parentNode.clone);
-		node.clone.set(_x, _y, {
+		if (!node.clone[_x])
+			node.clone[_x] = [];
+		node.clone[_x][_y] = {
 			ix : _x,
 			iy : _y,
 			element : _element,
 			owner : _player,
-		})
+		};
 		GLOBAL.floodCheck.silentCheckFlood(_x, _y, node.clone);
 		node.piles = self.clonePiles(_parentNode.piles);
 		node.piles[_player][_element]--;
@@ -308,7 +282,7 @@ GLOBAL.AlphaBeta = function() {
 				initialX : 0,
 				initialY : 0
 			}
-		rootNode.clone = self.getEmptyClone();
+		rootNode.clone = [];
 		rootNode.piles = self.countPiles();
 		return rootNode;
 	}
@@ -324,7 +298,7 @@ GLOBAL.AlphaBeta = function() {
 	
 	self.depthEstimation = function(turn) {
 		//return Math.max(2, Math.min( 10, Math.floor(14 * Math.exp(-turn/28.0) ) ) );
-		return 2;
+		return 3;
 		//return Math.max(2, Math.min( 14, Math.floor(75 * Math.exp(-turn/9.0) ) ) );
 	}
 	
@@ -334,7 +308,7 @@ GLOBAL.AlphaBeta = function() {
 			pileCount[pileNum] = [0,0,0,0];
 			for (var x=0;x<GLOBAL.Piles[pileNum].cols;x++)
 				for (var y=0;y<GLOBAL.Piles[pileNum].rows;y++) {
-					var stone = GLOBAL.Piles[pileNum].get(x,y);
+					var stone = GLOBAL.Piles[pileNum][x][y];
 					if (stone)
 						pileCount[pileNum][stone.element]++;
 				}

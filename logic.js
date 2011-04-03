@@ -2,6 +2,7 @@
 GLOBAL.FloodCheck = function() {
 	var self = this;
 	self.board = GLOBAL.BoardInstance;
+	self.floodMarkers = [];
 	
 	self.checkFlood = function(ix,iy, board) {
 		self.evalBoard(ix,iy,board);
@@ -26,26 +27,25 @@ GLOBAL.FloodCheck = function() {
 		GLOBAL.turnDelay = turnDelay;
 	}
 	
-	self.getNewFloodMarkers = function() {
-		var floodFill = {}
+	self.resetFloodMarkers = function() {
 		for (var i=0;i<GLOBAL.BoardInstance.cols;i++) {
-			floodFill[i] = {};
+			if (!self.floodMarkers[i])
+				self.floodMarkers[i] = [];
 			for (var j=0; j<GLOBAL.BoardInstance.rows; j++)
-				floodFill[i][j] = true;
+				self.floodMarkers[i][j] = true;
 		}
-		return floodFill;
 	}
 	
 	self.findDefender = function(ix, iy, fakeStone) {
 		function getDefender(x,y) {
-			var candidate = self.board.get(x,y);
+			var candidate = self.board[x]?self.board[x][y]:null;
 			if (candidate && candidate.owner == ownerWanted && candidate.element == elemWanted)
 				return candidate;
 			else
 				return false;
 		}
 		
-		var stone = self.board.get(ix,iy) || fakeStone;
+		var stone = self.board[ix][iy] || fakeStone;
 		if (!stone) {
 			return false;
 		}
@@ -55,13 +55,13 @@ GLOBAL.FloodCheck = function() {
 		ownerWanted = 1-stone.owner;
 		
 		return getDefender(ix-1,iy) ||
-				   getDefender(ix+1,iy) || 
-				   getDefender(ix,iy-1) ||
-				   getDefender(ix,iy+1);
+			   getDefender(ix+1,iy) || 
+			   getDefender(ix,iy-1) ||
+			   getDefender(ix,iy+1);
 	}
 	
 	self.checkDefense = function(x,y) {
-		var stone = self.board.get(x,y);
+		var stone = self.board[x][y];
 		defender = self.findDefender(x,y);
 		if (defender) {
 			self.convertStone( defender, stone );
@@ -78,23 +78,23 @@ GLOBAL.FloodCheck = function() {
 	
 	self.findAttacks = function(sx, sy, fakeStone) {
 		function parsePosition(ix,iy) {
-			var victim = self.board.get(ix,iy);
+			var victim = self.board[ix]?self.board[ix][iy]:null;
 			if (victim && victim.owner == ownerWanted && victim.element == elemWanted && 
-				floodMarkers[ix][iy]) {
+				self.floodMarkers[ix][iy]) {
 				victim.step = step+1;
 				attackStack.push(victim);
 				resultStack.push(victim);
-				floodMarkers[ix][iy] = false;
+				self.floodMarkers[ix][iy] = false;
 			}
 		}
 		
-		var masterStone = self.board.get(sx,sy) || fakeStone;
+		var masterStone = self.board[sx][sy] || fakeStone;
 		if (!masterStone) 
 				return false;
 
 		var attackStack = new Array();
 		var resultStack = new Array();
-		var floodMarkers = self.getNewFloodMarkers();
+		self.resetFloodMarkers();
 		
 		attackStack.push(masterStone);
 		masterStone.step = -1;
@@ -120,7 +120,7 @@ GLOBAL.FloodCheck = function() {
 	self.checkAttack  = function(sx,sy) {
 		var victimList = self.findAttacks(sx,sy);
 		
-		var stone = self.board.get(sx,sy);
+		var stone = self.board[sx][sy];
 		while (victimList.length) {
 			var victim = victimList.shift();
 			self.convertStone(stone,victim);
@@ -176,13 +176,13 @@ GLOBAL.FloodCheck = function() {
 	}
 	
 	self.countMarkers = function() {
-		GLOBAL.counts = {};
+		GLOBAL.counts = [];
 		GLOBAL.counts[0] = 0;
 		GLOBAL.counts[1] = 0;
 		for (var i=0; i<GLOBAL.BoardInstance.cols; i++)
 			for (var j=0; j<GLOBAL.BoardInstance.rows; j++) {
-				if (self.board.get(i,j)) {
-					GLOBAL.counts[ self.board.get(i,j).owner ]++;
+				if (self.board[i][j]) {
+					GLOBAL.counts[ self.board[i][j].owner ]++;
 				}
 			}
 	}

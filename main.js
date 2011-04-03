@@ -113,8 +113,6 @@ function drawInitialGame() {
 
 function connectMouse() {
 	GLOBAL.gameCanvas.addEventListener('mousedown', mouseDown, false);
-    GLOBAL.gameCanvas.addEventListener('mousemove', mouseMove, false);
-    GLOBAL.gameCanvas.addEventListener('mouseup',   mouseUp, false);
 }
 
 function randint(n) {
@@ -189,6 +187,7 @@ function manageTurn()
  	}
  		
  	if (turnIsReady) {	
+ 		GLOBAL.floodCheck.board = GLOBAL.BoardInstance;
  		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = 1-GLOBAL.action.turn;
 		

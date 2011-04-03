@@ -73,12 +73,12 @@ GLOBAL.DefenseModeOption.prototype.activate = function() {
 	GLOBAL.defenseMode = this.option;
 	var ctx = GLOBAL.gameContext;
 	ctx.fillStyle = "#FFFFFF";
-	ctx.fillRect(150,250,200,40);
+	ctx.fillRect(150,this.y0,200,40);
 	ctx.fillStyle = "#000000";
 	if (this.option)
-		ctx.fillText("on: Defense, then Attack", 150, 270);
+		ctx.fillText("on: Defense, then Attack", 150, this.y0+20);
 	else
-		ctx.fillText("off: Attack, then Defense", 150, 270);
+		ctx.fillText("off: Attack, then Defense", 150, this.y0+20);
 }
 
 GLOBAL.StartGameOption = function(x,y) {

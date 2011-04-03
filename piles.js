@@ -18,7 +18,7 @@ GLOBAL.PileClass.prototype.manageClicked = function( mx, my )
 	if (GLOBAL.action.turn != this.owner)
 		return;
 	
-	var newStone = this.get(mix,miy);
+	var newStone = this[mix][miy];
 	var oldStone = this.selection;
 	
 	if (oldStone) {
@@ -96,8 +96,8 @@ GLOBAL.PileClass.prototype.countStoneTypes = function()
 	
 	for (var ix=0; ix<this.cols; ix++)
 		for (var iy=0; iy<this.rows; iy++)
-			if (this.get(ix,iy)) {
-				typeCount[this.get(ix,iy).element]++;
+			if (this[ix][iy]) {
+				typeCount[this[ix][iy].element]++;
 		}
 	return typeCount;
 }
@@ -106,7 +106,7 @@ GLOBAL.PileClass.prototype.getStoneByElement = function(elem)
 {
 	for (var ix=0; ix<this.cols; ix++)
 		for (var iy=0; iy<this.rows; iy++) {
-			var current = this.get(ix,iy);
+			var current = this[ix][iy];
 			if (current && current.element == elem)
 				return current;
 		}
@@ -118,7 +118,5 @@ function initPiles()
 	GLOBAL.Piles = [];
 	GLOBAL.Piles[0] = new GLOBAL.PileClass(25, 10, 0);
 	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 1);
-	//GLOBAL.Piles[0].chooseTiles();
-	//GLOBAL.Piles[1].chooseTiles();
 }
 
