@@ -286,11 +286,13 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	GLOBAL.floodCheck.checkFlood(mix, miy);
 	
 	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
-		//GLOBAL.hardAI.reportPlayed(mix,miy,stone.element, GLOBAL.action.turn);
-		GLOBAL.hardAIWorker.postMessage([3, mix, miy, stone.element, GLOBAL.action.turn]);
-		GLOBAL.hardAIWorker.postMessage([4]);
-		//AiWorker.onmessage({data:[3, mix, miy, stone.element, GLOBAL.action.turn]});
-		//AiWorker.onmessage({data:[4]});
+		if (!noWorker) {
+			GLOBAL.hardAIWorker.postMessage([3, mix, miy, stone.element, GLOBAL.action.turn]);
+			GLOBAL.hardAIWorker.postMessage([4]);
+		} else {
+			AiWorker.onmessage({data:[3, mix, miy, stone.element, GLOBAL.action.turn]});
+			AiWorker.onmessage({data:[4]});
+		}
 	}
 	return true;
 }

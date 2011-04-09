@@ -1,6 +1,18 @@
 
-var AiWorker = self;
-//var AiWorker = {};
+var AiWorker;
+var itsAWorker;
+
+try {
+	if (noWorker) {
+		AiWorker = {};
+		itsAWorker = false;
+	}
+} catch(exception) {
+	AiWorker = self;
+	itsAWorker = true;
+}
+	
+	
 AiWorker.onmessage = function(event) {
 	var msg = event.data;
 	switch(event.data[0])
@@ -33,10 +45,12 @@ AiWorker.onmessage = function(event) {
 	}	
 }
 
-//AiWorker.postMessage = function(data) {
-//		GLOBAL.computerChoice = data;
-//		setTimeout(manageTurn, 1500);
-//}
+if (itsAWorker) {
+	AiWorker.postMessage = function(data) {
+			GLOBAL.computerChoice = data;
+			setTimeout(manageTurn, 1500);
+	}
+}
 
 floodCheck = new function() {
 	var self = this;

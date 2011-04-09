@@ -45,6 +45,9 @@ function prepareGame()
 	GLOBAL.canvasWidth = GLOBAL.gameCanvas.width;
 	GLOBAL.canvasHeight = GLOBAL.gameCanvas.height;
 	
+	// true: don't use worker, false: use worker
+	noWorker = false;
+	
 	GLOBAL.animationDelay = 250;
 	GLOBAL.framesPerStrip = 4;
 	
@@ -72,21 +75,23 @@ function prepareGame()
 	
 	//GLOBAL.hardAI = new GLOBAL.AlphaBeta();
 	
-	GLOBAL.hardAIWorker = new Worker("hardai.js");
-	GLOBAL.hardAIWorker.onmessage = function(event) {
-		GLOBAL.computerChoice = event.data;
-		manageTurn();
+	if (!noWorker) {
+		GLOBAL.hardAIWorker = new Worker("hardai.js");
+		GLOBAL.hardAIWorker.onmessage = function(event) {
+			GLOBAL.computerChoice = event.data;
+			manageTurn();
+		}
+		GLOBAL.hardAIWorker.onerror = function(event) {
+			throw event.data;
+		}
+		GLOBAL.hardAIWorker.postMessage([0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]);
+	} else {
+		AiWorker.onmessage({data:[0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]});
 	}
-	GLOBAL.hardAIWorker.onerror = function(event) {
-		throw event.data;
-	}
-	GLOBAL.hardAIWorker.postMessage([0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]);
 	
-	//AiWorker.onmessage({data:[0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]});
 	initPiles();
 	
 	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
-	//GLOBAL.floodCheck.countMarkers();
 	
 	// clicking on the board
 	GLOBAL.mouse = {
@@ -107,13 +112,14 @@ function restartGame() {
 	GLOBAL.Piles[1].chooseTiles();
 	GLOBAL.floodCheck.countMarkers();
 	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
-		
-		GLOBAL.hardAIWorker.postMessage([1, countPiles()]);
-		GLOBAL.hardAIWorker.postMessage([2, GLOBAL.defenseMode]);
-		
-		//AiWorker.onmessage({data:[1,countPiles()]});
-		//AiWorker.onmessage({data:[2,GLOBAL.defenseMode]});
-		//GLOBAL.hardAI.start();
+		if (!noWorker) {
+			GLOBAL.hardAIWorker.postMessage([1, countPiles()]);
+			GLOBAL.hardAIWorker.postMessage([2, GLOBAL.defenseMode]);
+		}
+		else {
+			AiWorker.onmessage({data:[1,countPiles()]});
+			AiWorker.onmessage({data:[2,GLOBAL.defenseMode]});
+		}
 	}
 	enableTurn();
 }
