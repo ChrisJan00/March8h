@@ -138,9 +138,15 @@ GLOBAL.FloodCheck = function() {
 	}
 	
 	self.convertStone = function(from, to) {
-		to.element = from.element;
-		to.owner = from.owner;
-		to.bgColor = from.bgColor;
+		self.board[to.ix][to.iy] = {
+			ix : to.ix,
+			iy : to.iy,
+			element : from.element,
+			owner : from.owner,
+			bgColor : from.bgColor,
+			visible : true,
+			active : to.active,
+		}
 		
 		if (self.board == GLOBAL.BoardInstance) {
 			var delay = to.step*GLOBAL.animationDelay;

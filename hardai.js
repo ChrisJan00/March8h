@@ -58,12 +58,11 @@ floodCheck = new function() {
 	}
 	
 	self.resetFloodMarkers = function() {
-		for (var i=0;i<self.board.cols;i++) {
-			if (!self.floodMarkers[i])
-				self.floodMarkers[i] = [];
-			for (var j=0; j<self.board.rows; j++)
-				self.floodMarkers[i][j] = true;
-		}
+		var markerCol = [];
+		for (var i=0;i<self.board.rows;i++)
+			markerCol[i] = true;
+		for (var i=0;i<self.board.cols;i++)
+			self.floodMarkers[i] = markerCol.slice();
 	}
 	
 	self.findDefender = function(ix, iy, fakeStone) {
@@ -163,9 +162,13 @@ floodCheck = new function() {
 	}
 	
 	self.convertStone = function(from, to) {
-		to.element = from.element;
-		to.owner = from.owner;
-		to.bgColor = from.bgColor;
+		self.board[to.ix][to.iy] = {
+			ix : to.ix,
+			iy : to.iy,
+			element : from.element,
+			owner : from.owner,
+			bgColor : from.bgColor,
+		}
 	}
 	
 	self.tileWinsTile = function(elemAtk, elemDef) {
@@ -200,7 +203,7 @@ AlphaBeta = new function() {
 	var self = this;
 	self.hashedNodes = [];
 	self.pIndex = 1;
-	self.currentNode = 0; //self.generateRootNode();
+	self.currentNode = 0;
 	self.rows = 6;
 	self.cols = 6;
 	self.useCache = false;
@@ -210,18 +213,8 @@ AlphaBeta = new function() {
 		newClone.rows = self.rows;
 		newClone.cols = self.cols;
 		for (var i=0;i<self.cols;i++) {
-			for (var j=0; j<self.rows; j++) {
-				var stone = oldClone[i] && oldClone[i][j];
-				if (stone) {
-					if (!newClone[i]) newClone[i] = [];
-					newClone[i][j] = {
-						ix: stone.ix,
-						iy: stone.iy,
-						owner: stone.owner,
-						element: stone.element
-					};
-				}
-			}
+			if (oldClone[i])
+				newClone[i] = oldClone[i].slice();
 		}
 		return newClone;
 	}
