@@ -9,7 +9,6 @@ GLOBAL.StoneHolder.prototype = {
 	height : 50,
 	x1 : 50,
 	y1 : 50,
-	contents : [],
 	stoneCount : 0,
 	borderTileSide : 6,
 	borderAnimationDelay : 150,
@@ -56,8 +55,8 @@ GLOBAL.StoneHolder.prototype = {
 	
 	redrawTileBackground : function(x,y, col) {
 		var color = "#FFFFFF";
-		if (this.contents[x][y] && this.contents[x][y].active)
-			color = this.contents[x][y].bgColor;
+		if (this[x][y] && this[x][y].active)
+			color = this[x][y].bgColor;
 			
 		if (col)
 			color = col;
@@ -85,7 +84,7 @@ GLOBAL.StoneHolder.prototype = {
 		// if there is no tile, draw empty space
 		this.redrawTileBackground(x,y,col);
 		
-		stone = this.get(x,y);
+		stone = this[x][y];
 		if (stone && stone.visible) {
 			// draw stone
 			var ix = this.x0 + x * this.side;
@@ -116,7 +115,7 @@ GLOBAL.StoneHolder.prototype = {
 	blinkTile : function(x,y,frame) 
 	{
 		var self = this;
-		var stone = this.get(x,y);
+		var stone = this[x][y];
 		if (!stone) return;
 		
 		var color = frame%2? colorForPlayer(stone.owner) : colorForPlayerStrong(stone.owner);
@@ -137,7 +136,7 @@ GLOBAL.StoneHolder.prototype = {
 	
 	animateTile : function(x,y, frame) 
 	{
- 		var stone = this.get(x,y);
+ 		var stone = this[x][y];
  		
  		this.redrawTileBackground(x, y);
  
@@ -166,6 +165,7 @@ GLOBAL.StoneHolder.prototype = {
 	},
 	
 	startBorderAnimation: function(x,y) {
+		GLOBAL.turnDelay = Math.max(GLOBAL.turnDelay, (this.borderTileSide+1)*this.borderAnimationDelay);
 		this.borderAnimation(x,y, this.borderTileSide);
 	},
 	
@@ -214,29 +214,24 @@ GLOBAL.StoneHolder.prototype = {
 			owner : stone.owner
 		};
 	 	newStone.bgColor = colorForPlayer(stone.owner);
-	 	if (!this.contents[x][y])
+	 	if (!this[x][y])
 	 		this.stoneCount++;
-		this.contents[x][y] = newStone;
+		this[x][y] = newStone;
 	},
 	
-	get : function(x,y) {
-		if (x<0 || x>=this.cols || y<0 || y>=this.rows)
-			return false;
-		return this.contents[x][y];
-	},
+	// get skipped, it was too expensive
 	
 	del : function(x,y) {
-		if (this.contents[x][y]) {
-			this.contents[x][y] = false;
+		if (this[x][y]) {
+			this[x][y] = null;
 			this.stoneCount--;
 		}
 	},
 	
 	clearContents : function() {
 		var self = this;
-		self.contents = [];
 		for (var i=0;i<self.cols;i++)
-		self.contents[i] = [];
+			self[i] = [];
 		self.stoneCount = 0;
 	},
 	
@@ -269,7 +264,7 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	var currentPile = GLOBAL.Piles[GLOBAL.action.turn];
 	
 	// place taken?
-	if (this.get(mix,miy))
+	if (this[mix][miy])
 		return false;
 		
 	// no selection?
@@ -290,6 +285,15 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	//startFlood(mix, miy);
 	GLOBAL.floodCheck.checkFlood(mix, miy);
 	
+	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
+		if (!noWorker) {
+			GLOBAL.hardAIWorker.postMessage([3, mix, miy, stone.element, GLOBAL.action.turn]);
+			GLOBAL.hardAIWorker.postMessage([4]);
+		} else {
+			AiWorker.onmessage({data:[3, mix, miy, stone.element, GLOBAL.action.turn]});
+			AiWorker.onmessage({data:[4]});
+		}
+	}
 	return true;
 }
 

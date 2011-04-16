@@ -30,7 +30,7 @@ function computerPlay() {
 		self.options = new Array();
 		for (var ix=0;ix<GLOBAL.BoardInstance.cols;ix++)
 			for (var iy=0;iy<GLOBAL.BoardInstance.rows;iy++) {
-				if (GLOBAL.BoardInstance.get(ix,iy))
+				if (GLOBAL.BoardInstance[ix][iy])
 					continue;
 				for (var color=0;color<4;color++) {
 					var score = 0;
@@ -57,13 +57,11 @@ function computerPlay() {
 	}
 	
 	self.check = function(x,y,color,owner) {
-			if (x>=0 && x<GLOBAL.BoardInstance.cols && y>=0 && y<GLOBAL.BoardInstance.rows &&
-				GLOBAL.BoardInstance.get(x,y) && 
-				GLOBAL.BoardInstance.get(x,y).element == color && 
-				GLOBAL.BoardInstance.get(x,y).owner == owner)
-					return true;
-			else return false;
-		}
+		var candidate = GLOBAL.BoardInstance[x]?GLOBAL.BoardInstance[x][y]:null;
+		if ( candidate && candidate.element == color && candidate.owner == owner)
+			return true;
+		else return false;
+	}
 	
 	self.isDefended = function( ix, iy, color, owner )
 	{
@@ -111,7 +109,18 @@ function computerPlay() {
 		return self.options[choice];
 	}
 	
-	self.playThis = function(mix,miy,elem) {
+	
+	self.computeStones();
+	self.computeEntropies();
+	self.computeBasicScores();
+	self.normalizeScores();
+	return self.chooseOption();
+	//var finalChoice = self.chooseOption();
+	//return self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
+	
+}
+
+function computerMove(mix,miy,elem, pn) {
 		// find one stone in own pile
 		
 		var currentPile = GLOBAL.Piles[pn];
@@ -133,13 +142,3 @@ function computerPlay() {
 		
 		return true;
 	}
-	
-	
-	self.computeStones();
-	self.computeEntropies();
-	self.computeBasicScores();
-	self.normalizeScores();
-	var finalChoice = self.chooseOption();
-	return self.playThis(finalChoice[0], finalChoice[1], finalChoice[2]);
-	
-}

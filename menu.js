@@ -1,13 +1,14 @@
 
 GLOBAL.GameMenu = function() {
-	self = this;
+	var self = this;
 	self.active = false;
 	self.create = function() 
 	{
 		GLOBAL.playerOption = new GLOBAL.PlayerOption( 100, 100 );
 		GLOBAL.computerEasyOption = new GLOBAL.ComputerEasyOption(100, 150);
 		GLOBAL.computerMediumOption = new GLOBAL.ComputerMediumOption(100, 200);
-		GLOBAL.defenseModeOption = new GLOBAL.DefenseModeOption(100, 250);
+		GLOBAL.computerHardOption = new GLOBAL.ComputerHardOption(100, 250);
+		GLOBAL.defenseModeOption = new GLOBAL.DefenseModeOption(100, 300);
 		self.startGameOption = new GLOBAL.StartGameOption(100,350);
 		
 		GLOBAL.computerEasyOption.set(true);
@@ -19,6 +20,7 @@ GLOBAL.GameMenu = function() {
 		GLOBAL.playerOption.set(GLOBAL.playerOption.option);
 		GLOBAL.computerEasyOption.set(GLOBAL.computerEasyOption.option);
 		GLOBAL.computerMediumOption.set(GLOBAL.computerMediumOption.option);
+		GLOBAL.computerHardOption.set(GLOBAL.computerHardOption.option);
 		GLOBAL.defenseModeOption.set(GLOBAL.defenseModeOption.option);
 		self.startGameOption.set(self.startGameOption.option);
 	}
@@ -38,12 +40,14 @@ GLOBAL.GameMenu = function() {
 		ctx.fillText("Player VS Player", 150, 120);
 		ctx.fillText("Player VS Computer (Easy)", 150, 170);
 		ctx.fillText("Player VS Computer (Medium)", 150, 220);
-		ctx.fillText("off: Attack, then Defense", 150, 270);
+		ctx.fillText("Player VS Computer (Hard)", 150, 270);
+		ctx.fillText("off: Attack, then Defense", 150, 320);
 		ctx.fillText("Start Game", 150, 370);
 		
 		GLOBAL.playerOption.redraw();
 		GLOBAL.computerEasyOption.redraw();
 		GLOBAL.computerMediumOption.redraw();
+		GLOBAL.computerHardOption.redraw();
 		GLOBAL.defenseModeOption.redraw();
 		self.startGameOption.redraw();
 		self.active = true;
@@ -58,6 +62,7 @@ GLOBAL.GameMenu = function() {
 		GLOBAL.playerOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
 		GLOBAL.computerEasyOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
 		GLOBAL.computerMediumOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
+		GLOBAL.computerHardOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
 		GLOBAL.defenseModeOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
 		self.startGameOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	}
@@ -68,12 +73,12 @@ GLOBAL.DefenseModeOption.prototype.activate = function() {
 	GLOBAL.defenseMode = this.option;
 	var ctx = GLOBAL.gameContext;
 	ctx.fillStyle = "#FFFFFF";
-	ctx.fillRect(150,250,200,40);
+	ctx.fillRect(150,this.y0,200,40);
 	ctx.fillStyle = "#000000";
 	if (this.option)
-		ctx.fillText("on: Defense, then Attack", 150, 270);
+		ctx.fillText("on: Defense, then Attack", 150, this.y0+20);
 	else
-		ctx.fillText("off: Attack, then Defense", 150, 270);
+		ctx.fillText("off: Attack, then Defense", 150, this.y0+20);
 }
 
 GLOBAL.StartGameOption = function(x,y) {
@@ -84,6 +89,7 @@ GLOBAL.StartGameOption = function(x,y) {
 GLOBAL.StartGameOption.prototype = new GLOBAL.OptionBox;
 GLOBAL.StartGameOption.prototype.activate = function() {
 	GLOBAL.menu.hide();
+	restartGame();
 	drawInitialGame();
 	this.option = false;
 }
@@ -98,7 +104,8 @@ GLOBAL.ExitOption.prototype = new GLOBAL.OptionBox;
 GLOBAL.ExitOption.prototype.activate = function() {
 	if ((!this.option) && GLOBAL.turnEnabled) {
 		this.option = true;
-		prepareGame();
+		//prepareGame();
+		restartGame();
 		GLOBAL.menu.reloadControls();
 		GLOBAL.menu.show();
 	}

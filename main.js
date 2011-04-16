@@ -45,6 +45,9 @@ function prepareGame()
 	GLOBAL.canvasWidth = GLOBAL.gameCanvas.width;
 	GLOBAL.canvasHeight = GLOBAL.gameCanvas.height;
 	
+	// true: don't use worker, false: use worker
+	noWorker = false;
+	
 	GLOBAL.animationDelay = 250;
 	GLOBAL.framesPerStrip = 4;
 	
@@ -67,11 +70,28 @@ function prepareGame()
 	GLOBAL.computerDelay = 1000;//1500;
 	GLOBAL.maximizeEntropy = false;
 	GLOBAL.defenseMode = true;
+	GLOBAL.computerHard = false;
+	GLOBAL.computerChoice = [0,0,0];
+	
+	//GLOBAL.hardAI = new GLOBAL.AlphaBeta();
+	
+	if (!noWorker) {
+		GLOBAL.hardAIWorker = new Worker("hardai.js");
+		GLOBAL.hardAIWorker.onmessage = function(event) {
+			GLOBAL.computerChoice = event.data;
+			manageTurn();
+		}
+		GLOBAL.hardAIWorker.onerror = function(event) {
+			throw event.data;
+		}
+		GLOBAL.hardAIWorker.postMessage([0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]);
+	} else {
+		AiWorker.onmessage({data:[0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]});
+	}
 	
 	initPiles();
 	
 	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
-	GLOBAL.floodCheck.countMarkers();
 	
 	// clicking on the board
 	GLOBAL.mouse = {
@@ -82,7 +102,7 @@ function prepareGame()
 	
 	GLOBAL.exitOption = new GLOBAL.ExitOption();
 	
-	enableTurn();
+	//restartGame();
 }
 
 function restartGame() {
@@ -91,6 +111,16 @@ function restartGame() {
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
 	GLOBAL.floodCheck.countMarkers();
+	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
+		if (!noWorker) {
+			GLOBAL.hardAIWorker.postMessage([1, countPiles()]);
+			GLOBAL.hardAIWorker.postMessage([2, GLOBAL.defenseMode]);
+		}
+		else {
+			AiWorker.onmessage({data:[1,countPiles()]});
+			AiWorker.onmessage({data:[2,GLOBAL.defenseMode]});
+		}
+	}
 	enableTurn();
 }
 
@@ -107,8 +137,6 @@ function drawInitialGame() {
 
 function connectMouse() {
 	GLOBAL.gameCanvas.addEventListener('mousedown', mouseDown, false);
-    GLOBAL.gameCanvas.addEventListener('mousemove', mouseMove, false);
-    GLOBAL.gameCanvas.addEventListener('mouseup',   mouseUp, false);
 }
 
 function randint(n) {
@@ -145,9 +173,14 @@ function mouseDown( ev ) {
 function enableTurn()
 {
 	GLOBAL.turnEnabled = true;
+	GLOBAL.turnDelay = 0;
 	GLOBAL.exitOption.activate();
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		setTimeout(manageTurn, GLOBAL.computerDelay);
+		if (GLOBAL.computerHard) {
+			// wait for the worker message
+			//manageTurn(); // don't wait for now
+		} else
+			setTimeout(manageTurn, GLOBAL.computerDelay);
 	}
 }
 
@@ -159,9 +192,18 @@ function disableTurn()
 function manageTurn()
 {
 	var turnIsReady = false;
+	GLOBAL.turnDelay = 0;
+		
 	
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		turnIsReady = computerPlay();
+		if (GLOBAL.computerHard) {
+			// got from the message
+			//GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
+		}
+		else
+			GLOBAL.computerChoice = computerPlay();
+		var c = GLOBAL.computerChoice;
+		turnIsReady = computerMove(c[0],c[1],c[2], 1);
 	} else {
 		if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
 			GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
@@ -172,15 +214,26 @@ function manageTurn()
  	}
  		
  	if (turnIsReady) {	
+ 		GLOBAL.floodCheck.board = GLOBAL.BoardInstance;
  		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = 1-GLOBAL.action.turn;
 		
 		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
+//			if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
+//				if (GLOBAL.computerHard)
+//					GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
+//				else
+//					GLOBAL.computerChoice = computerPlay();
+//			}
 			showPlayer();
 		} else {
 			checkVictory();
 		}
-		
+	}
+	
+	if (GLOBAL.turnDelay>0) {
+		disableTurn();
+		setTimeout(enableTurn, GLOBAL.turnDelay);
 	}
 }
 
@@ -217,6 +270,7 @@ function waitForImages()
 		setTimeout(waitForImages, 500);
 	else {
 		prepareGame();
+		//restartGame();
 		connectMouse();
 		GLOBAL.menu = new GLOBAL.GameMenu();
 		GLOBAL.menu.create();
