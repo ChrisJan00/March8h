@@ -46,11 +46,14 @@ function computerPlay() {
 							score = 1 + self.countAttacks(ix,iy,color,pn);
 						}
 					} else {
-						score = 1 + self.countAttacks(ix,iy,color,pn);
+						var threshold = 10
+						score = threshold + self.countAttacks(ix,iy,color,pn);
 						if (self.isDefended(ix,iy,color,pn)) {
-							score--;
+							score -= threshold;
 						}
 					}
+					
+					score += 1;
 					self.options.push([ix,iy,color,score]);
 				}					
 			}
@@ -89,7 +92,11 @@ function computerPlay() {
 	{	
 		self.totalScore = 0;
 		for (var i=0; i<self.options.length;i++) {
-			self.options[i][3] = Math.pow((self.options[i][3]+1) * self.entropies[self.options[i][2]] * 0.5, decisionExp);
+			//self.options[i][3] = Math.pow((self.options[i][3]+1) * self.entropies[self.options[i][2]] * 0.5, decisionExp);
+			if (GLOBAL.maximizeEntropy) {
+				self.options[i][3] *= self.typeCount[self.options[i][2]];
+			}
+			self.options[i][3] = Math.pow(self.options[i][3], decisionExp);
 			self.totalScore += self.options[i][3];
 		}
 	}
