@@ -26,6 +26,8 @@ function showPlayer() {
 	ctx.fillStyle = colorForPlayer(pn);
 	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
 	var msg = (pn?"orange":"purple")+"'s turn";
+	if (GLOBAL.computerEnabled && pn==1)
+		msg = "thinking...";
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2 );
 	
