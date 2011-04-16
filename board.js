@@ -284,16 +284,7 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	//startFlood(mix, miy);
 	GLOBAL.floodCheck.checkFlood(mix, miy);
-	
-	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
-		if (!noWorker) {
-			GLOBAL.hardAIWorker.postMessage([3, mix, miy, stone.element, GLOBAL.action.turn]);
-			GLOBAL.hardAIWorker.postMessage([4]);
-		} else {
-			AiWorker.onmessage({data:[3, mix, miy, stone.element, GLOBAL.action.turn]});
-			AiWorker.onmessage({data:[4]});
-		}
-	}
+
 	return true;
 }
 

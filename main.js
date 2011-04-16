@@ -73,22 +73,6 @@ function prepareGame()
 	GLOBAL.computerHard = false;
 	GLOBAL.computerChoice = [0,0,0];
 	
-	//GLOBAL.hardAI = new GLOBAL.AlphaBeta();
-	
-	if (!noWorker) {
-		GLOBAL.hardAIWorker = new Worker("hardai.js");
-		GLOBAL.hardAIWorker.onmessage = function(event) {
-			GLOBAL.computerChoice = event.data;
-			manageTurn();
-		}
-		GLOBAL.hardAIWorker.onerror = function(event) {
-			throw event.data;
-		}
-		GLOBAL.hardAIWorker.postMessage([0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]);
-	} else {
-		AiWorker.onmessage({data:[0,[GLOBAL.BoardInstance.cols,GLOBAL.BoardInstance.rows]]});
-	}
-	
 	initPiles();
 	
 	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
@@ -111,16 +95,6 @@ function restartGame() {
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
 	GLOBAL.floodCheck.countMarkers();
-	if (GLOBAL.computerEnabled && GLOBAL.computerHard) {
-		if (!noWorker) {
-			GLOBAL.hardAIWorker.postMessage([1, countPiles()]);
-			GLOBAL.hardAIWorker.postMessage([2, GLOBAL.defenseMode]);
-		}
-		else {
-			AiWorker.onmessage({data:[1,countPiles()]});
-			AiWorker.onmessage({data:[2,GLOBAL.defenseMode]});
-		}
-	}
 	enableTurn();
 }
 
@@ -196,12 +170,7 @@ function manageTurn()
 		
 	
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		if (GLOBAL.computerHard) {
-			// got from the message
-			//GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
-		}
-		else
-			GLOBAL.computerChoice = computerPlay();
+		GLOBAL.computerChoice = computerPlay();
 		var c = GLOBAL.computerChoice;
 		turnIsReady = computerMove(c[0],c[1],c[2], 1);
 	} else {
@@ -219,12 +188,6 @@ function manageTurn()
 		GLOBAL.action.turn = 1-GLOBAL.action.turn;
 		
 		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
-//			if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-//				if (GLOBAL.computerHard)
-//					GLOBAL.computerChoice = GLOBAL.hardAI.computerPlay();
-//				else
-//					GLOBAL.computerChoice = computerPlay();
-//			}
 			showPlayer();
 		} else {
 			checkVictory();
