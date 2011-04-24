@@ -44,11 +44,42 @@ GLOBAL.PileClass.prototype.unSelect = function()
 	this.selection = false;
 }
 
+// minimum 2 tiles of each type
+GLOBAL.PileClass.prototype.prefill = function()
+{
+	var minCount = 2;
+	for (var elem=0;elem<4;elem++) {
+		for (var count=0;count<minCount;count++) {
+			var x,y;
+			do {
+				x = randint(this.cols);
+				y = randint(this.rows);
+			} while (this[x][y]);
+			var st = {
+				ix : x,
+				iy : y,
+				bgColor : "#FFFFFF",
+				visible : true,
+				selected : false,
+				element : elem,
+				owner : 0,
+				active : false
+			}
+			st.owner = this.owner;
+			this.set(x,y,st);
+		}
+	}
+}
+
 GLOBAL.PileClass.prototype.chooseTiles = function( ) 
 {
+	this.clearContents();
+	this.prefill();
 	for (var x=0; x<this.cols; x++)
 		for (var y=0; y<this.rows; y++)
 		{
+			if (this[x][y])
+				continue;
 			var st = {
 				ix : x,
 				iy : y,
