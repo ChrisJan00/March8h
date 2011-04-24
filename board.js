@@ -271,7 +271,8 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	var stone = currentPile.selection;
 	if (!stone)
 		return false;
-		
+	
+	var stoneIndex = stone.ix * currentPile.rows + stone.iy;
 	currentPile.del(stone.ix, stone.iy);
 	currentPile.unSelect();
 	currentPile.redrawTile(stone.ix, stone.iy);
@@ -281,6 +282,8 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	this.redrawTile(mix,miy);
 	
 	this.startBorderAnimation(mix,miy);
+
+	GLOBAL.gameLog.registerMove(GLOBAL.action.turn, stone, stoneIndex);
 	
 	//startFlood(mix, miy);
 	GLOBAL.floodCheck.checkFlood(mix, miy);

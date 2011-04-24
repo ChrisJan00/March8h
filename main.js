@@ -1,7 +1,11 @@
-// Todo: 
-// AI as a class?
+// Todo:
+// log
 // AI random starter
 // variable sizes
+// more players? 3? 4?
+// different pile arrangement (i.e. 3x6 instead of 2x9)
+// in-game options: surrender, exit to menu, restart game, replay at end
+
 
 function preload() {
 	//images
@@ -45,6 +49,9 @@ function prepareGame()
 	GLOBAL.canvasWidth = GLOBAL.gameCanvas.width;
 	GLOBAL.canvasHeight = GLOBAL.gameCanvas.height;
 	
+	GLOBAL.xoffset = GLOBAL.findAbsoluteX(GLOBAL.gameCanvas);
+	GLOBAL.yoffset = GLOBAL.findAbsoluteY(GLOBAL.gameCanvas);
+	
 	// true: don't use worker, false: use worker
 	noWorker = false;
 	
@@ -85,7 +92,7 @@ function prepareGame()
 	};
 	
 	GLOBAL.exitOption = new GLOBAL.ExitOption();
-	
+	GLOBAL.gameLog = new GLOBAL.GameLog();
 	//restartGame();
 }
 
@@ -95,6 +102,7 @@ function restartGame() {
 	GLOBAL.Piles[0].chooseTiles();
 	GLOBAL.Piles[1].chooseTiles();
 	GLOBAL.floodCheck.countMarkers();
+	GLOBAL.gameLog.init();
 	enableTurn();
 }
 
@@ -206,11 +214,11 @@ function mouseUp( ev ) {
 
 function mouseMove( ev ) {
 	if (ev.layerX || ev.layerX == 0) { // Firefox
-    	GLOBAL.mouse.x = ev.layerX - 8;
-    	GLOBAL.mouse.y = ev.layerY - 8;
+    	GLOBAL.mouse.x = ev.layerX - GLOBAL.xoffset;
+    	GLOBAL.mouse.y = ev.layerY - GLOBAL.yoffset;
   } else if (ev.offsetX || ev.offsetX == 0) { // Opera
-    	GLOBAL.mouse.x = ev.offsetX - 8;
-    	GLOBAL.mouse.y = ev.offsetY - 8;
+    	GLOBAL.mouse.x = ev.offsetX - GLOBAL.xoffset;
+    	GLOBAL.mouse.y = ev.offsetY - GLOBAL.yoffset;
   }
 
 }

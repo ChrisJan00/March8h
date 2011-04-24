@@ -127,6 +127,7 @@ function computerMove(mix,miy,elem, pn) {
 		
 		//currentPile.selection = GLOBAL.Piles[pn].getStoneByElement(elem);
 		var stone = currentPile.getStoneByElement(elem);
+		var stoneIndex = stone.ix * currentPile.rows + stone.iy;
 		currentPile.del(stone.ix, stone.iy);
 		currentPile.redrawTile(stone.ix, stone.iy);
 		stone.active = true;
@@ -136,6 +137,8 @@ function computerMove(mix,miy,elem, pn) {
 		GLOBAL.BoardInstance.redrawTile(mix,miy);
 		
 		GLOBAL.BoardInstance.startBorderAnimation(mix,miy);
+		
+		GLOBAL.gameLog.registerMove(GLOBAL.action.turn, stone, stoneIndex);
 	
 		//startFlood(mix, miy);
 		GLOBAL.floodCheck.checkFlood(mix, miy);
