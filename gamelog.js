@@ -289,6 +289,7 @@ GLOBAL.GameLog = function() {
 			selected : false,
 			active : false
 		}
+		currentPile.selection = null;
 		currentPile.redrawTile(pileX, pileY);
 		
 		// delete stone from board
@@ -312,6 +313,7 @@ GLOBAL.GameLog = function() {
  		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = move.who;
 		showPlayer();
+		enableTurn();
 	}
 	
 	self.reapply = function()
@@ -324,6 +326,7 @@ GLOBAL.GameLog = function() {
 		var pileX = Math.floor(move.pileIndex/currentPile.rows);
 		var pileY = move.pileIndex % currentPile.rows;
 		
+		currentPile.selection = null;
 		currentPile.del(pileX, pileY);
 		currentPile.redrawTile(pileX, pileY);
 		
@@ -363,6 +366,7 @@ GLOBAL.GameLog = function() {
  		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = 1-_owner;
 		showPlayer();
+		enableTurn();
 	}
 	// todo: replay
 }
