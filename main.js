@@ -126,9 +126,12 @@ function randint(n) {
 }
 
 function mouseDown( ev ) {
-	GLOBAL.mouse.button = true;	
+	GLOBAL.mouse.button = true;
 	
 	mouseMove( ev );
+	
+	if (ev.stopPropagation)
+		ev.stopPropagation();
 	
 	if (GLOBAL.menu.active) {
 		GLOBAL.menu.mouseDown(ev);
