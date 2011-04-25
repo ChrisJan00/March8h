@@ -125,10 +125,22 @@ function randint(n) {
 	return Math.floor(Math.random() * n);
 }
 
+function absorbEvent_(event) {
+    var e = event || window.event;
+    e.preventDefault && e.preventDefault();
+    e.stopPropagation && e.stopPropagation();
+    e.cancelBubble = true;
+    e.returnValue = false;
+	return false;
+}
+
+
 function mouseDown( ev ) {
-	GLOBAL.mouse.button = true;	
+	GLOBAL.mouse.button = true;
 	
 	mouseMove( ev );
+	
+	absorbEvent_(ev);
 	
 	if (GLOBAL.menu.active) {
 		GLOBAL.menu.mouseDown(ev);
