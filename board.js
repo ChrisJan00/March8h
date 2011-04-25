@@ -350,7 +350,6 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	// move stone to board
 	this.set(mix, miy, stone);
 	this.redrawTile(mix,miy);
-	this.refreshAllTileBorders();
 	
 	this.startBorderAnimation(mix,miy);
 
@@ -358,7 +357,12 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	//startFlood(mix, miy);
 	GLOBAL.floodCheck.checkFlood(mix, miy);
-
+	var def = GLOBAL.floodCheck.findDefender(mix,miy);
+	
+	this.refreshTileBorders(mix, miy);
+	if (def)
+		this.refreshTileBorders(def.ix, def.iy);
+	
 	return true;
 }
 

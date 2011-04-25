@@ -135,7 +135,6 @@ function computerMove(mix,miy,elem, pn) {
 		
 		GLOBAL.BoardInstance.set(mix,miy,stone);
 		GLOBAL.BoardInstance.redrawTile(mix,miy);
-		GLOBAL.BoardInstance.refreshAllTileBorders();
 		
 		GLOBAL.BoardInstance.startBorderAnimation(mix,miy);
 		
@@ -143,6 +142,11 @@ function computerMove(mix,miy,elem, pn) {
 	
 		//startFlood(mix, miy);
 		GLOBAL.floodCheck.checkFlood(mix, miy);
+		
+		var def = GLOBAL.floodCheck.findDefender(mix,miy);
+		GLOBAL.BoardInstance.refreshTileBorders(mix, miy);
+		if (def)
+			GLOBAL.BoardInstance.refreshTileBorders(def.ix, def.iy);
 		
 		return true;
 	}

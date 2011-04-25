@@ -172,10 +172,12 @@ function initPiles()
 	GLOBAL.Piles[0] = new GLOBAL.PileClass(25, 10, 0);
 	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 1);
 	GLOBAL.Piles[0].cellColor = function(ind) {
-		return ind?"#f1d9ff":"#d6b8e6";
+		//return ind?"#f1d9ff":"#d6b8e6";
+		return "#f1d9ff";
 	}
 	GLOBAL.Piles[1].cellColor = function(ind) {
-		return ind?"#ffe2bf":"#ffcb8c";
+		//return ind?"#ffe2bf":"#ffcb8c";
+		return "#ffe2bf";
 	}
 	GLOBAL.Piles[0].borderColor = function(ind) {
 		return ind?"#660099":"#9932CC";

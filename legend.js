@@ -1,7 +1,8 @@
 
 function colorForPlayer(pn) {
 	//return pn?"#FF8C00":"#9932CC";
-	return GLOBAL.Piles[pn].cellColor(0);
+	return pn?"#ffcb8c":"#d6b8e6";
+	//return GLOBAL.Piles[pn].cellColor(0);
 }
 
 function colorForPlayerLegend(pn) {
@@ -12,6 +13,11 @@ function colorForPlayerWeak(pn) {
 	//return pn?"#FFA940":"#AA66CC";
 	return pn?"#ffc680":"#b485cc";
 }
+
+function colorForPlayerStrong(pn) {
+	return pn?"#ff5400":"#6e0c9e";
+}
+
 
 function showPlayer() {
 	var data = GLOBAL.coords.text
