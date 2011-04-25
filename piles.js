@@ -1,7 +1,7 @@
 GLOBAL.PileClass = function(x0,y0, owner) {
 	this.setDimensions(2, 9, x0, y0);
 	
-	this.border = 10;
+	this.border = 5;
 	this.totalItems = this.rows * this.cols;
 	this.owner = owner;
 	this.selection = false;
@@ -131,16 +131,15 @@ GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
 		GLOBAL.gameContext.fillRect(this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
 	}
 	
-	return;
 	var ctx = GLOBAL.gameContext;
-	var color = strong?colorForPlayer(this.owner):colorForPlayerWeak(this.owner);
+	//var color = strong?colorForPlayerLegend(this.owner):"#FFFFFF";
+	var color = strong?this.borderColor(0):"#FFFFFF";
 	ctx.fillStyle = color;
-	ctx.strokeStyle = color;
 	
-	ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border);
-	ctx.fillRect(this.x0-this.border, this.y0, this.border, this.height);
-	ctx.fillRect(this.x0-this.border, this.y1, this.width + 2*this.border, this.border);
-	ctx.fillRect(this.x1, this.y0, this.border, this.height);
+	ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border-1);
+	ctx.fillRect(this.x0-this.border, this.y0-1, this.border-1, this.height+2);
+	ctx.fillRect(this.x0-this.border, this.y1+1, this.width + 2*this.border, this.border-1);
+	ctx.fillRect(this.x1+1, this.y0-1, this.border-1, this.height+2);
 }
 
 GLOBAL.PileClass.prototype.countStoneTypes = function()
