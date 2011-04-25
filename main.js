@@ -1,5 +1,9 @@
 // Todo:
-// log
+// delay print "strong" pile until turn enabled
+// fix bugs in inner borders (some still there)
+// log (bugs?)
+// new legend
+// cleanup code!!
 // AI random starter
 // variable sizes
 // more players? 3? 4?

@@ -120,9 +120,12 @@ GLOBAL.PileClass.prototype.drawFromScratch = function() {
 GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
 	if (strong)
 	{
-		GLOBAL.gameContext.drawImage(this.strCanvas, 
-			0, 0, this.strCanvas.width, this.strCanvas.height,
-			this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
+		if (GLOBAL.BoardInstance.stoneCount == GLOBAL.BoardInstance.maxStones)
+			this.drawFromScratch();
+		else
+			GLOBAL.gameContext.drawImage(this.strCanvas, 
+				0, 0, this.strCanvas.width, this.strCanvas.height,
+				this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
 	} else {
 		this.strContext.drawImage(GLOBAL.bgCanvas, 
 			this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height,
