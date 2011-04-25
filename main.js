@@ -157,6 +157,9 @@ function enableTurn()
 	GLOBAL.turnEnabled = true;
 	GLOBAL.turnDelay = 0;
 	GLOBAL.exitOption.activate();
+	
+	GLOBAL.BoardInstance.refreshAllTileBorders();
+	
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
 		if (GLOBAL.computerHard) {
 			// wait for the worker message

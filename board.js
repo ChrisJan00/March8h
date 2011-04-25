@@ -25,59 +25,70 @@ GLOBAL.StoneHolder.prototype = {
 		this.maxStones = this.cols * this.rows;
 		this.clearContents();
 	},
+	
+	cellColor : function(ind) {
+		return ind?"#dff2ea":"#c5e6d8";
+	},
+	
+	borderColor : function(ind) {
+		return ind?"#208059":"#30bf86";
+	},
 		
-	drawEmpty : function() {
+	drawEmpty : function()
+	{
 		var self = this;
 		var ctx = GLOBAL.gameContext;
 		
 		for (var j=0;j<2;j++) {
 			if (j==1) ctx = GLOBAL.bgContext;
-			ctx.fillStyle = "#FFFFFF";
+			ctx.fillStyle="#FFFFFF";
 			ctx.fillRect(self.x0 - self.borderTileSide, self.y0 - self.borderTileSide,
 				self.width + 2*self.borderTileSide, self.height + 2*self.borderTileSide);
 			
-			ctx.strokeStyle = "#000000"
-			for (var i=0;i<=self.cols;i++) {
-				ctx.beginPath();
-				ctx.moveTo(self.x0 + i*self.side, self.y0);
-				ctx.lineTo(self.x0 + i*self.side, self.y1);
-				ctx.stroke();
+			ctx.strokeStyle = self.borderColor(0);
+			ctx.beginPath();
+			ctx.moveTo(self.x0-1, self.y0+self.height+1);
+			ctx.lineTo(self.x0-1, self.y0-1);
+			ctx.lineTo(self.x0 + self.width + 1, self.y0-1);
+			ctx.stroke();
+				
+				
+			ctx.strokeStyle = self.borderColor(1);
+			ctx.beginPath();
+			ctx.moveTo(self.x0 + self.width + 1, self.y0-1);
+			ctx.lineTo(self.x0 + self.width + 1, self.y0+self.height+1);
+			ctx.lineTo(self.x0 - 1, self.y0+self.height+1);
+			ctx.stroke();
+			
+			for (var x=0;x<self.cols;x++) 
+				for (var y=0;y<self.rows;y++) {
+				ctx.fillStyle = self.cellColor((x+y)%2);
+				ctx.fillRect(self.x0 + x*self.side, self.y0 + y*self.side, self.side, self.side);
 			}
 			
-			for (var i=0;i<=self.rows;i++) {
-				ctx.beginPath();
-				ctx.moveTo(self.x0, self.y0+i*self.side);
-				ctx.lineTo(self.x1, self.y0+i*self.side);
-				ctx.stroke();
-			}
 		}
 	},
 	
 	redrawTileBackground : function(x,y, col) {
-		var color = "#FFFFFF";
+		var color = this.cellColor((x+y)%2);
 		if (this[x][y] && this[x][y].active)
 			color = this[x][y].bgColor;
-			
+				
 		if (col)
 			color = col;
-				
+					
 		var mx = this.x0 + x * this.side;
 		var my = this.y0 + y * this.side;
-
+	
 		var ctx = GLOBAL.gameContext;
 		for (var i=0;i<2;i++) {
 			if (i==1) ctx = GLOBAL.bgContext;
 			ctx.fillStyle = color;
-			ctx.strokeStyle = "#000000";
-			ctx.beginPath();
-			ctx.moveTo(mx, my);
-			ctx.lineTo(mx + this.side, my);
-			ctx.lineTo(mx + this.side, my + this.side);
-			ctx.lineTo(mx, my+this.side);
-			ctx.closePath();
-			ctx.fill();
-			ctx.stroke();
+			ctx.fillRect(mx,my,this.side, this.side);
 		}
+		
+		if (this[x][y] && this[x][y].active && this == GLOBAL.BoardInstance)
+				this.refreshTileBorders(x,y);
 	},
 	
 	redrawTile : function(x,y,col) {
@@ -106,6 +117,65 @@ GLOBAL.StoneHolder.prototype = {
 		}
 	},
 	
+	refreshAllTileBorders : function() {
+		for (var x=0;x<this.cols;x++)
+			for (var y=0;y<this.rows;y++) 
+				this.refreshTileBorders(x,y);
+	},
+	
+	refreshTileBorders : function(x,y) {
+		var ctx = GLOBAL.gameContext;
+		var ix = this.x0 + x * this.side;
+		var iy = this.y0 + y * this.side;
+		var stone = this[x][y];
+		if (stone)
+		{
+			var hideLeft = (x>0 && this[x-1][y] && this[x-1][y].owner == stone.owner && this[x-1][y].element == stone.element);
+			var hideRight = (x<this.cols-1 && this[x+1][y] && this[x+1][y].owner == stone.owner  && this[x+1][y].element == stone.element);
+			var hideUp = (y>0 && this[x][y-1] && this[x][y-1].owner == stone.owner  && this[x][y-1].element == stone.element);
+			var hideDown = (y<this.rows-1 && this[x][y+1] && this[x][y+1].owner == stone.owner  && this[x][y+1].element == stone.element);
+				
+			for (var ctxcnt=0;ctxcnt<2;ctxcnt++) {
+				if (ctxcnt==1) ctx = GLOBAL.bgContext;
+					
+				// draw own border
+				ctx.fillStyle = hideLeft? 
+					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+				ctx.fillRect(ix, iy+1, 1, this.side-2);
+				
+				ctx.fillStyle = hideRight? 
+					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+				ctx.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
+				
+				ctx.fillStyle = hideUp? 
+					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+				ctx.fillRect(ix+1, iy, this.side-2, 1);
+				
+				ctx.fillStyle = hideDown? 
+					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+				ctx.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
+				
+				ctx.fillStyle = colorForPlayerLegend(stone.owner);
+				if ((!hideLeft) || (!hideUp))
+					ctx.fillRect(ix, iy, 1, 1);
+				
+				if ((!hideRight) || (!hideUp))
+					ctx.fillRect(ix+this.side-1, iy, 1, 1);
+					
+				if ((!hideLeft) || (!hideDown))
+					ctx.fillRect(ix, iy+this.side-1, 1, 1);
+					
+				if ((!hideRight) || (!hideDown))
+					ctx.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
+					
+//				ctx.fillStyle = colorForPlayerLegend(stone.owner);
+//				ctx.fillRect(ix, iy, 1, this.side);
+//				ctx.fillRect(ix+this.side-1, iy, 1, this.side);
+//				ctx.fillRect(ix, iy, this.side, 1);
+//				ctx.fillRect(ix, iy+this.side-1, this.side, 1);
+			}
+		}
+	},	
 	startTileBlinking : function(x,y) 
 	{
 		var self = this;
@@ -280,6 +350,7 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	// move stone to board
 	this.set(mix, miy, stone);
 	this.redrawTile(mix,miy);
+	this.refreshAllTileBorders();
 	
 	this.startBorderAnimation(mix,miy);
 

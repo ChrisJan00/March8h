@@ -135,6 +135,7 @@ function computerMove(mix,miy,elem, pn) {
 		
 		GLOBAL.BoardInstance.set(mix,miy,stone);
 		GLOBAL.BoardInstance.redrawTile(mix,miy);
+		GLOBAL.BoardInstance.refreshAllTileBorders();
 		
 		GLOBAL.BoardInstance.startBorderAnimation(mix,miy);
 		

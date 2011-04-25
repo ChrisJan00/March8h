@@ -1,15 +1,16 @@
 
 function colorForPlayer(pn) {
+	//return pn?"#FF8C00":"#9932CC";
+	return GLOBAL.Piles[pn].cellColor(0);
+}
+
+function colorForPlayerLegend(pn) {
 	return pn?"#FF8C00":"#9932CC";
 }
 
 function colorForPlayerWeak(pn) {
 	//return pn?"#FFA940":"#AA66CC";
 	return pn?"#ffc680":"#b485cc";
-}
-
-function colorForPlayerStrong(pn) {
-	return pn?"#ff5400":"#6e0c9e";
 }
 
 function showPlayer() {
@@ -19,11 +20,11 @@ function showPlayer() {
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
 	var pn = GLOBAL.action.turn;
 	ctx.font = "bold 24px sans-serif";
-	ctx.fillStyle = colorForPlayer(0);
+	ctx.fillStyle = colorForPlayerLegend(0);
 	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(1);
+	ctx.fillStyle = colorForPlayerLegend(1);
 	ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(pn);
+	ctx.fillStyle = colorForPlayerLegend(pn);
 	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
 	var msg = (pn?"orange":"purple")+"'s turn";
 	if (GLOBAL.computerEnabled && pn==1)
@@ -36,6 +37,7 @@ function showPlayer() {
 }
 
 function showOrder() {
+//	return;
 	// only arrows pointing to the right by now
 	var drawArrow = function(xfrom,yfrom,xto,yto) {
 		var ctx = GLOBAL.gameContext;
@@ -81,18 +83,18 @@ function checkVictory() {
 	var pn = GLOBAL.action.turn;
 	ctx.font = "bold 24px sans-serif";
 	
-	ctx.fillStyle = colorForPlayer(0);
+	ctx.fillStyle = colorForPlayerLegend(0);
 	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(1);
+	ctx.fillStyle = colorForPlayerLegend(1);
 	ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayer(pn);
+	ctx.fillStyle = colorForPlayerLegend(pn);
 	
 	var msg;
 	if (counts[0]>counts[1]) {
-		ctx.fillStyle = colorForPlayer(0);
+		ctx.fillStyle = colorForPlayerLegend(0);
 		msg = "purple won!";
 	} else if (counts[0] < counts[1]) {
-		ctx.fillStyle = colorForPlayer(1);
+		ctx.fillStyle = colorForPlayerLegend(1);
 		msg = "orange won!";
 	} else {
 		ctx.fillStyle = "#000000";

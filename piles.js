@@ -33,7 +33,7 @@ GLOBAL.PileClass.prototype.manageClicked = function( mx, my )
 	if (newStone && (oldStone != newStone) && newStone.visible) {
 			newStone.selected = true;
 			newStone.active = true;
-			newStone.bgColor = colorForPlayer(this.owner);
+			newStone.bgColor = colorForPlayerLegend(this.owner);
 			this.redrawTile(mix, miy);
 			this.selection = newStone;
 	}
@@ -100,16 +100,38 @@ GLOBAL.PileClass.prototype.chooseTiles = function( )
 GLOBAL.PileClass.prototype.drawFromScratch = function() {
 	var ctx = GLOBAL.gameContext;
 	
-	ctx.fillStyle = colorForPlayer(this.owner);
-	ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.height + 2*this.border);
+	//ctx.fillStyle = colorForPlayer(this.owner);
+	//ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.height + 2*this.border);
 	
 	this.drawEmpty();
 	for (var ix=0;ix<this.cols; ix++)
 		for (var iy=0;iy<this.rows;iy++)
 			this.redrawTile(ix,iy);
+			
+	this.strCanvas = document.createElement('canvas');
+	this.strCanvas.width = this.width+4;
+	this.strCanvas.height = this.height+4;
+	this.strContext = this.strCanvas.getContext("2d");
+	this.strContext.drawImage(GLOBAL.gameCanvas, 
+		this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height,
+		0, 0, this.strCanvas.width, this.strCanvas.height);
 }
 
 GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
+	if (strong)
+	{
+		GLOBAL.gameContext.drawImage(this.strCanvas, 
+			0, 0, this.strCanvas.width, this.strCanvas.height,
+			this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
+	} else {
+		this.strContext.drawImage(GLOBAL.bgCanvas, 
+			this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height,
+			0, 0, this.strCanvas.width, this.strCanvas.height);
+		GLOBAL.gameContext.fillStyle = "rgba(255,255,255,0.4)"
+		GLOBAL.gameContext.fillRect(this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
+	}
+	
+	return;
 	var ctx = GLOBAL.gameContext;
 	var color = strong?colorForPlayer(this.owner):colorForPlayerWeak(this.owner);
 	ctx.fillStyle = color;
@@ -149,6 +171,19 @@ function initPiles()
 	GLOBAL.Piles = [];
 	GLOBAL.Piles[0] = new GLOBAL.PileClass(25, 10, 0);
 	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 1);
+	GLOBAL.Piles[0].cellColor = function(ind) {
+		return ind?"#f1d9ff":"#d6b8e6";
+	}
+	GLOBAL.Piles[1].cellColor = function(ind) {
+		return ind?"#ffe2bf":"#ffcb8c";
+	}
+	GLOBAL.Piles[0].borderColor = function(ind) {
+		return ind?"#660099":"#9932CC";
+	}
+	GLOBAL.Piles[1].borderColor = function(ind) {
+		return ind?"#ff8c00":"#ffa940";
+	}
+	
 }
 
 function countPiles() {

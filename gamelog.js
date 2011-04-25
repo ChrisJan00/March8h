@@ -15,8 +15,8 @@ GLOBAL.GameLog = function() {
 	self.print = function(_who, text) 
 	{
 		self.lineCount++;
-		//var paragraphStart = "<p style=\"font-weight:bold; font-family:sans-serif; color:"+colorForPlayer(_who)+"\">";
-		var paragraphStart = "<span style=\"font-family:sans-serif; color:"+colorForPlayer(_who)+"\">";
+		//var paragraphStart = "<p style=\"font-weight:bold; font-family:sans-serif; color:"+colorForPlayerLegend(_who)+"\">";
+		var paragraphStart = "<span style=\"font-family:sans-serif; color:"+colorForPlayerLegend(_who)+"\">";
 		var paragraphEnd = "<br></span>";
 		self.outputString = paragraphStart + text + paragraphEnd + self.outputString;
 		
@@ -304,7 +304,7 @@ GLOBAL.GameLog = function() {
 				var dest = GLOBAL.BoardInstance[x][y];
 				dest.owner = move.attack[i].owner;
 				dest.element = move.attack[i].element;
-				dest.bgColor = colorForPlayer(dest.owner);
+				dest.bgColor = colorForPlayerLegend(dest.owner);
 				GLOBAL.BoardInstance.redrawTile(x,y);
 			}
 			
@@ -336,7 +336,7 @@ GLOBAL.GameLog = function() {
 			iy : move.y,
 			owner : _owner,
 			element : move.element,
-			bgColor : colorForPlayer(_owner),
+			bgColor : colorForPlayerLegend(_owner),
 			visible : true,
 			selected : false,
 			active : true,
@@ -350,7 +350,7 @@ GLOBAL.GameLog = function() {
 				var dest = GLOBAL.BoardInstance[x][y];
 				dest.owner = _owner;
 				dest.element = move.element;
-				dest.bgColor = colorForPlayer(_owner);
+				dest.bgColor = colorForPlayerLegend(_owner);
 				GLOBAL.BoardInstance.redrawTile(x,y);
 			}
 			
@@ -358,7 +358,7 @@ GLOBAL.GameLog = function() {
 			var dest = GLOBAL.BoardInstance[move.x][move.y];
 			dest.owner = move.defense.owner;
 			dest.element = move.defense.element;
-			dest.bgColor = colorForPlayer(move.defense.owner);
+			dest.bgColor = colorForPlayerLegend(move.defense.owner);
 			GLOBAL.BoardInstance.redrawTile(move.x, move.y);
 		}
 		
