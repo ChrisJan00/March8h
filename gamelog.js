@@ -15,8 +15,8 @@ GLOBAL.GameLog = function() {
 	self.print = function(_who, text) 
 	{
 		self.lineCount++;
-		//var paragraphStart = "<p style=\"font-weight:bold; font-family:sans-serif; color:"+colorForPlayerLegend(_who)+"\">";
-		var paragraphStart = "<span style=\"font-family:sans-serif; color:"+colorForPlayerLegend(_who)+"\">";
+		//var paragraphStart = "<p style=\"font-weight:bold; font-family:customfont; color:"+colorForPlayerLegend(_who)+"\">";
+		var paragraphStart = "<span style=\"font-family:customfont; color:"+colorForPlayerLegend(_who)+"\">";
 		var paragraphEnd = "<br></span>";
 		self.outputString = paragraphStart + text + paragraphEnd + self.outputString;
 		
@@ -73,7 +73,7 @@ GLOBAL.GameLog = function() {
 		self.outputString = "</div>";
 		self.countChanges(_stone);
 		self.print(_who, playString);
-		self.outputString = "<span style=\"font-family:sans-serif\">" + turnNumber + ". " + "</span>" + self.outputString;
+		self.outputString = "<span style=\"font-family:customfont\">" + turnNumber + ". " + "</span>" + self.outputString;
 		self.outputString = "<div id=\"turn" + turnNumber + "\">" + self.outputString;
 		
 		self.output.innerHTML = self.outputString + self.output.innerHTML;
@@ -263,7 +263,7 @@ GLOBAL.GameLog = function() {
 		self.outputString = "</div>";
 		self.tellChanges();
 		self.print(_who, playString);
-		self.outputString = "<span style=\"font-family:sans-serif\">" + turnNumber + ". " + "</span>" + self.outputString;
+		self.outputString = "<span style=\"font-family:customfont\">" + turnNumber + ". " + "</span>" + self.outputString;
 		self.outputString = "<div id=\"turn" + turnNumber + "\">" + self.outputString;
 		
 		self.output.innerHTML = self.outputString + self.output.innerHTML;

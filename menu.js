@@ -27,7 +27,7 @@ GLOBAL.GameMenu = function() {
 	{	
 		var ctx = GLOBAL.gameContext;
 		
-		ctx.font = "16px sans-serif";
+		ctx.font = "16px CustomFont";
 		
 		ctx.fillStyle = "#FFFFFF";
 		ctx.fillRect(0,0,GLOBAL.canvasWidth,GLOBAL.canvasHeight);
@@ -38,7 +38,7 @@ GLOBAL.GameMenu = function() {
 		ctx.fillText("Player VS Player", 150, 120);
 		ctx.fillText("Player VS Computer (Easy)", 150, 170);
 		ctx.fillText("Player VS Computer (Medium)", 150, 220);
-		ctx.fillText("off: Attack, then Defense", 150, 320);
+		ctx.fillText("Defense rule", 150, 320);
 		ctx.fillText("Start Game", 150, 370);
 		
 		GLOBAL.playerOption.redraw();
@@ -66,14 +66,14 @@ GLOBAL.GameMenu = function() {
 
 GLOBAL.DefenseModeOption.prototype.activate = function() {
 	GLOBAL.defenseMode = this.option;
-	var ctx = GLOBAL.gameContext;
-	ctx.fillStyle = "#FFFFFF";
-	ctx.fillRect(150,this.y0,200,40);
-	ctx.fillStyle = "#000000";
-	if (this.option)
-		ctx.fillText("on: Defense, then Attack", 150, this.y0+20);
-	else
-		ctx.fillText("off: Attack, then Defense", 150, this.y0+20);
+//	var ctx = GLOBAL.gameContext;
+//	ctx.fillStyle = "#FFFFFF";
+//	ctx.fillRect(150,this.y0,200,40);
+//	ctx.fillStyle = "#000000";
+//	if (this.option)
+//		ctx.fillText("on: Defense, then Attack", 150, this.y0+20);
+//	else
+//		ctx.fillText("off: Attack, then Defense", 150, this.y0+20);
 }
 
 GLOBAL.StartGameOption = function(x,y) {
@@ -89,19 +89,19 @@ GLOBAL.StartGameOption.prototype.activate = function() {
 	this.option = false;
 }
 
-GLOBAL.ExitOption = function(x,y) {
-	this.x0 = x? x:610;
-	this.y0 = y? y:20;
-	this.option = true;
-}
-
-GLOBAL.ExitOption.prototype = new GLOBAL.OptionBox;
-GLOBAL.ExitOption.prototype.activate = function() {
-	if ((!this.option) && GLOBAL.turnEnabled) {
-		this.option = true;
-		//prepareGame();
-		restartGame();
-		GLOBAL.menu.reloadControls();
-		GLOBAL.menu.show();
-	}
-}
+//GLOBAL.ExitOption = function(x,y) {
+//	this.x0 = x? x:610;
+//	this.y0 = y? y:20;
+//	this.option = true;
+//}
+//
+//GLOBAL.ExitOption.prototype = new GLOBAL.OptionBox;
+//GLOBAL.ExitOption.prototype.activate = function() {
+//	if ((!this.option) && GLOBAL.turnEnabled) {
+//		this.option = true;
+//		//prepareGame();
+//		restartGame();
+//		GLOBAL.menu.reloadControls();
+//		GLOBAL.menu.show();
+//	}
+//}

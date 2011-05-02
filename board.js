@@ -321,7 +321,7 @@ GLOBAL.StoneHolder.prototype = {
 }
 
 GLOBAL.BoardClass = function() {
-	this.setDimensions(6,6, 160, 70);
+	this.setDimensions(6,6, 180, 70);
 }
 GLOBAL.BoardClass.prototype = new GLOBAL.StoneHolder;
 

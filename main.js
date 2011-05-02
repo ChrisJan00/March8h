@@ -70,7 +70,7 @@ function prepareGame()
 
 	GLOBAL.coords = {
 		text : {
-			x0: 160,
+			x0: 180,
 			y0: 15,
 			width: 300,
 			height: 52
@@ -95,7 +95,7 @@ function prepareGame()
 		button : false
 	};
 	
-	GLOBAL.exitOption = new GLOBAL.ExitOption();
+	//GLOBAL.exitOption = new GLOBAL.ExitOption();
 	GLOBAL.gameLog = new GLOBAL.GameLog();
 	//restartGame();
 }
@@ -117,7 +117,7 @@ function drawInitialGame() {
 	GLOBAL.BoardInstance.drawEmpty();
 	showPlayer();
 	showOrder();
-	GLOBAL.exitOption.redraw();
+	//GLOBAL.exitOption.redraw();
 	enableTurn();
 }
 
@@ -140,7 +140,7 @@ function mouseDown( ev ) {
 	}
 		
 	
-	GLOBAL.exitOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
+	//GLOBAL.exitOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	
 	if (!GLOBAL.turnEnabled)
 		return;
@@ -160,7 +160,7 @@ function enableTurn()
 {
 	GLOBAL.turnEnabled = true;
 	GLOBAL.turnDelay = 0;
-	GLOBAL.exitOption.activate();
+	//GLOBAL.exitOption.activate();
 	
 	GLOBAL.BoardInstance.refreshAllTileBorders();
 	

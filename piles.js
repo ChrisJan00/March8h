@@ -1,5 +1,5 @@
 GLOBAL.PileClass = function(x0,y0, owner) {
-	this.setDimensions(2, 9, x0, y0);
+	this.setDimensions(3, 6, x0, y0);
 	
 	this.border = 5;
 	this.totalItems = this.rows * this.cols;
@@ -171,15 +171,17 @@ GLOBAL.PileClass.prototype.getStoneByElement = function(elem)
 function initPiles()
 {
 	GLOBAL.Piles = [];
-	GLOBAL.Piles[0] = new GLOBAL.PileClass(25, 10, 0);
-	GLOBAL.Piles[1] = new GLOBAL.PileClass(495, 10, 1);
+	GLOBAL.Piles[0] = new GLOBAL.PileClass(10, 70, 0);
+	GLOBAL.Piles[1] = new GLOBAL.PileClass(500, 70, 1);
 	GLOBAL.Piles[0].cellColor = function(ind) {
 		//return ind?"#f1d9ff":"#d6b8e6";
-		return "#f1d9ff";
+		//return "#f1d9ff";
+		return "#f4e2ff";
 	}
 	GLOBAL.Piles[1].cellColor = function(ind) {
 		//return ind?"#ffe2bf":"#ffcb8c";
-		return "#ffe2bf";
+		//return "#ffe2bf";
+		return "#ffe9ce";
 	}
 	GLOBAL.Piles[0].borderColor = function(ind) {
 		return ind?"#660099":"#9932CC";

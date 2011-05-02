@@ -1,5 +1,11 @@
 <html><head>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<style>
+@font-face {
+    font-family: 'CustomFont';
+    src: url('graphics/lopo.ttf');
+}
+</style>
 <title>March8h</title>
 <script type="text/javascript" src="globals.js"></script>
 <script type="text/javascript" src="options.js"></script>
@@ -11,18 +17,27 @@
 <script type="text/javascript" src="gamelog.js"></script>
 <script type="text/javascript" src="autoplayer.js"></script>
 <script type="text/javascript" src="main.js"></script>
+<script type="text/javascript">
+function restartMenu() {
+	restartGame();
+	GLOBAL.menu.reloadControls();
+	GLOBAL.menu.show();
+}
+</script>
 </head>
-<body onload="startGame()">
+<body onload="startGame()" style="font-family:CustomFont">
 <table cellpadding="15"><tr><td>
 <canvas id="canvas1" style="image-rendering: 
 optimizespeed ! important; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);" moz-opaque=""
-width="641" height="480"></canvas>
+width="680" height="480"></canvas>
 </td><td>
 <table><tr><td>
 <div id="undoButton" onclick="GLOBAL.gameLog.undo()">UNDO</div>
 </td><td>
 <div id="redoButton" onclick="GLOBAL.gameLog.redo()">REDO</div>
-</td></tr><tr> <td colspan=2>
+</td><td>
+<div id="exitButton" onclick="restartMenu()">EXIT</div>
+</td></tr><tr> <td colspan=3>
 <div id="logWindow" style ="width:400px;
 height:480px;
 overflow:auto;

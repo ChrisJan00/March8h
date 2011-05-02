@@ -25,14 +25,15 @@ function showPlayer() {
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
 	var pn = GLOBAL.action.turn;
-	ctx.font = "bold 24px sans-serif";
+	ctx.font = "bold 24px customfont";
 	ctx.fillStyle = colorForPlayerLegend(0);
 	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
 	ctx.fillStyle = colorForPlayerLegend(1);
 	ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
 	ctx.fillStyle = colorForPlayerLegend(pn);
 	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
-	var msg = (pn?"orange":"purple")+"'s turn";
+	//var msg = (pn?"orange":"purple")+"'s turn";
+	var msg  = (pn?"orange":"purple");
 	if (GLOBAL.computerEnabled && pn==1)
 		msg = "thinking...";
 	var msglen = ctx.measureText(msg);
@@ -87,7 +88,7 @@ function checkVictory() {
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
 	var pn = GLOBAL.action.turn;
-	ctx.font = "bold 24px sans-serif";
+	ctx.font = "bold 24px customfont";
 	
 	ctx.fillStyle = colorForPlayerLegend(0);
 	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
