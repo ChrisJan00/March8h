@@ -13,11 +13,14 @@ GLOBAL.DragNDrop = function() {
 		self.snapContext.drawImage(GLOBAL.gameCanvas, 0, 0, GLOBAL.canvasWidth, GLOBAL.canvasHeight);
 
 		self.dragging = true;
+		self.drawing = false;
 		self.stoneData = stone;
 		self.dx = stonex - fromx;
 		self.dy = stoney - fromy;
 		self.ox = fromx;
 		self.oy = fromy;
+		self.initialx = fromx;
+		self.initialy = fromy;
 		self.move(fromx, fromy);
 		
 		GLOBAL.gameCanvas.addEventListener('mousemove', self.moveEvent, false);
@@ -42,6 +45,15 @@ GLOBAL.DragNDrop = function() {
 	}
 	
 	self.move = function( x, y ) {
+		if (!self.drawing) {
+			var dx = x - self.initialx;
+			var dy = y - self.initialy;
+			var dmin = GLOBAL.BoardInstance.side/4;
+			if (dx*dx+dy*dy < dmin*dmin)
+				return;
+			self.drawing = true;
+		}
+		
 		self.undrawStone( );
 		self.ox = x + self.dx;
 		self.oy = y + self.dy;
