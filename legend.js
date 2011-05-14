@@ -25,7 +25,7 @@ function showPlayer() {
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
 	var pn = GLOBAL.action.turn;
-	ctx.font = "bold 24px customfont";
+	ctx.font = "bold 24px CustomFont, sans-serif";
 	ctx.fillStyle = colorForPlayerLegend(0);
 	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
 	ctx.fillStyle = colorForPlayerLegend(1);
@@ -88,7 +88,7 @@ function checkVictory() {
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
 	var pn = GLOBAL.action.turn;
-	ctx.font = "bold 24px customfont";
+	ctx.font = "bold 24px CustomFont, sans-serif";
 	
 	ctx.fillStyle = colorForPlayerLegend(0);
 	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );

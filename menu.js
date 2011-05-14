@@ -27,7 +27,7 @@ GLOBAL.GameMenu = function() {
 	{	
 		var ctx = GLOBAL.gameContext;
 		
-		ctx.font = "16px CustomFont";
+		ctx.font = "16px CustomFont, sans-serif";
 		
 		ctx.fillStyle = "#FFFFFF";
 		ctx.fillRect(0,0,GLOBAL.canvasWidth,GLOBAL.canvasHeight);
