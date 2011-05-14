@@ -66,14 +66,6 @@ GLOBAL.GameMenu = function() {
 
 GLOBAL.DefenseModeOption.prototype.activate = function() {
 	GLOBAL.defenseMode = this.option;
-//	var ctx = GLOBAL.gameContext;
-//	ctx.fillStyle = "#FFFFFF";
-//	ctx.fillRect(150,this.y0,200,40);
-//	ctx.fillStyle = "#000000";
-//	if (this.option)
-//		ctx.fillText("on: Defense, then Attack", 150, this.y0+20);
-//	else
-//		ctx.fillText("off: Attack, then Defense", 150, this.y0+20);
 }
 
 GLOBAL.StartGameOption = function(x,y) {
@@ -89,19 +81,42 @@ GLOBAL.StartGameOption.prototype.activate = function() {
 	this.option = false;
 }
 
-//GLOBAL.ExitOption = function(x,y) {
-//	this.x0 = x? x:610;
-//	this.y0 = y? y:20;
-//	this.option = true;
-//}
-//
-//GLOBAL.ExitOption.prototype = new GLOBAL.OptionBox;
-//GLOBAL.ExitOption.prototype.activate = function() {
-//	if ((!this.option) && GLOBAL.turnEnabled) {
-//		this.option = true;
-//		//prepareGame();
-//		restartGame();
-//		GLOBAL.menu.reloadControls();
-//		GLOBAL.menu.show();
-//	}
-//}
+//-------------------------------------- PAUSE MODE
+GLOBAL.pauseManager = new function()
+{
+	var self = this;
+	self.paused = false;
+	
+	self.togglePause = function() {
+		if (self.paused)
+			self.disablePause();
+		else
+			self.enablePause();
+	}
+	
+	self.enablePause = function() {
+		if (self.paused)
+			return;
+		self.paused = true;
+		disableTurn();
+		
+		self.show();
+	} 
+	
+	self.disablePause = function() {
+		if (!self.paused)
+			return;
+			
+		self.hide();
+		self.paused = false;
+		enableTurn();
+	}
+	
+	self.show = function() {
+		document.getElementById("pauseButton").innerHTML = "CONT";
+	}
+	
+	self.hide = function() {
+		document.getElementById("pauseButton").innerHTML = "PAUSE";
+	}
+}

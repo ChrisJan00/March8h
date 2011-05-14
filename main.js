@@ -97,6 +97,7 @@ function prepareGame()
 }
 
 function restartGame() {
+	GLOBAL.pauseManager.disablePause();
 	GLOBAL.action.turn = 0;
 	GLOBAL.BoardInstance.clearContents();
 	GLOBAL.Piles[0].chooseTiles();
@@ -153,7 +154,7 @@ function enableTurn()
 	GLOBAL.turnEnabled = true;
 	GLOBAL.turnDelay = 0;
 	
-	GLOBAL.BoardInstance.refreshAllTileBorders();
+	//GLOBAL.BoardInstance.refreshAllTileBorders();
 	
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
 			setTimeout(manageTurn, GLOBAL.computerDelay);

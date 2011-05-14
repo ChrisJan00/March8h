@@ -79,6 +79,10 @@ GLOBAL.GameLog = function() {
 		self.output.innerHTML = self.outputString + self.output.innerHTML;
 		
 		self.index++;
+		
+		// force end of memory here
+		if (self.moves.length > self.index)
+			self.moves.splice(self.index, self.moves.length - self.index + 1);
 	}
 	
 	self.showResult = function(_who, stoneFrom, stoneTo, stoneCount) 
@@ -95,8 +99,6 @@ GLOBAL.GameLog = function() {
 		+ "</span>";
 		 
 		self.print(_who, playString);
-		
-		// todo: register that in moves
 	}
 	
 	self.copyStone = function(stone) {
@@ -238,7 +240,9 @@ GLOBAL.GameLog = function() {
 	{
 		if (self.index==0)
 			return;
-			
+		
+		GLOBAL.pauseManager.enablePause();
+		
 		// undo the changes from the last move
 		var turnName = "turn" + self.index;
 		var turnSpan = document.getElementById(turnName);
@@ -253,6 +257,8 @@ GLOBAL.GameLog = function() {
 	{
 		if (self.index >= self.moves.length)
 			return;
+		
+		GLOBAL.pauseManager.enablePause();
 		
 		var _who = self.moves[self.index].who;
 		var playerName = self.playerName(_who);
@@ -290,11 +296,13 @@ GLOBAL.GameLog = function() {
 			active : false
 		}
 		currentPile.selection = null;
+		currentPile.redrawBorder( true );
 		currentPile.redrawTile(pileX, pileY);
-		
+		currentPile.redrawBorder( false );
 		// delete stone from board
 		GLOBAL.BoardInstance[move.x][move.y] = null;
 		GLOBAL.BoardInstance.redrawTile(move.x,move.y);
+		GLOBAL.BoardInstance.stoneCount--;
 		
 		// undo attacks
 		if (move.attack)
@@ -304,7 +312,7 @@ GLOBAL.GameLog = function() {
 				var dest = GLOBAL.BoardInstance[x][y];
 				dest.owner = move.attack[i].owner;
 				dest.element = move.attack[i].element;
-				dest.bgColor = colorForPlayerLegend(dest.owner);
+				dest.bgColor = colorForPlayer(dest.owner);
 				GLOBAL.BoardInstance.redrawTile(x,y);
 			}
 			
@@ -313,7 +321,7 @@ GLOBAL.GameLog = function() {
  		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = move.who;
 		showPlayer();
-		enableTurn();
+		//enableTurn();
 	}
 	
 	self.reapply = function()
@@ -326,6 +334,8 @@ GLOBAL.GameLog = function() {
 		var pileX = Math.floor(move.pileIndex/currentPile.rows);
 		var pileY = move.pileIndex % currentPile.rows;
 		
+		//currentPile.redrawBorder( true );
+		
 		currentPile.selection = null;
 		currentPile.del(pileX, pileY);
 		currentPile.redrawTile(pileX, pileY);
@@ -336,12 +346,13 @@ GLOBAL.GameLog = function() {
 			iy : move.y,
 			owner : _owner,
 			element : move.element,
-			bgColor : colorForPlayerLegend(_owner),
+			bgColor : colorForPlayer(_owner),
 			visible : true,
 			selected : false,
 			active : true,
 		};
 		GLOBAL.BoardInstance.redrawTile(move.x, move.y);
+		GLOBAL.BoardInstance.stoneCount++;
 		
 		if (move.attack)
 			for (var i=0;i<move.attack.length; i++) {
@@ -350,7 +361,7 @@ GLOBAL.GameLog = function() {
 				var dest = GLOBAL.BoardInstance[x][y];
 				dest.owner = _owner;
 				dest.element = move.element;
-				dest.bgColor = colorForPlayerLegend(_owner);
+				dest.bgColor = colorForPlayer(_owner);
 				GLOBAL.BoardInstance.redrawTile(x,y);
 			}
 			
@@ -358,7 +369,7 @@ GLOBAL.GameLog = function() {
 			var dest = GLOBAL.BoardInstance[move.x][move.y];
 			dest.owner = move.defense.owner;
 			dest.element = move.defense.element;
-			dest.bgColor = colorForPlayerLegend(move.defense.owner);
+			dest.bgColor = colorForPlayer(move.defense.owner);
 			GLOBAL.BoardInstance.redrawTile(move.x, move.y);
 		}
 		
@@ -366,7 +377,7 @@ GLOBAL.GameLog = function() {
  		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = 1-_owner;
 		showPlayer();
-		enableTurn();
+		//enableTurn();
 	}
 	// todo: replay
 }
