@@ -56,9 +56,6 @@ function prepareGame()
 	GLOBAL.xoffset = GLOBAL.findAbsoluteX(GLOBAL.gameCanvas);
 	GLOBAL.yoffset = GLOBAL.findAbsoluteY(GLOBAL.gameCanvas);
 	
-	// true: don't use worker, false: use worker
-	noWorker = false;
-	
 	GLOBAL.animationDelay = 250;
 	GLOBAL.framesPerStrip = 4;
 	
@@ -95,9 +92,8 @@ function prepareGame()
 		button : false
 	};
 	
-	//GLOBAL.exitOption = new GLOBAL.ExitOption();
 	GLOBAL.gameLog = new GLOBAL.GameLog();
-	//restartGame();
+	GLOBAL.dragndrop = new GLOBAL.DragNDrop();
 }
 
 function restartGame() {
@@ -117,7 +113,6 @@ function drawInitialGame() {
 	GLOBAL.BoardInstance.drawEmpty();
 	showPlayer();
 	showOrder();
-	//GLOBAL.exitOption.redraw();
 	enableTurn();
 }
 
@@ -138,9 +133,6 @@ function mouseDown( ev ) {
 		GLOBAL.menu.mouseDown(ev);
 		return;
 	}
-		
-	
-	//GLOBAL.exitOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 	
 	if (!GLOBAL.turnEnabled)
 		return;
@@ -160,15 +152,10 @@ function enableTurn()
 {
 	GLOBAL.turnEnabled = true;
 	GLOBAL.turnDelay = 0;
-	//GLOBAL.exitOption.activate();
 	
 	GLOBAL.BoardInstance.refreshAllTileBorders();
 	
 	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		if (GLOBAL.computerHard) {
-			// wait for the worker message
-			//manageTurn(); // don't wait for now
-		} else
 			setTimeout(manageTurn, GLOBAL.computerDelay);
 	}
 }

@@ -33,9 +33,9 @@ function showPlayer() {
 	ctx.fillStyle = colorForPlayerLegend(pn);
 	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
 	//var msg = (pn?"orange":"purple")+"'s turn";
-	var msg  = (pn?"orange":"purple");
+	var msg  = (pn?"Orange":"Purple");
 	if (GLOBAL.computerEnabled && pn==1)
-		msg = "thinking...";
+		msg = "Thinking...";
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2 );
 	

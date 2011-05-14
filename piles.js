@@ -37,6 +37,13 @@ GLOBAL.PileClass.prototype.manageClicked = function( mx, my )
 			this.redrawTile(mix, miy);
 			this.selection = newStone;
 	}
+	
+	// dragndrop: setdragobject (newStone)
+	if (newStone) {
+		var stonex = this.x0 + mix*this.side;
+		var stoney = this.y0 + miy*this.side;
+		GLOBAL.dragndrop.startDrag(mx, my, newStone, stonex, stoney);
+	}
 }
 
 GLOBAL.PileClass.prototype.unSelect = function()
@@ -135,14 +142,17 @@ GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
 	}
 	
 	var ctx = GLOBAL.gameContext;
-	//var color = strong?colorForPlayerLegend(this.owner):"#FFFFFF";
-	var color = strong?this.borderColor(0):"#FFFFFF";
-	ctx.fillStyle = color;
-	
-	ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border-1);
-	ctx.fillRect(this.x0-this.border, this.y0-1, this.border-1, this.height+2);
-	ctx.fillRect(this.x0-this.border, this.y1+1, this.width + 2*this.border, this.border-1);
-	ctx.fillRect(this.x1+1, this.y0-1, this.border-1, this.height+2);
+	for (var i=0;i<2;i++) {
+		if (i==1)
+			ctx = GLOBAL.bgContext;
+		var color = strong?this.borderColor(0):"#FFFFFF";
+		ctx.fillStyle = color;
+		
+		ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border-1);
+		ctx.fillRect(this.x0-this.border, this.y0-1, this.border-1, this.height+2);
+		ctx.fillRect(this.x0-this.border, this.y1+1, this.width + 2*this.border, this.border-1);
+		ctx.fillRect(this.x1+1, this.y0-1, this.border-1, this.height+2);
+	}
 }
 
 GLOBAL.PileClass.prototype.countStoneTypes = function()
