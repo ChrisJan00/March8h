@@ -211,8 +211,8 @@ function mouseMove( ev ) {
     	GLOBAL.mouse.x = ev.layerX - GLOBAL.xoffset;
     	GLOBAL.mouse.y = ev.layerY - GLOBAL.yoffset;
   } else if (ev.offsetX || ev.offsetX == 0) { // Opera
-    	GLOBAL.mouse.x = ev.offsetX; // - GLOBAL.xoffset;
-    	GLOBAL.mouse.y = ev.offsetY; // - GLOBAL.yoffset;
+    	GLOBAL.mouse.x = ev.offsetX;
+    	GLOBAL.mouse.y = ev.offsetY;
   }
 
 }

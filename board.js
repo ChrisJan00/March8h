@@ -87,8 +87,10 @@ GLOBAL.StoneHolder.prototype = {
 			ctx.fillRect(mx,my,this.side, this.side);
 		}
 		
-		if (this[x][y] && this[x][y].active && this == GLOBAL.BoardInstance)
-				this.refreshTileBorders(x,y);
+		if (this[x][y] && this[x][y].active && this == GLOBAL.BoardInstance) {
+				this[x][y].invertedColors = false;
+				this.refreshTileBordersExpansive(x,y);
+		}
 	},
 	
 	redrawTile : function(x,y,col) {
@@ -123,7 +125,17 @@ GLOBAL.StoneHolder.prototype = {
 				this.refreshTileBorders(x,y);
 	},
 	
+	refreshTileBordersExpansive : function(x,y) 
+	{
+		for (var i=-1; i<2; i++)
+			for (var j=-1; j<2; j++)
+				GLOBAL.BoardInstance.refreshTileBorders(x+i, y+j);
+	},
+	
 	refreshTileBorders : function(x,y) {
+		if (x<0 || x>=this.cols || y<0 || y>=this.rows)
+			return;
+			
 		var ctx = GLOBAL.gameContext;
 		var ix = this.x0 + x * this.side;
 		var iy = this.y0 + y * this.side;
@@ -134,45 +146,51 @@ GLOBAL.StoneHolder.prototype = {
 			var hideRight = (x<this.cols-1 && this[x+1][y] && this[x+1][y].owner == stone.owner  && this[x+1][y].element == stone.element);
 			var hideUp = (y>0 && this[x][y-1] && this[x][y-1].owner == stone.owner  && this[x][y-1].element == stone.element);
 			var hideDown = (y<this.rows-1 && this[x][y+1] && this[x][y+1].owner == stone.owner  && this[x][y+1].element == stone.element);
-				
+			
+			var diagLU = (x>0 && y>0 && this[x-1][y-1] && this[x-1][y-1].owner == stone.owner && this[x-1][y-1].element == stone.element);
+			var diagRU = (x<this.cols-1 && y>0 && this[x+1][y-1] && this[x+1][y-1].owner == stone.owner && this[x+1][y-1].element == stone.element);
+			var diagLD = (x>0 && y<this.rows-1 && this[x-1][y+1] && this[x-1][y+1].owner == stone.owner && this[x-1][y+1].element == stone.element);
+			var diagRD = (x<this.cols-1 && y<this.rows-1 && this[x+1][y+1] && this[x+1][y+1].owner == stone.owner && this[x+1][y+1].element == stone.element);
+			
+			var perceivedOwner = stone.invertedColors? (1-stone.owner) : stone.owner;
+			
 			for (var ctxcnt=0;ctxcnt<2;ctxcnt++) {
 				if (ctxcnt==1) ctx = GLOBAL.bgContext;
 					
 				// draw own border
 				ctx.fillStyle = hideLeft? 
-					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix, iy+1, 1, this.side-2);
 				
 				ctx.fillStyle = hideRight? 
-					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
 				
 				ctx.fillStyle = hideUp? 
-					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+1, iy, this.side-2, 1);
 				
 				ctx.fillStyle = hideDown? 
-					colorForPlayer(stone.owner) : colorForPlayerLegend(stone.owner);
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
 				
-				ctx.fillStyle = colorForPlayerLegend(stone.owner);
-				if ((!hideLeft) || (!hideUp))
-					ctx.fillRect(ix, iy, 1, 1);
+				ctx.fillStyle = colorForPlayerLegend(perceivedOwner);
+				ctx.fillStyle = (hideLeft && hideUp && diagLU)?
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+				ctx.fillRect(ix, iy, 1, 1);
 				
-				if ((!hideRight) || (!hideUp))
-					ctx.fillRect(ix+this.side-1, iy, 1, 1);
+				ctx.fillStyle = (hideRight && hideUp && diagRU)?
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+				ctx.fillRect(ix+this.side-1, iy, 1, 1);
 					
-				if ((!hideLeft) || (!hideDown))
-					ctx.fillRect(ix, iy+this.side-1, 1, 1);
+				ctx.fillStyle = (hideLeft && hideDown && diagLD)?
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+				ctx.fillRect(ix, iy+this.side-1, 1, 1);
 					
-				if ((!hideRight) || (!hideDown))
-					ctx.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
-					
-//				ctx.fillStyle = colorForPlayerLegend(stone.owner);
-//				ctx.fillRect(ix, iy, 1, this.side);
-//				ctx.fillRect(ix+this.side-1, iy, 1, this.side);
-//				ctx.fillRect(ix, iy, this.side, 1);
-//				ctx.fillRect(ix, iy+this.side-1, this.side, 1);
+				ctx.fillStyle = (hideRight && hideDown && diagRD)?
+					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+				ctx.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
+
 			}
 		}
 	},	
@@ -357,11 +375,12 @@ GLOBAL.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	//startFlood(mix, miy);
 	GLOBAL.floodCheck.checkFlood(mix, miy);
-	var def = GLOBAL.floodCheck.findDefender(mix,miy);
+	//var def = GLOBAL.floodCheck.findDefender(mix,miy);
 	
-	this.refreshTileBorders(mix, miy);
-	if (def)
-		this.refreshTileBorders(def.ix, def.iy);
+	//this.refreshTileBorders(mix, miy);
+	//if (def)
+	//	this.refreshTileBorders(def.ix, def.iy);
+	this.refreshTileBordersExpansive(mix, miy);
 	
 	return true;
 }

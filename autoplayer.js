@@ -143,10 +143,8 @@ function computerMove(mix,miy,elem, pn) {
 		//startFlood(mix, miy);
 		GLOBAL.floodCheck.checkFlood(mix, miy);
 		
-		var def = GLOBAL.floodCheck.findDefender(mix,miy);
-		GLOBAL.BoardInstance.refreshTileBorders(mix, miy);
-		if (def)
-			GLOBAL.BoardInstance.refreshTileBorders(def.ix, def.iy);
+		//GLOBAL.BoardInstance.refreshTileBorders(mix, miy);
+		GLOBAL.BoardInstance.refreshTileBordersExpansive(mix, miy);
 		
 		return true;
 	}

@@ -149,6 +149,7 @@ GLOBAL.FloodCheck = function() {
 		}
 		
 		if (self.board == GLOBAL.BoardInstance) {
+			self.board[to.ix][to.iy].invertedColors = true;
 			var delay = to.step*GLOBAL.animationDelay;
 			setTimeout(function(){GLOBAL.BoardInstance.startTileAnimation(to.ix, to.iy);}, delay);
 			GLOBAL.turnDelay = Math.max(GLOBAL.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2) + delay);
