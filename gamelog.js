@@ -334,8 +334,6 @@ GLOBAL.GameLog = function() {
 		var pileX = Math.floor(move.pileIndex/currentPile.rows);
 		var pileY = move.pileIndex % currentPile.rows;
 		
-		//currentPile.redrawBorder( true );
-		
 		currentPile.selection = null;
 		currentPile.del(pileX, pileY);
 		currentPile.redrawTile(pileX, pileY);
@@ -376,8 +374,14 @@ GLOBAL.GameLog = function() {
 		GLOBAL.floodCheck.board = GLOBAL.BoardInstance;
  		GLOBAL.floodCheck.countMarkers();
 		GLOBAL.action.turn = 1-_owner;
-		showPlayer();
-		//enableTurn();
+		
+		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
+			showPlayer();
+		} else {
+			checkVictory();
+		}
+		
+		// enableTurn();
 	}
 	// todo: replay
 }
