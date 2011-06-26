@@ -11,7 +11,42 @@ GLOBAL.GameLog = function() {
 		self.output = document.getElementById("logWindow");
 		self.output.innerHTML = "";
 	}
-
+	
+	self.visible = false;
+	self.show = function() {
+		self.visible = true;
+		document.getElementById("logContainer").style.visibility = "visible";
+		document.getElementById("logWindow").style.visibility = "visible";
+	}
+	
+	self.hide = function() {
+		self.visible = false;
+		document.getElementById("logContainer").style.visibility = "hidden";
+		document.getElementById("logWindow").style.visibility = "hidden";
+	}
+	
+	self.toggle = function() {
+		if (self.visible)
+			self.hide();
+		else
+			self.show();
+	}
+	
+	self.updateVisible = function()
+	{
+		if (self.visible)
+			self.show();
+		else
+			self.hide();	
+	}
+	
+	self.unDisplay = function()
+	{
+		document.getElementById("logContainer").style.visibility = "hidden";
+		document.getElementById("logWindow").style.visibility = "hidden";
+		
+	}
+	
 	self.print = function(_who, text) 
 	{
 		self.lineCount++;
@@ -299,6 +334,7 @@ GLOBAL.GameLog = function() {
 		currentPile.redrawBorder( true );
 		currentPile.redrawTile(pileX, pileY);
 		currentPile.redrawBorder( false );
+		
 		// delete stone from board
 		GLOBAL.BoardInstance[move.x][move.y] = null;
 		GLOBAL.BoardInstance.redrawTile(move.x,move.y);

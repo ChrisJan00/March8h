@@ -94,6 +94,12 @@ function prepareGame()
 	
 	GLOBAL.gameLog = new GLOBAL.GameLog();
 	GLOBAL.dragndrop = new GLOBAL.DragNDrop();
+	GLOBAL.optionsMenu = new GLOBAL.OptionsMenu();
+	GLOBAL.optionsMenu.hide();
+	GLOBAL.optionsButton = new GLOBAL.ClickableOption( GLOBAL.gameCanvas, 600, 35, "Options", GLOBAL.optionsMenu.activate );
+	GLOBAL.optionsButton.width = 50;
+	GLOBAL.optionsButton.height = 25;
+	GLOBAL.optionsButton.fontSize = 10;
 }
 
 function restartGame() {
@@ -114,11 +120,15 @@ function drawInitialGame() {
 	GLOBAL.BoardInstance.drawEmpty();
 	showPlayer();
 	showOrder();
+	GLOBAL.optionsButton.drawNormal();
+	GLOBAL.gameLog.updateVisible();
 	enableTurn();
 }
 
 function connectMouse() {
 	GLOBAL.gameCanvas.addEventListener('mousedown', mouseDown, false);
+	GLOBAL.gameCanvas.addEventListener('mouseup', mouseRaise, false);
+	GLOBAL.gameCanvas.addEventListener('mousemove', mouseMv, false);
 }
 
 function randint(n) {
@@ -130,13 +140,23 @@ function mouseDown( ev ) {
 	
 	mouseMove( ev );
 	
+	
 	if (GLOBAL.menu.active) {
 		GLOBAL.menu.mouseDown(ev);
 		return;
 	}
 	
+	if (GLOBAL.pauseManager.paused) {
+		GLOBAL.pauseManager.disablePause();
+		GLOBAL.optionsMenu.hide();
+		return;
+	}
+	
+	GLOBAL.optionsButton.managePressed(GLOBAL.mouse.x, GLOBAL.mouse.y );
+	
 	if (!GLOBAL.turnEnabled)
 		return;
+		
 	
 	if (GLOBAL.action.turn == -1) {
 		restartGame();
@@ -146,7 +166,20 @@ function mouseDown( ev ) {
 	
 	if (GLOBAL.action.turn==0 || !GLOBAL.computerEnabled)
 		manageTurn();
-	
+}
+
+function mouseRaise( ev ) {
+	if (GLOBAL.menu.active || GLOBAL.pauseManager.paused)
+		return;
+	mouseMove( ev );
+	GLOBAL.optionsButton.manageReleased( GLOBAL.mouse.x, GLOBAL.mouse.y );
+}
+
+function mouseMv( ev ) {
+	if (GLOBAL.menu.active || GLOBAL.pauseManager.paused)
+		return;
+	mouseMove( ev );
+	GLOBAL.optionsButton.manageHover( GLOBAL.mouse.x, GLOBAL.mouse.y );
 }
 
 function enableTurn()

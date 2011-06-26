@@ -46,6 +46,8 @@ GLOBAL.GameMenu = function() {
 		GLOBAL.computerMediumOption.redraw();
 		GLOBAL.defenseModeOption.redraw();
 		self.startGameOption.redraw();
+		
+		GLOBAL.gameLog.unDisplay();
 		self.active = true;
 	}
 	
@@ -113,10 +115,15 @@ GLOBAL.pauseManager = new function()
 	}
 	
 	self.show = function() {
-		document.getElementById("pauseButton").innerHTML = "CONT";
+		//GLOBAL.gameContext.fillStyle = "rgba(127,127,127,0.5)"
+		//GLOBAL.gameContext.fillRect(0, 0, GLOBAL.canvasWidth, GLOBAL.canvasHeight);
+		//document.getElementById("pauseButton").innerHTML = "CONT";
 	}
 	
 	self.hide = function() {
-		document.getElementById("pauseButton").innerHTML = "PAUSE";
+		//drawInitialGame();
+		//GLOBAL.BoardInstance.drawAllTiles();
+		
+		//document.getElementById("pauseButton").innerHTML = "PAUSE";
 	}
 }

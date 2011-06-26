@@ -17,6 +17,7 @@
 <script type="text/javascript" src="gamelog.js"></script>
 <script type="text/javascript" src="dragndrop.js"></script>
 <script type="text/javascript" src="autoplayer.js"></script>
+<script type="text/javascript" src="messagebox.js"></script>
 <script type="text/javascript" src="main.js"></script>
 <script type="text/javascript">
 function restartMenu() {
@@ -24,29 +25,54 @@ function restartMenu() {
 	GLOBAL.menu.reloadControls();
 	GLOBAL.menu.show();
 }
+//function showe() {
+//	var a = document.getElementById("testing");
+//	testing.innerHTML = window.innerWidth + " " + window.innerHeight;
+//}
 </script>
 </head>
-<body onload="startGame()" style="font-family:CustomFont, sans-serif">
+<body onload="startGame();" style="font-family:CustomFont, sans-serif">
 <table cellpadding="15"><tr><td>
+<div id="viewport">
 <canvas id="canvas1" style="image-rendering: 
 optimizespeed ! important; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);" moz-opaque=""
 width="680" height="480"></canvas>
+<div id="logWindow" 
+style ="width:400px;
+top: 60;
+left: 720;
+position: absolute;
+height:480px;
+overflow:auto;
+font-size:14px;" ></div>
+<!--
+<canvas id="endbox"
+style="image-rendering: 
+optimizespeed ! important; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+position: absolute;
+top: 240;
+left: 260" moz-opaque=""
+width="640" height="480"></canvas>
+-->
+<canvas id="optionsmenu"
+style="image-rendering: 
+optimizespeed ! important; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+position: absolute;
+top: 100;
+left: 260" moz-opaque=""
+width="0" height="0"></canvas>
+</div>
 </td><td>
-<table><tr><td>
-<div id="undoButton" onclick="GLOBAL.gameLog.undo()">UNDO</div>
-</td><td>
-<div id="redoButton" onclick="GLOBAL.gameLog.redo()">REDO</div>
-</td><td>
-<div id="pauseButton" onclick="GLOBAL.pauseManager.togglePause()">PAUSE</div>
-</td><td>
-<div id="exitButton" onclick="restartMenu()">EXIT</div>
-</td></tr><tr> <td colspan=4>
+<div id="logContainer" style="visibility:hidden">
+<table>
+<tr><td>Game Log</td></tr><tr><td>
 <div id="logWindow" style ="width:400px;
 height:480px;
 overflow:auto;
 font-size:14px;" ></div>
 </td></tr></table>
+</div>
 </td></tr></table>
-
+<!--<div style="font-size:32px">ELEMENTIS</div>-->
 </body>
 </html>

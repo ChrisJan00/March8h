@@ -69,6 +69,14 @@ GLOBAL.StoneHolder.prototype = {
 		}
 	},
 	
+	drawAllTiles : function() {
+		var self = this;
+		for (var x=0;x<self.cols;x++)
+			for (var y=0;y<self.rows;y++)
+				self.redrawTile(x,y);
+		//this.refreshAllTileBorders();
+	},
+	
 	redrawTileBackground : function(x,y, col) {
 		var color = this.cellColor((x+y)%2);
 		if (this[x][y] && this[x][y].active)
@@ -97,7 +105,7 @@ GLOBAL.StoneHolder.prototype = {
 		// if there is no tile, draw empty space
 		this.redrawTileBackground(x,y,col);
 		
-		stone = this[x][y];
+		var stone = this[x][y];
 		if (stone && stone.visible) {
 			// draw stone
 			var ix = this.x0 + x * this.side;
