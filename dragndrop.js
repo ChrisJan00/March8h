@@ -87,7 +87,7 @@ GLOBAL.DragNDrop = function() {
 		
 		// draw icon
 		var img;
-		switch (stone.element) {
+		switch (self.stoneData.element) {
 			case 0:	img = GLOBAL.imageFire;
 				break;
 			case 1:	img = GLOBAL.imageEarth;
