@@ -155,12 +155,12 @@ GLOBAL.OptionsMenu = function() {
 	
 	// buttons
 	self.optionButtons = [];
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 60, "UNDO", GLOBAL.gameLog.undo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 105, "REDO", GLOBAL.gameLog.redo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 150, "TOGGLE LOG", GLOBAL.gameLog.toggle ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 195, "START NEW GAME", self.doRestart ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 240, "EXIT GAME", self.doExit ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 285, "CONTINUE", self.deactivate ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 60, "Undo", GLOBAL.gameLog.undo ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 105, "Redo", GLOBAL.gameLog.redo ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 150, "Toggle Log", GLOBAL.gameLog.toggle ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 195, "Start New Game", self.doRestart ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 240, "Exit Game", self.doExit ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 285, "Continue", self.deactivate ));
 	
 }
 
