@@ -18,6 +18,37 @@ function colorForPlayerStrong(pn) {
 	return pn?"#ff5400":"#6e0c9e";
 }
 
+function colorForPlayerBackground(pn) {
+	return pn?"#ffe9ce":"#f4e2ff"
+}
+
+function showPlayerScore(pn) {
+	var size = 50;
+	var x0 = GLOBAL.Piles[pn].x0 + GLOBAL.Piles[pn].width/2 - size/2;
+	var y0 = GLOBAL.Piles[pn].y0 / 2 - size/2;
+	
+	var ctxt = GLOBAL.gameContext;
+	
+	ctxt.fillStyle = colorForPlayerBackground(pn);
+	ctxt.fillRect(x0, y0, size, size);
+	
+	ctxt.fillStyle = GLOBAL.Piles[pn].borderColor(0);
+	ctxt.fillRect(x0, y0, size, 1);
+	ctxt.fillRect(x0, y0, 1, size);
+	
+	ctxt.fillStyle = GLOBAL.Piles[pn].borderColor(1);
+	ctxt.fillRect(x0 + size - 1, y0, 1, size);
+	ctxt.fillRect(x0, y0 + size - 1, size, 1);
+	
+	ctxt.font = "bold 28px CustomFont, sans-serif";
+	ctxt.fillStyle = colorForPlayerLegend(pn);
+	var numberStr = " "+GLOBAL.counts[pn]+" ";
+	var textLen = ctxt.measureText(numberStr).width;
+	ctxt.fillText(numberStr, x0 + size/2 - textLen/2, y0 + size/2 + 10 );
+	//ctx.fillStyle = colorForPlayerLegend(pn);
+	//ctx.fillText(GLOBAL.counts[pn]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
+	//ctx.fillStyle = colorForPlayerLegend(pn);
+}
 
 function showPlayer() {
 	var data = GLOBAL.coords.text
@@ -25,11 +56,11 @@ function showPlayer() {
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(data.x0,data.y0,data.width,data.height);
 	var pn = GLOBAL.action.turn;
-	ctx.font = "bold 24px CustomFont, sans-serif";
-	ctx.fillStyle = colorForPlayerLegend(0);
-	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayerLegend(1);
-	ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
+	
+	showPlayerScore(0);
+	showPlayerScore(1);
+	
+	ctx.font = "bold 28px CustomFont, sans-serif";
 	ctx.fillStyle = colorForPlayerLegend(pn);
 	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
 	//var msg = (pn?"orange":"purple")+"'s turn";
@@ -37,7 +68,7 @@ function showPlayer() {
 	if (GLOBAL.computerEnabled && pn==1)
 		msg = "Thinking...";
 	var msglen = ctx.measureText(msg);
-	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2 );
+	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
 	
 	GLOBAL.Piles[0].redrawBorder(GLOBAL.action.turn==0);
 	GLOBAL.Piles[1].redrawBorder(GLOBAL.action.turn==1);
@@ -90,10 +121,11 @@ function checkVictory() {
 	var pn = GLOBAL.action.turn;
 	ctx.font = "bold 24px CustomFont, sans-serif";
 	
-	ctx.fillStyle = colorForPlayerLegend(0);
-	ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
-	ctx.fillStyle = colorForPlayerLegend(1);
-	ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
+	//ctx.fillStyle = colorForPlayerLegend(0);
+	//ctx.fillText(GLOBAL.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
+	//ctx.fillStyle = colorForPlayerLegend(1);
+	//ctx.fillText(GLOBAL.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
+	
 	ctx.fillStyle = colorForPlayerLegend(pn);
 	
 	var msg;

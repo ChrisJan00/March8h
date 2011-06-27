@@ -68,9 +68,9 @@ function prepareGame()
 	GLOBAL.coords = {
 		text : {
 			x0: 180,
-			y0: 15,
+			y0: 5,
 			width: 300,
-			height: 52
+			height: 62
 		}
 	};
 
@@ -96,7 +96,7 @@ function prepareGame()
 	GLOBAL.dragndrop = new GLOBAL.DragNDrop();
 	GLOBAL.optionsMenu = new GLOBAL.OptionsMenu();
 	GLOBAL.optionsMenu.hide();
-	GLOBAL.optionsButton = new GLOBAL.ClickableOption( GLOBAL.gameCanvas, 600, 35, 50, 25, "Options", GLOBAL.optionsMenu.activate );
+	GLOBAL.optionsButton = new GLOBAL.ClickableOption( GLOBAL.gameCanvas, 605, 5, 50, 25, "Options", GLOBAL.optionsMenu.activate );
 	GLOBAL.optionsButton.fontSize = 10;
 }
 

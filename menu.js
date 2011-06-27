@@ -50,8 +50,8 @@ GLOBAL.GameMenu = function() {
 		//GLOBAL.defenseModeOption.set(false);
 		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 160, 400, 50, "Player Vs Player (Easy)", self.pvpno));
 		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 220, 400, 50, "Player Vs Player (Defense)", self.pvpdef));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 280, 400, 50, "Player Vs Player (Easy)", self.compeasy));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 340, 400, 50, "Player Vs Player (Hard)", self.comphard));
+		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 280, 400, 50, "Player Vs Computer (Easy)", self.compeasy));
+		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 340, 400, 50, "Player Vs Computer (Hard)", self.comphard));
 		
 	}
 	
