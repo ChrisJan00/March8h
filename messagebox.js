@@ -126,9 +126,9 @@ GLOBAL.OptionsMenu = function() {
 			self.release(self.mouse.x, self.mouse.y);
 			self.dragging = false;
 		} else {
-			var buttonPressed = false;
+			var buttonReleased = false;
 			for (var ii=0; ii < self.optionButtons.length; ii++) {
-				buttonPressed = buttonPressed || self.optionButtons[ii].manageReleased(self.mouse.x, self.mouse.y);
+				buttonReleased = buttonReleased || self.optionButtons[ii].manageReleased(self.mouse.x, self.mouse.y);
 			}
 		}
 	}
@@ -155,12 +155,12 @@ GLOBAL.OptionsMenu = function() {
 	
 	// buttons
 	self.optionButtons = [];
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 60, "Undo", GLOBAL.gameLog.undo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 105, "Redo", GLOBAL.gameLog.redo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 150, "Toggle Log", GLOBAL.gameLog.toggle ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 195, "Start New Game", self.doRestart ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 240, "Exit Game", self.doExit ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 285, "Continue", self.deactivate ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 60, 200, 40, "Undo", GLOBAL.gameLog.undo ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 105, 200, 40, "Redo", GLOBAL.gameLog.redo ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 150, 200, 40, "Toggle Log", GLOBAL.gameLog.toggle ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 195, 200, 40, "Start New Game", self.doRestart ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 240, 200, 40, "Exit Game", self.doExit ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 285, 200, 40, "Continue", self.deactivate ));
 	
 }
 
@@ -169,14 +169,14 @@ GLOBAL.OptionsMenu = function() {
 // if you mouseover the background turns light grey
 // if you press, it turns dark grey
 // if you release, it sends a "signal"
-GLOBAL.ClickableOption = function(canvas, x, y, text, callBack) {
+GLOBAL.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 	var self = this;
 	
 	self.label = text;
 	self.x0 = x;
 	self.y0 = y;
-	self.width = 200;
-	self.height = 40;
+	self.width = w;
+	self.height = h;
 	self.canvas = canvas;
 	self.ctxt = self.canvas.getContext("2d");
 	self.fontSize = 18;
@@ -211,10 +211,10 @@ GLOBAL.ClickableOption = function(canvas, x, y, text, callBack) {
 	self.manageReleased = function(x,y) {
 		if (!self.isHover(x,y))
 			return false;
+		self.drawHover();
 		if (self.pressed)
 			self.callback();
 		self.pressed = false;
-		self.drawHover();
 		return true;
 	}
 	

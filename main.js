@@ -96,9 +96,7 @@ function prepareGame()
 	GLOBAL.dragndrop = new GLOBAL.DragNDrop();
 	GLOBAL.optionsMenu = new GLOBAL.OptionsMenu();
 	GLOBAL.optionsMenu.hide();
-	GLOBAL.optionsButton = new GLOBAL.ClickableOption( GLOBAL.gameCanvas, 600, 35, "Options", GLOBAL.optionsMenu.activate );
-	GLOBAL.optionsButton.width = 50;
-	GLOBAL.optionsButton.height = 25;
+	GLOBAL.optionsButton = new GLOBAL.ClickableOption( GLOBAL.gameCanvas, 600, 35, 50, 25, "Options", GLOBAL.optionsMenu.activate );
 	GLOBAL.optionsButton.fontSize = 10;
 }
 
@@ -168,17 +166,25 @@ function mouseDown( ev ) {
 		manageTurn();
 }
 
-function mouseRaise( ev ) {
-	if (GLOBAL.menu.active || GLOBAL.pauseManager.paused)
+function mouseRaise( ev ) {	
+	if (GLOBAL.pauseManager.paused)
 		return;
 	mouseMove( ev );
+	if (GLOBAL.menu.active) {
+		GLOBAL.menu.mouseUp(ev);
+		return;
+	}
 	GLOBAL.optionsButton.manageReleased( GLOBAL.mouse.x, GLOBAL.mouse.y );
 }
 
 function mouseMv( ev ) {
-	if (GLOBAL.menu.active || GLOBAL.pauseManager.paused)
+	if (GLOBAL.pauseManager.paused)
 		return;
 	mouseMove( ev );
+	if (GLOBAL.menu.active) {
+		GLOBAL.menu.mouseMove(ev);
+		return;
+	}
 	GLOBAL.optionsButton.manageHover( GLOBAL.mouse.x, GLOBAL.mouse.y );
 }
 
