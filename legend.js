@@ -96,6 +96,57 @@ function showOrder() {
 	var y = GLOBAL.BoardInstance.y0 + GLOBAL.BoardInstance.rows * GLOBAL.BoardInstance.side
 	
 	var x0 = GLOBAL.BoardInstance.x0
+	var y0 = y + 15
+	var y1 = y + GLOBAL.imageFire.height/2 + 5
+	var ctx = GLOBAL.gameContext;
+	
+	xi = 5;
+	var lastElem = 0;
+	var img;
+	while (xi < GLOBAL.canvasWidth) {
+		switch(lastElem) {
+			case 0: img = GLOBAL.imageFire; break;
+			case 1: img = GLOBAL.imageWind; break;
+			case 2: img = GLOBAL.imageEarth; break;
+			case 3: img = GLOBAL.imageWater; break;
+		}
+		ctx.drawImage(img, 0, 0, 50, 50, xi, y0, 25, 25 );
+		drawArrow(xi + 30, y0+12, xi + al + 30, y0+12);
+		xi = xi + 35 + al;
+		lastElem = (lastElem+1)%4;
+	}
+
+	//ctx.drawImage(GLOBAL.imageFire, x0 + 2*b , y0);
+	//drawArrow( x0 + 3*b + s, y1, x0 + 3*b + s + al, y1 );
+	//ctx.drawImage(GLOBAL.imageWind, x0 + 4*b + s + al, y0);
+	//drawArrow( x0 + 5*b + 2*s + al, y1, x0 + 5*b + 2*s + 2*al, y1 );
+	//ctx.drawImage(GLOBAL.imageEarth, x0 + 6*b + 2*s + 2*al , y0);
+	//drawArrow(x0 + 7*b + 3*s + 2*al, y1, x0 + 7*b + 3*s + 3*al, y1 );
+	//ctx.drawImage(GLOBAL.imageWater, x0 + 8*b + 3*s + 3*al , y0);
+}
+
+function showOrderOld() {
+//	return;
+	// only arrows pointing to the right by now
+	var drawArrow = function(xfrom,yfrom,xto,yto) {
+		var ctx = GLOBAL.gameContext;
+		ctx.strokeStyle = "#000000";
+		ctx.beginPath();
+		ctx.moveTo(xfrom,yfrom);
+		ctx.lineTo(xto,yto);
+		ctx.lineTo(xto-6,yto-6);
+		ctx.moveTo(xto-6,yto+6);
+		ctx.lineTo(xto,yto);
+		ctx.stroke();
+	}
+	
+	var s = GLOBAL.BoardInstance.side
+	var width = s * GLOBAL.BoardInstance.cols
+	var b = Math.floor((width - 45 - 4*s)/10);
+	var al = 15;
+	var y = GLOBAL.BoardInstance.y0 + GLOBAL.BoardInstance.rows * GLOBAL.BoardInstance.side
+	
+	var x0 = GLOBAL.BoardInstance.x0
 	var y0 = y + 5
 	var y1 = y + GLOBAL.imageFire.height/2 + 5
 	var ctx = GLOBAL.gameContext;
