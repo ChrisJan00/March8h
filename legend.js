@@ -64,9 +64,9 @@ function showPlayer() {
 	ctx.fillStyle = colorForPlayerLegend(pn);
 	//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
 	//var msg = (pn?"orange":"purple")+"'s turn";
-	var msg  = (pn?"Orange":"Purple");
+	var msg  = (pn?GLOBAL.strings.secondPlayerName:GLOBAL.strings.firstPlayerName);
 	if (GLOBAL.computerEnabled && pn==1)
-		msg = "Thinking...";
+		msg = GLOBAL.strings.thinkingMessage;
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
 	
@@ -182,13 +182,13 @@ function checkVictory() {
 	var msg;
 	if (counts[0]>counts[1]) {
 		ctx.fillStyle = colorForPlayerLegend(0);
-		msg = "purple won!";
+		msg = GLOBAL.strings.firstVictory;
 	} else if (counts[0] < counts[1]) {
 		ctx.fillStyle = colorForPlayerLegend(1);
-		msg = "orange won!";
+		msg = GLOBAL.strings.secondVictory;
 	} else {
 		ctx.fillStyle = "#000000";
-		msg = "Tie game";
+		msg = GLOBAL.strings.tieGame;
 	}
 	var msglen = ctx.measureText(msg);
 	ctx.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );

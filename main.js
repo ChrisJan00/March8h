@@ -96,7 +96,7 @@ function prepareGame()
 	GLOBAL.dragndrop = new GLOBAL.DragNDrop();
 	GLOBAL.optionsMenu = new GLOBAL.OptionsMenu();
 	GLOBAL.optionsMenu.hide();
-	GLOBAL.optionsButton = new GLOBAL.ClickableOption( GLOBAL.gameCanvas, 605, 5, 50, 25, "Options", GLOBAL.optionsMenu.activate );
+	GLOBAL.optionsButton = new GLOBAL.ClickableOption( GLOBAL.gameCanvas, 605, 5, 50, 25, GLOBAL.strings.optionsButton, GLOBAL.optionsMenu.activate );
 	GLOBAL.optionsButton.fontSize = 10;
 }
 

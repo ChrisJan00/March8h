@@ -64,28 +64,28 @@ GLOBAL.GameLog = function() {
 	self.elementName = function(_element) 
 	{
 		switch (_element) {
-			case 0: return "fire"; break;
-			case 1: return "earth"; break;
-			case 2: return "water"; break;
-			case 3: return "wind"; break;
+			case 0: return GLOBAL.strings.fireName; break;
+			case 1: return GLOBAL.strings.earthName; break;
+			case 2: return GLOBAL.strings.waterName; break;
+			case 3: return GLOBAL.strings.airName; break;
 		}
 	}
 	
 	self.verb = function(_element)
 	{
 		switch (_element) {
-			case 0: return "burns"; break;
-			case 1: return "dries"; break;
-			case 2: return "extinguishes"; break;
-			case 3: return "blows"; break;
+			case 0: return GLOBAL.strings.fireAttack; break;
+			case 1: return GLOBAL.strings.earthAttack; break;
+			case 2: return GLOBAL.strings.waterAttack; break;
+			case 3: return GLOBAL.strings.airAttack; break;
 		}
 	}
 	
 	self.playerName = function(_who)
 	{
 		if (_who==1 && GLOBAL.computerEnabled)
-			return "computer";
-		return _who?"orange":"purple";
+			return GLOBAL.strings.computerPlayerName;
+		return _who?GLOBAL.strings.secondPlayerName:GLOBAL.strings.firstPlayerName;
 	}
 	
 	self.registerMove = function(_who, _stone, _fromPosition) 
@@ -93,7 +93,7 @@ GLOBAL.GameLog = function() {
 		var playerName = self.playerName(_who);
 		var elementName = self.elementName(_stone.element);
 		var turnNumber = self.index + 1;
-		var playString = playerName+" played "+elementName+" at ("+_stone.ix+", "+_stone.iy+")";
+		var playString = playerName+" "+GLOBAL.strings.playAction+" "+elementName+" "+GLOBAL.strings.prePosition+" ("+_stone.ix+", "+_stone.iy+")";
 		
 		self.moves[self.index] = {
 			who: _who,
@@ -129,8 +129,8 @@ GLOBAL.GameLog = function() {
 		var verb = self.verb(stoneFrom.element);
 
 		var playString = "<span style=\"padding-left:40px\">" 
-		+ attackerName + "'s " + attackerElement + " " + verb + " "
-		+ stoneCount + " " + defenderName + "'s " + defenderElement + (stoneCount>1?"s":"")
+		+ attackerName + GLOBAL.strings.possessive + " " + attackerElement + " " + verb + " "
+		+ stoneCount + " " + defenderName + GLOBAL.strings.possessive + " " + defenderElement + (stoneCount>1?GLOBAL.strings.plural:"")
 		+ "</span>";
 		 
 		self.print(_who, playString);
@@ -279,7 +279,7 @@ GLOBAL.GameLog = function() {
 		GLOBAL.pauseManager.enablePause();
 		
 		// undo the changes from the last move
-		var turnName = "turn" + self.index;
+		var turnName = GLOBAL.strings.turn + self.index;
 		var turnSpan = document.getElementById(turnName);
 		var container = document.getElementById("logWindow");
 		container.removeChild(turnSpan);
@@ -299,7 +299,7 @@ GLOBAL.GameLog = function() {
 		var playerName = self.playerName(_who);
 		var elementName = self.elementName(self.moves[self.index].element);
 		var turnNumber = self.index + 1;
-		var playString = playerName+" played "+elementName+" at ("+self.moves[self.index].x+", "+self.moves[self.index].y+")";
+		var playString = playerName+" " + GLOBAL.strings.playAction +" "+elementName+" "+GLOBAL.strings.prePosition+" ("+self.moves[self.index].x+", "+self.moves[self.index].y+")";
 		
 		self.outputString = "</div>";
 		self.tellChanges();

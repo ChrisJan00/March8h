@@ -72,7 +72,7 @@ GLOBAL.OptionsMenu = function() {
 		ctxt.fillStyle = "#000000";
 		ctxt.font = "bold 18px CustomFont, sans-serif";
 		var textLen = ctxt.measureText("OPTIONS").width;
-		ctxt.fillText("OPTIONS", self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
+		ctxt.fillText(GLOBAL.strings.optionsMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
 		
 		for (var i=0; i<self.optionButtons.length; i++)
 			self.optionButtons[i].drawNormal();
@@ -155,13 +155,13 @@ GLOBAL.OptionsMenu = function() {
 	
 	// buttons
 	self.optionButtons = [];
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 60, 200, 40, "Undo", GLOBAL.gameLog.undo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 105, 200, 40, "Redo", GLOBAL.gameLog.redo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 150, 200, 40, "Toggle Log", GLOBAL.gameLog.toggle ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 195, 200, 40, "Start New Game", self.doRestart ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 240, 200, 40, "Exit Game", self.doExit ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 285, 200, 40, "Continue", self.deactivate ));
-	
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 60, 200, 40, GLOBAL.strings.undoButton, GLOBAL.gameLog.undo ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 105, 200, 40, GLOBAL.strings.redoButton, GLOBAL.gameLog.redo ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 150, 200, 40, GLOBAL.strings.gamelogToggleButton, GLOBAL.gameLog.toggle ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 195, 200, 40, GLOBAL.strings.newGameButton, self.doRestart ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 240, 200, 40, GLOBAL.strings.exitGameButton, self.doExit ));
+	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 285, 200, 40, GLOBAL.strings.closeMenuButton, self.deactivate ));
+
 }
 
 // it's an option in a menu

@@ -48,10 +48,10 @@ GLOBAL.GameMenu = function() {
 		
 		//GLOBAL.computerEasyOption.set(true);
 		//GLOBAL.defenseModeOption.set(false);
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 160, 400, 50, "Player Vs Player (Easy)", self.pvpno));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 220, 400, 50, "Player Vs Player (Defense)", self.pvpdef));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 280, 400, 50, "Player Vs Computer (Easy)", self.compeasy));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 340, 400, 50, "Player Vs Computer (Hard)", self.comphard));
+		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 160, 400, 50, GLOBAL.strings.pvpEasy, self.pvpno));
+		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 220, 400, 50, GLOBAL.strings.pvpDef, self.pvpdef));
+		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 280, 400, 50, GLOBAL.strings.pvcEasy, self.compeasy));
+		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 340, 400, 50, GLOBAL.strings.pvcDef, self.comphard));
 		
 	}
 	
@@ -81,8 +81,8 @@ GLOBAL.GameMenu = function() {
 		ctx.font = "48px CustomFont, sans-serif";
 		ctx.fillStyle = "#000000";
 		
-		var textLen = ctx.measureText("ELEMENTIS").width;
-		ctx.fillText("ELEMENTIS", width/2 - textLen/2 + x0, 100);
+		var textLen = ctx.measureText(GLOBAL.strings.gameName).width;
+		ctx.fillText(GLOBAL.strings.gameTitle, width/2 - textLen/2 + x0, 100);
 		
 		for (var ii=0; ii < self.buttons.length; ii++)
 			self.buttons[ii].drawNormal();
