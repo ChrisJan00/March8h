@@ -100,11 +100,12 @@ G.Display = function() {
 		var y1 = y + G.imageFire.height/2 + 5
 		var ctxt = G.graphicsManager.messagesContext;
 		G.graphicsManager.mark(0, y0, G.graphicsManager.width, 25);
+		ctxt.clearRect(0, y0, G.graphicsManager.width, 25);
 		
 		xi = 5;
 		var lastElem = 0;
 		var img;
-		while (xi < G.canvasWidth) {
+		while (xi < G.graphicsManager.width) {
 			switch(lastElem) {
 				case 0: img = G.imageFire; break;
 				case 1: img = G.imageWind; break;
