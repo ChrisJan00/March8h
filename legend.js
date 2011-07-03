@@ -48,7 +48,7 @@ G.Display = function() {
 		
 		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		var pn = G.action.turn;
+		var pn = G.turn;
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);
@@ -61,8 +61,8 @@ G.Display = function() {
 		var msglen = ctxt.measureText(msg);
 		ctxt.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
 		
-		//G.Piles[0].redrawBorder(G.action.turn==0);
-		//G.Piles[1].redrawBorder(G.action.turn==1);
+		//G.Piles[0].redrawBorder(G.turn==0);
+		//G.Piles[1].redrawBorder(G.turn==1);
 		G.Piles[0].redrawBorder(false);
 		G.Piles[1].redrawBorder(false);
 	}
@@ -117,7 +117,7 @@ G.Display = function() {
 	
 	self.checkVictory = function() {
 		var data = G.coords.text
-		G.action.turn = -1;
+		G.turn = -1;
 		var counts = G.counts;
 		var victory1 = counts[0]>counts[1];
 		
@@ -125,7 +125,7 @@ G.Display = function() {
 		
 		var ctxt = G.graphicsManager.messagesContext;
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		var pn = G.action.turn;
+		var pn = G.turn;
 		ctxt.font = "bold 24px CustomFont, sans-serif";
 		ctxt.fillStyle = self.colorForPlayerBorder(pn);
 		

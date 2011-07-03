@@ -45,9 +45,7 @@ G.Main = function() {
 		G.animationDelay = 250;
 		G.framesPerStrip = 4;
 		
-		G.action = {
-			turn:0,
-		};
+		G.turn = 0;
 		
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
@@ -97,7 +95,7 @@ G.Main = function() {
 	
 	self.restartGame = function() {
 		G.pauseManager.disablePause();
-		G.action.turn = 0;
+		G.turn = 0;
 		G.board.clearContents();
 		G.Piles[0].chooseTiles();
 		G.Piles[1].chooseTiles();
@@ -148,13 +146,13 @@ G.Main = function() {
 			return;
 			
 		
-		if (G.action.turn == -1) {
+		if (G.turn == -1) {
 			self.restartGame();
 			self.drawInitialGame();
 			return;
 		}
 		
-		if (G.action.turn==0 || !G.computerEnabled)
+		if (G.turn==0 || !G.computerEnabled)
 			self.manageTurn();
 	}
 	
@@ -185,10 +183,10 @@ G.Main = function() {
 		G.turnEnabled = true;
 		G.turnDelay = 0;
 		
-		G.Piles[0].redrawBorder(G.action.turn == 0);
-		G.Piles[1].redrawBorder(G.action.turn == 1);
+		G.Piles[0].redrawBorder(G.turn == 0);
+		G.Piles[1].redrawBorder(G.turn == 1);
 		
-		if (G.computerEnabled && G.action.turn == 1) {
+		if (G.computerEnabled && G.turn == 1) {
 				setTimeout(self.manageTurn, G.computerDelay);
 		}
 	}
@@ -204,7 +202,7 @@ G.Main = function() {
 		G.turnDelay = 0;
 			
 		
-		if (G.computerEnabled && G.action.turn == 1) {
+		if (G.computerEnabled && G.turn == 1) {
 			G.computerChoice = G.computerPlay();
 			var c = G.computerChoice;
 			turnIsReady = G.computerMove(c[0],c[1],c[2], 1);
@@ -220,7 +218,7 @@ G.Main = function() {
 	 	if (turnIsReady) {	
 	 		G.floodCheck.board = G.board;
 	 		G.floodCheck.countMarkers();
-			G.action.turn = 1-G.action.turn;
+			G.turn = 1-G.turn;
 			
 			if (G.board.stoneCount < G.board.maxStones) {
 				 G.display.showPlayer();

@@ -37,6 +37,7 @@ G.colors = {
 	
 	purple: "#d6b8e6",
 	purpleBorder : "#9932CC",
+	purpleBorderLight : "#9932CC",
 	purpleBorderDark : "#660099",
 	purpleHighlight :"#6e0c9e",
 	purpleBackground : "#f4e2ff",
@@ -44,6 +45,7 @@ G.colors = {
 	orange: "#ffcb8c",
 	orangeBorder : "#FF8C00",
 	orangeBorderLight :"#ffa940",
+	orangeBorderDark : "ff8c00",
 	orangeHighlight : "#ff5400",
 	orangeBackground : "#ffe9ce",
 

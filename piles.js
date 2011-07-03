@@ -15,7 +15,7 @@ G.PileClass.prototype.manageClicked = function( mx, my )
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
 	
-	if (G.action.turn != this.owner)
+	if (G.turn != this.owner)
 		return;
 	
 	var newStone = this[mix][miy];
@@ -170,10 +170,10 @@ G.initPiles = function()
 		return G.colors.orangeBackground;
 	}
 	G.Piles[0].borderColor = function(ind) {
-		return ind? G.colors.purpleBorderDark : G.colors.purpleBorder;
+		return ind? G.colors.purpleBorderDark : G.colors.purpleBorderLight;
 	}
 	G.Piles[1].borderColor = function(ind) {
-		return ind? G.colors.orangeBorder : G.colors.orangeBorderLight;
+		return ind? G.colors.orangeBorderDark : G.colors.orangeBorderLight;
 	}
 	
 }

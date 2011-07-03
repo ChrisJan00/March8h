@@ -361,7 +361,7 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
 	
-	var currentPile = G.Piles[G.action.turn];
+	var currentPile = G.Piles[G.turn];
 	
 	// place taken?
 	if (this[mix][miy])
@@ -383,7 +383,7 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	this.startBorderAnimation(mix,miy);
 
-	G.gameLog.registerMove(G.action.turn, stone, stoneIndex);
+	G.gameLog.registerMove(G.turn, stone, stoneIndex);
 	
 	G.floodCheck.checkFlood(mix, miy);
 

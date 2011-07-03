@@ -163,7 +163,7 @@ G.GameLog = function() {
 			if (defenseCount > 0) {
 				self.moves[self.index].defense = self.copyStone(defenseList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.turn, 
 					{
 						element: G.floodCheck.colorThatWins(stone.element),
 						owner : 1-stone.owner,
@@ -175,7 +175,7 @@ G.GameLog = function() {
 			if (attackCount > 0) {
 				self.moves[self.index].attack = self.copyList(attackList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.turn, 
 					stone,
 					{
 						element: G.floodCheck.colorWonBy(stone.element),
@@ -187,7 +187,7 @@ G.GameLog = function() {
 			if (attackCount > 0) {
 				self.moves[self.index].attack = self.copyList(attackList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.turn, 
 					stone,
 					{
 						element: G.floodCheck.colorWonBy(stone.element),
@@ -198,7 +198,7 @@ G.GameLog = function() {
 			if (defenseCount > 0) {
 				self.moves[self.index].defense = self.copyStone(defenseList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.turn, 
 					{
 						element: G.floodCheck.colorThatWins(stone.element),
 						owner : 1-stone.owner
@@ -356,7 +356,7 @@ G.GameLog = function() {
 		// change the turn
 		G.floodCheck.board = G.board;
  		G.floodCheck.countMarkers();
-		G.action.turn = move.who;
+		G.turn = move.who;
 		G.display.showPlayer();
 		G.graphicsManager.redraw();
 		//enableTurn();
@@ -411,7 +411,7 @@ G.GameLog = function() {
 		
 		G.floodCheck.board = G.board;
  		G.floodCheck.countMarkers();
-		G.action.turn = 1-_owner;
+		G.turn = 1-_owner;
 		
 		if (G.board.stoneCount < G.board.maxStones) {
 			G.display.showPlayer();

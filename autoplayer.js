@@ -1,7 +1,7 @@
 //----------------------------------------------------------
 G.computerPlay = function() {
 	var self = this;
-	var pn = G.action.turn;
+	var pn = G.turn;
 	var decisionExp = 5;
 	
 	self.availableCount = G.Piles[pn].stoneCount;
@@ -138,7 +138,7 @@ G.computerMove = function(mix,miy,elem, pn) {
 		
 		G.board.startBorderAnimation(mix,miy);
 		
-		G.gameLog.registerMove(G.action.turn, stone, stoneIndex);
+		G.gameLog.registerMove(G.turn, stone, stoneIndex);
 	
 		//startFlood(mix, miy);
 		G.floodCheck.checkFlood(mix, miy);
