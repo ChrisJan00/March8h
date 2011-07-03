@@ -100,6 +100,12 @@ function prepareGame()
 	GLOBAL.optionsButton.fontSize = 10;
 }
 
+function restartMenu() {
+	restartGame();
+	GLOBAL.menu.reloadControls();
+	GLOBAL.menu.show();
+}
+
 function restartGame() {
 	GLOBAL.pauseManager.disablePause();
 	GLOBAL.action.turn = 0;
