@@ -83,6 +83,7 @@ G.Main = function() {
 		G.gameLog = new G.GameLog();
 		G.dragndrop = new G.DragNDrop();
 		G.optionsMenu = new G.OptionsMenu();
+		G.optionsMenu.init();
 		G.optionsMenu.hide();
 		G.optionsButton = new G.ClickableOption( G.graphicsManager.messagesLayer, 605, 5, 50, 25, G.strings.optionsButton, G.optionsMenu.activate );
 		G.optionsButton.fontSize = 10;

@@ -15,6 +15,16 @@ G.OptionsMenu = function() {
 		dy: 0
 	}
 	
+	self.init = function() {
+		self.optionButtons = [];
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 60, 200, 40, G.strings.undoButton, G.gameLog.undo ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 105, 200, 40, G.strings.redoButton, G.gameLog.redo ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 150, 200, 40, G.strings.gamelogToggleButton, G.gameLog.toggle ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 195, 200, 40, G.strings.newGameButton, self.doRestart ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 240, 200, 40, G.strings.exitGameButton, self.doExit ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 285, 200, 40, G.strings.closeMenuButton, self.deactivate ));
+	}
+	
 	self.doRestart = function() {
 		self.deactivate();
 		G.main.restartGame();
@@ -155,15 +165,6 @@ G.OptionsMenu = function() {
 		self.move( x, y );
 	}
 	
-	// buttons
-	self.optionButtons = [];
-	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 60, 200, 40, G.strings.undoButton, G.gameLog.undo ));
-	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 105, 200, 40, G.strings.redoButton, G.gameLog.redo ));
-	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 150, 200, 40, G.strings.gamelogToggleButton, G.gameLog.toggle ));
-	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 195, 200, 40, G.strings.newGameButton, self.doRestart ));
-	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 240, 200, 40, G.strings.exitGameButton, self.doExit ));
-	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 285, 200, 40, G.strings.closeMenuButton, self.deactivate ));
-
 }
 
 G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
