@@ -185,6 +185,9 @@ G.Main = function() {
 		G.turnEnabled = true;
 		G.turnDelay = 0;
 		
+		G.Piles[0].redrawBorder(G.action.turn == 0);
+		G.Piles[1].redrawBorder(G.action.turn == 1);
+		
 		if (G.computerEnabled && G.action.turn == 1) {
 				setTimeout(self.manageTurn, G.computerDelay);
 		}

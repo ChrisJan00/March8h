@@ -68,8 +68,10 @@ G.Display = function() {
 		var msglen = ctxt.measureText(msg);
 		ctxt.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
 		
-		G.Piles[0].redrawBorder(G.action.turn==0);
-		G.Piles[1].redrawBorder(G.action.turn==1);
+		//G.Piles[0].redrawBorder(G.action.turn==0);
+		//G.Piles[1].redrawBorder(G.action.turn==1);
+		G.Piles[0].redrawBorder(false);
+		G.Piles[1].redrawBorder(false);
 	}
 	
 	self.showOrder = function() {
