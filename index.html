@@ -9,6 +9,7 @@
 <title>March8h</title>
 <script type="text/javascript" src="globals.js"></script>
 <script type="text/javascript" src="strings.js"></script>
+<script type="text/javascript" src="graphicsManager.js"></script>
 <script type="text/javascript" src="mainmenu.js"></script>
 <script type="text/javascript" src="optionsmenu.js"></script>
 <script type="text/javascript" src="board.js"></script>
@@ -20,9 +21,13 @@
 <script type="text/javascript" src="autoplayer.js"></script>
 <script type="text/javascript" src="main.js"></script>
 <script type="text/javascript">
+function begin() {
+	G.main = new G.Main();
+	G.main.startGame();
+}
 </script>
 </head>
-<body onload="G.Main.startGame();" style="font-family:CustomFont, sans-serif">
+<body onload="begin();" style="font-family:CustomFont, sans-serif">
 <table cellpadding="15"><tr><td>
 <div id="viewport">
 <canvas id="canvas1" style="image-rendering: 

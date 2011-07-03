@@ -28,9 +28,9 @@ G.computerPlay = function() {
 	
 	self.computeBasicScores = function() {
 		self.options = new Array();
-		for (var ix=0;ix<G.BoardInstance.cols;ix++)
-			for (var iy=0;iy<G.BoardInstance.rows;iy++) {
-				if (G.BoardInstance[ix][iy])
+		for (var ix=0;ix<G.board.cols;ix++)
+			for (var iy=0;iy<G.board.rows;iy++) {
+				if (G.board[ix][iy])
 					continue;
 				for (var color=0;color<4;color++) {
 					var score = 0;
@@ -57,7 +57,7 @@ G.computerPlay = function() {
 	}
 	
 	self.check = function(x,y,color,owner) {
-		var candidate = G.BoardInstance[x]?G.BoardInstance[x][y]:null;
+		var candidate = G.board[x]?G.board[x][y]:null;
 		if ( candidate && candidate.element == color && candidate.owner == owner)
 			return true;
 		else return false;
@@ -82,7 +82,7 @@ G.computerPlay = function() {
 			element : color
 		}
 		
-		return G.floodCheck.countAttacks(x,y, G.BoardInstance, fakeStone);
+		return G.floodCheck.countAttacks(x,y, G.board, fakeStone);
 	}
 	
 	self.normalizeScores = function() 
@@ -133,18 +133,18 @@ G.computerMove = function(mix,miy,elem, pn) {
 		stone.active = true;
 
 		
-		G.BoardInstance.set(mix,miy,stone);
-		G.BoardInstance.redrawTile(mix,miy);
+		G.board.set(mix,miy,stone);
+		G.board.redrawTile(mix,miy);
 		
-		G.BoardInstance.startBorderAnimation(mix,miy);
+		G.board.startBorderAnimation(mix,miy);
 		
 		G.gameLog.registerMove(G.action.turn, stone, stoneIndex);
 	
 		//startFlood(mix, miy);
 		G.floodCheck.checkFlood(mix, miy);
 		
-		//G.BoardInstance.refreshTileBorders(mix, miy);
-		G.BoardInstance.refreshTileBordersExpansive(mix, miy);
+		//G.board.refreshTileBorders(mix, miy);
+		G.board.refreshTileBordersExpansive(mix, miy);
 		
 		return true;
 	}

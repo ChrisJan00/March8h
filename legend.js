@@ -91,13 +91,13 @@ G.Display = function() {
 			ctx.stroke();
 		}
 		
-		var s = G.BoardInstance.side
-		var width = s * G.BoardInstance.cols
+		var s = G.board.side
+		var width = s * G.board.cols
 		var b = Math.floor((width - 45 - 4*s)/10);
 		var al = 15;
-		var y = G.BoardInstance.y0 + G.BoardInstance.rows * G.BoardInstance.side
+		var y = G.board.y0 + G.board.rows * G.board.side
 		
-		var x0 = G.BoardInstance.x0
+		var x0 = G.board.x0
 		var y0 = y + 15
 		var y1 = y + G.imageFire.height/2 + 5
 		var ctx = G.gameContext;
@@ -142,13 +142,13 @@ G.Display = function() {
 			ctx.stroke();
 		}
 		
-		var s = G.BoardInstance.side
-		var width = s * G.BoardInstance.cols
+		var s = G.board.side
+		var width = s * G.board.cols
 		var b = Math.floor((width - 45 - 4*s)/10);
 		var al = 15;
-		var y = G.BoardInstance.y0 + G.BoardInstance.rows * G.BoardInstance.side
+		var y = G.board.y0 + G.board.rows * G.board.side
 		
-		var x0 = G.BoardInstance.x0
+		var x0 = G.board.x0
 		var y0 = y + 5
 		var y1 = y + G.imageFire.height/2 + 5
 		var ctx = G.gameContext;

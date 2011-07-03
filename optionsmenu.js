@@ -17,13 +17,13 @@ G.OptionsMenu = function() {
 	
 	self.doRestart = function() {
 		self.deactivate();
-		G.Main.restartGame();
-		G.Main.drawInitialGame();
+		G.main.restartGame();
+		G.main.drawInitialGame();
 	}
 	
 	self.doExit = function() {
 		self.deactivate();
-		G.Main.restartGame();
+		G.main.restartGame();
 		G.menu.reloadControls();
 		G.menu.show();
 	} 

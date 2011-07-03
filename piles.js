@@ -127,7 +127,7 @@ G.PileClass.prototype.drawFromScratch = function() {
 G.PileClass.prototype.redrawBorder = function(strong) {
 	if (strong)
 	{
-		if (G.BoardInstance.stoneCount == G.BoardInstance.maxStones)
+		if (G.board.stoneCount == G.board.maxStones)
 			this.drawFromScratch();
 		else
 			G.gameContext.drawImage(this.strCanvas, 

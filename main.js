@@ -1,4 +1,4 @@
-G.Main = new function() {
+G.Main = function() {
 	var self = this;
 	
 	self.preload = function() {
@@ -52,7 +52,9 @@ G.Main = new function() {
 			turn:0,
 		};
 		
-		G.BoardInstance = new G.BoardClass();
+		G.pauseManager = new G.PauseManager();
+		
+		G.board = new G.BoardClass();
 	
 		G.coords = {
 			text : {
@@ -98,7 +100,7 @@ G.Main = new function() {
 	self.restartGame = function() {
 		G.pauseManager.disablePause();
 		G.action.turn = 0;
-		G.BoardInstance.clearContents();
+		G.board.clearContents();
 		G.Piles[0].chooseTiles();
 		G.Piles[1].chooseTiles();
 		G.floodCheck.countMarkers();
@@ -110,7 +112,7 @@ G.Main = new function() {
 		self.clearCanvas();
 		G.Piles[0].drawFromScratch();
 		G.Piles[1].drawFromScratch();
-		G.BoardInstance.drawEmpty();
+		G.board.drawEmpty();
 		G.display.showPlayer();
 		G.display.showOrder();
 		G.optionsButton.drawNormal();
@@ -209,16 +211,16 @@ G.Main = new function() {
 				G.Piles[0].manageClicked(G.mouse.x, G.mouse.y);
 			else if (G.Piles[1].isClicked(G.mouse.x, G.mouse.y))
 				G.Piles[1].manageClicked(G.mouse.x, G.mouse.y);
-			else if (G.BoardInstance.isClicked(G.mouse.x, G.mouse.y))
-		 		turnIsReady = G.BoardInstance.manageClicked(G.mouse.x, G.mouse.y);
+			else if (G.board.isClicked(G.mouse.x, G.mouse.y))
+		 		turnIsReady = G.board.manageClicked(G.mouse.x, G.mouse.y);
 	 	}
 	 		
 	 	if (turnIsReady) {	
-	 		G.floodCheck.board = G.BoardInstance;
+	 		G.floodCheck.board = G.board;
 	 		G.floodCheck.countMarkers();
 			G.action.turn = 1-G.action.turn;
 			
-			if (G.BoardInstance.stoneCount < G.BoardInstance.maxStones) {
+			if (G.board.stoneCount < G.board.maxStones) {
 				 G.display.showPlayer();
 			} else {
 				 G.display.checkVictory();

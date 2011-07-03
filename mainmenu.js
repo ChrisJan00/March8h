@@ -8,16 +8,16 @@ G.GameMenu = function() {
 		G.computerEnabled = false;
 		G.defenseMode = false;
 		G.menu.hide();
-		G.Main.restartGame();
-		G.Main.drawInitialGame();
+		G.main.restartGame();
+		G.main.drawInitialGame();
 	}
 	
 	self.pvpdef = function() {
 		G.computerEnabled = false;
 		G.defenseMode = true;
 		G.menu.hide();
-		G.Main.restartGame();
-		G.Main.drawInitialGame();
+		G.main.restartGame();
+		G.main.drawInitialGame();
 	}
 	
 	self.compeasy = function() {
@@ -25,8 +25,8 @@ G.GameMenu = function() {
 		G.maximizeEntropy = false;
 		G.defenseMode = false;
 		G.menu.hide();
-		G.Main.restartGame();
-		G.Main.drawInitialGame();
+		G.main.restartGame();
+		G.main.drawInitialGame();
 	}
 	
 	self.comphard = function() {
@@ -34,8 +34,8 @@ G.GameMenu = function() {
 		G.maximizeEntropy = true;
 		G.defenseMode = true;
 		G.menu.hide();
-		G.Main.restartGame();
-		G.Main.drawInitialGame();
+		G.main.restartGame();
+		G.main.drawInitialGame();
 	}
 	
 	self.create = function() 
@@ -105,7 +105,7 @@ G.GameMenu = function() {
 }
 
 //-------------------------------------- PAUSE MODE
-G.pauseManager = new function()
+G.PauseManager = function()
 {
 	var self = this;
 	self.paused = false;
@@ -121,7 +121,7 @@ G.pauseManager = new function()
 		if (self.paused)
 			return;
 		self.paused = true;
-		G.Main.disableTurn();
+		G.main.disableTurn();
 		
 		self.show();
 	} 
@@ -132,7 +132,7 @@ G.pauseManager = new function()
 			
 		self.hide();
 		self.paused = false;
-		G.Main.enableTurn();
+		G.main.enableTurn();
 	}
 	
 	self.show = function() {

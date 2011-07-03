@@ -29,14 +29,14 @@ G.DragNDrop = function() {
 	
 	self.moveEvent = function( ev ) {
 		if (self.dragging) {
-			G.Main.mouseMove(ev);
+			G.main.mouseMove(ev);
 			self.move(G.mouse.x, G.mouse.y);
 		}
 	}
 	
 	self.releaseEvent = function( ev ) {
 		if (self.dragging) {
-			G.Main.mouseMove(ev);
+			G.main.mouseMove(ev);
 			self.release(G.mouse.x, G.mouse.y);
 			self.dragging = false;
 			G.gameCanvas.removeEventListener('mousemove', self.moveEvent, false);
@@ -48,7 +48,7 @@ G.DragNDrop = function() {
 		if (!self.drawing) {
 			var dx = x - self.initialx;
 			var dy = y - self.initialy;
-			var dmin = G.BoardInstance.side/4;
+			var dmin = G.board.side/4;
 			if (dx*dx+dy*dy < dmin*dmin)
 				return;
 			self.drawing = true;
@@ -63,12 +63,12 @@ G.DragNDrop = function() {
 	self.release = function( x, y ) {
 		self.undrawStone();
 		
-		if (G.BoardInstance.isClicked(x, y))
-			G.Main.manageTurn();
+		if (G.board.isClicked(x, y))
+			G.main.manageTurn();
 	}
 	
 	self.drawStone = function(x,y) {
-		var side = G.BoardInstance.side;
+		var side = G.board.side;
 		var mx = x + self.dx;
 		var my = y + self.dy;
 		
@@ -104,8 +104,8 @@ G.DragNDrop = function() {
 	self.undrawStone = function() {
 		var x = self.ox;
 		var y = self.oy;
-		var sx = G.BoardInstance.side;
-		var sy = G.BoardInstance.side;
+		var sx = G.board.side;
+		var sy = G.board.side;
 		if (x<0) x = 0;
 		if (y<0) y = 0;
 		if (x+sx > G.canvasWidth) sx = G.canvasWidth - x;

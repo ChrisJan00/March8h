@@ -95,7 +95,7 @@ G.StoneHolder.prototype = {
 			ctx.fillRect(mx,my,this.side, this.side);
 		}
 		
-		if (this[x][y] && this[x][y].active && this == G.BoardInstance) {
+		if (this[x][y] && this[x][y].active && this == G.board) {
 				this[x][y].invertedColors = false;
 				this.refreshTileBordersExpansive(x,y);
 		}
@@ -137,7 +137,7 @@ G.StoneHolder.prototype = {
 	{
 		for (var i=-1; i<2; i++)
 			for (var j=-1; j<2; j++)
-				G.BoardInstance.refreshTileBorders(x+i, y+j);
+				G.board.refreshTileBorders(x+i, y+j);
 	},
 	
 	refreshTileBorders : function(x,y) {
@@ -314,8 +314,6 @@ G.StoneHolder.prototype = {
 	 		this.stoneCount++;
 		this[x][y] = newStone;
 	},
-	
-	// get skipped, it was too expensive
 	
 	del : function(x,y) {
 		if (this[x][y]) {

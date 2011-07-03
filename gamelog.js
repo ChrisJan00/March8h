@@ -153,7 +153,7 @@ G.GameLog = function() {
 	}
 	
 	self.countChanges = function(stone) {
-		G.floodCheck.board = G.BoardInstance;
+		G.floodCheck.board = G.board;
 		var attackList = G.floodCheck.findAttacks(stone.ix,stone.iy,stone);
 		var defenseList = G.floodCheck.findDefender(stone.ix,stone.iy,stone);
 		var attackCount = attackList.length;
@@ -336,24 +336,24 @@ G.GameLog = function() {
 		currentPile.redrawBorder( false );
 		
 		// delete stone from board
-		G.BoardInstance[move.x][move.y] = null;
-		G.BoardInstance.redrawTile(move.x,move.y);
-		G.BoardInstance.stoneCount--;
+		G.board[move.x][move.y] = null;
+		G.board.redrawTile(move.x,move.y);
+		G.board.stoneCount--;
 		
 		// undo attacks
 		if (move.attack)
 			for (var i=0;i<move.attack.length; i++) {
 				var x = move.attack[i].ix;
 				var y = move.attack[i].iy;
-				var dest = G.BoardInstance[x][y];
+				var dest = G.board[x][y];
 				dest.owner = move.attack[i].owner;
 				dest.element = move.attack[i].element;
 				dest.bgColor = G.display.colorForPlayer(dest.owner);
-				G.BoardInstance.redrawTile(x,y);
+				G.board.redrawTile(x,y);
 			}
 			
 		// change the turn
-		G.floodCheck.board = G.BoardInstance;
+		G.floodCheck.board = G.board;
  		G.floodCheck.countMarkers();
 		G.action.turn = move.who;
 		G.display.showPlayer();
@@ -375,7 +375,7 @@ G.GameLog = function() {
 		currentPile.redrawTile(pileX, pileY);
 		
 		// move stone to board
-		G.BoardInstance[move.x][move.y] = {
+		G.board[move.x][move.y] = {
 			ix : move.x,
 			iy : move.y,
 			owner : _owner,
@@ -385,33 +385,33 @@ G.GameLog = function() {
 			selected : false,
 			active : true,
 		};
-		G.BoardInstance.redrawTile(move.x, move.y);
-		G.BoardInstance.stoneCount++;
+		G.board.redrawTile(move.x, move.y);
+		G.board.stoneCount++;
 		
 		if (move.attack)
 			for (var i=0;i<move.attack.length; i++) {
 				var x = move.attack[i].ix;
 				var y = move.attack[i].iy;
-				var dest = G.BoardInstance[x][y];
+				var dest = G.board[x][y];
 				dest.owner = _owner;
 				dest.element = move.element;
 				dest.bgColor = G.display.colorForPlayer(_owner);
-				G.BoardInstance.redrawTile(x,y);
+				G.board.redrawTile(x,y);
 			}
 			
 		if (move.defense) {
-			var dest = G.BoardInstance[move.x][move.y];
+			var dest = G.board[move.x][move.y];
 			dest.owner = move.defense.owner;
 			dest.element = move.defense.element;
 			dest.bgColor = G.display.colorForPlayer(move.defense.owner);
-			G.BoardInstance.redrawTile(move.x, move.y);
+			G.board.redrawTile(move.x, move.y);
 		}
 		
-		G.floodCheck.board = G.BoardInstance;
+		G.floodCheck.board = G.board;
  		G.floodCheck.countMarkers();
 		G.action.turn = 1-_owner;
 		
-		if (G.BoardInstance.stoneCount < G.BoardInstance.maxStones) {
+		if (G.board.stoneCount < G.board.maxStones) {
 			G.display.showPlayer();
 		} else {
 			G.display.checkVictory();

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------
 G.FloodCheck = function() {
 	var self = this;
-	self.board = G.BoardInstance;
+	self.board = G.board;
 	self.floodMarkers = [];
 	
 	self.checkFlood = function(ix,iy, board) {
@@ -9,7 +9,7 @@ G.FloodCheck = function() {
 	}
 	
 	self.evalBoard = function(ix, iy, board) {
-		self.board = board || G.BoardInstance;
+		self.board = board || G.board;
 		
 		if (G.defenseMode) {
 			var defended = self.checkDefense(ix, iy);
@@ -66,9 +66,9 @@ G.FloodCheck = function() {
 		if (defender) {
 			self.convertStone( defender, stone );
 			
-			if (self.board == G.BoardInstance) {
+			if (self.board == G.board) {
 				G.turnDelay = Math.max(G.turnDelay, G.animationDelay * (G.framesPerStrip+2));
-				G.BoardInstance.startTileBlinking(defender.ix, defender.iy);
+				G.board.startTileBlinking(defender.ix, defender.iy);
 			}
 			return true;
 		}
@@ -128,12 +128,12 @@ G.FloodCheck = function() {
 	}
 	
 	self.countAttacks = function(x,y, board, fakeStone) {
-		self.board = board || G.BoardInstance;
+		self.board = board || G.board;
 		return self.findAttacks(x,y, fakeStone).length;
 	}
 	
 	self.countDefenses = function(x,y, board, fakeStone) {
-		self.board = board || G.BoardInstance;
+		self.board = board || G.board;
 		return self.findDefender(x,y, fakeStone)?1:0;
 	}
 	
@@ -148,10 +148,10 @@ G.FloodCheck = function() {
 			active : to.active,
 		}
 		
-		if (self.board == G.BoardInstance) {
+		if (self.board == G.board) {
 			self.board[to.ix][to.iy].invertedColors = true;
 			var delay = to.step*G.animationDelay;
-			setTimeout(function(){G.BoardInstance.startTileAnimation(to.ix, to.iy);}, delay);
+			setTimeout(function(){G.board.startTileAnimation(to.ix, to.iy);}, delay);
 			G.turnDelay = Math.max(G.turnDelay, G.animationDelay * (G.framesPerStrip+2) + delay);
 		}
 	}
