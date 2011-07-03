@@ -136,8 +136,15 @@ G.PauseManager = function()
 	}
 	
 	self.show = function() {
+//		G.graphicsManager.pauseContext.fillStyle = "rgba(0,0,0,0.25)";
+//		G.graphicsManager.pauseContext.fillRect(0, 0, G.graphicsManager.width, G.graphicsManager.height);
+//		G.graphicsManager.mark(0,0,G.graphicsManager.width, G.graphicsManager.height);
+//		G.graphicsManager.redraw();
 	}
 	
 	self.hide = function() {
+//		G.graphicsManager.pauseContext.clearRect(0, 0, G.graphicsManager.width, G.graphicsManager.height);
+//		G.graphicsManager.mark(0,0,G.graphicsManager.width, G.graphicsManager.height);
+//		G.graphicsManager.redraw();
 	}
 }

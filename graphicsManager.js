@@ -31,8 +31,8 @@ G.GraphicsManager = function() {
 		self.dragLayer = self.createLayer();
 		self.dragContext = self.getContext(self.dragLayer);
 		
-		self.pauseLayer = self.createLayer();
-		self.pauseContext = self.getContext(self.pauseLayer);
+//		self.pauseLayer = self.createLayer();
+//		self.pauseContext = self.getContext(self.pauseLayer);
 	}
 	
 	self.createLayer = function() {
