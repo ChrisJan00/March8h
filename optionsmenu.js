@@ -1,12 +1,12 @@
-GLOBAL.OptionsMenuWidth = 230;
-GLOBAL.OptionsMenuHeight = 350;
+G.OptionsMenuWidth = 230;
+G.OptionsMenuHeight = 350;
 
-GLOBAL.OptionsMenu = function() {
+G.OptionsMenu = function() {
 	var self = this;
 	
 	self.canvas = document.getElementById("optionsmenu");
-	self.canvas.width = GLOBAL.OptionsMenuWidth;
-	self.canvas.height = GLOBAL.OptionsMenuHeight;
+	self.canvas.width = G.OptionsMenuWidth;
+	self.canvas.height = G.OptionsMenuHeight;
 	
 	self.mouse = {
 		x: 0,
@@ -24,24 +24,24 @@ GLOBAL.OptionsMenu = function() {
 	self.doExit = function() {
 		self.deactivate();
 		restartGame();
-		GLOBAL.menu.reloadControls();
-		GLOBAL.menu.show();
+		G.menu.reloadControls();
+		G.menu.show();
 	} 
 	
 	self.activate = function() {
-		GLOBAL.pauseManager.enablePause();
+		G.pauseManager.enablePause();
 		self.show();
 	}
 	
 	self.deactivate = function() {
 		self.hide();
-		GLOBAL.pauseManager.disablePause();
+		G.pauseManager.disablePause();
 	}
 	
 	// show / hide
 	self.show = function() {
-		self.canvas.style.width = GLOBAL.OptionsMenuWidth;
-		self.canvas.style.height = GLOBAL.OptionsMenuHeight;
+		self.canvas.style.width = G.OptionsMenuWidth;
+		self.canvas.style.height = G.OptionsMenuHeight;
 		self.repaint();
 		
 		self.canvas.addEventListener('mousemove', self.moveEvent, false);
@@ -72,7 +72,7 @@ GLOBAL.OptionsMenu = function() {
 		ctxt.fillStyle = "#000000";
 		ctxt.font = "bold 18px CustomFont, sans-serif";
 		var textLen = ctxt.measureText("OPTIONS").width;
-		ctxt.fillText(GLOBAL.strings.optionsMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
+		ctxt.fillText(G.strings.optionsMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
 		
 		for (var i=0; i<self.optionButtons.length; i++)
 			self.optionButtons[i].drawNormal();
@@ -134,19 +134,19 @@ GLOBAL.OptionsMenu = function() {
 	}
 	
 	self.press = function( x, y ) {
-		self.mouse.dx = x - GLOBAL.findAbsoluteX( self.canvas );
-		self.mouse.dy = y - GLOBAL.findAbsoluteY( self.canvas );
+		self.mouse.dx = x - G.findAbsoluteX( self.canvas );
+		self.mouse.dy = y - G.findAbsoluteY( self.canvas );
 	}
 	
 	self.move = function( x, y ) {
-		var oldX = GLOBAL.findAbsoluteX( self.canvas );
-		var oldY =  GLOBAL.findAbsoluteY( self.canvas );
+		var oldX = G.findAbsoluteX( self.canvas );
+		var oldY =  G.findAbsoluteY( self.canvas );
 
 		self.canvas.style.left = x - self.mouse.dx;
 		self.canvas.style.top = y - self.mouse.dy;
 
-		self.mouse.dx = self.mouse.dx + oldX - GLOBAL.findAbsoluteX( self.canvas );
-		self.mouse.dy = self.mouse.dy + oldY - GLOBAL.findAbsoluteY( self.canvas );
+		self.mouse.dx = self.mouse.dx + oldX - G.findAbsoluteX( self.canvas );
+		self.mouse.dy = self.mouse.dy + oldY - G.findAbsoluteY( self.canvas );
 	}
 	
 	self.release = function( x, y ) {
@@ -155,12 +155,12 @@ GLOBAL.OptionsMenu = function() {
 	
 	// buttons
 	self.optionButtons = [];
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 60, 200, 40, GLOBAL.strings.undoButton, GLOBAL.gameLog.undo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 105, 200, 40, GLOBAL.strings.redoButton, GLOBAL.gameLog.redo ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 150, 200, 40, GLOBAL.strings.gamelogToggleButton, GLOBAL.gameLog.toggle ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 195, 200, 40, GLOBAL.strings.newGameButton, self.doRestart ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 240, 200, 40, GLOBAL.strings.exitGameButton, self.doExit ));
-	self.optionButtons.push(new GLOBAL.ClickableOption(self.canvas, 15, 285, 200, 40, GLOBAL.strings.closeMenuButton, self.deactivate ));
+	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 60, 200, 40, G.strings.undoButton, G.gameLog.undo ));
+	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 105, 200, 40, G.strings.redoButton, G.gameLog.redo ));
+	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 150, 200, 40, G.strings.gamelogToggleButton, G.gameLog.toggle ));
+	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 195, 200, 40, G.strings.newGameButton, self.doRestart ));
+	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 240, 200, 40, G.strings.exitGameButton, self.doExit ));
+	self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 285, 200, 40, G.strings.closeMenuButton, self.deactivate ));
 
 }
 
@@ -169,7 +169,7 @@ GLOBAL.OptionsMenu = function() {
 // if you mouseover the background turns light grey
 // if you press, it turns dark grey
 // if you release, it sends a "signal"
-GLOBAL.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
+G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 	var self = this;
 	
 	self.label = text;

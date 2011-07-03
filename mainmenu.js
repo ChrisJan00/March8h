@@ -1,49 +1,49 @@
 
-GLOBAL.GameMenu = function() {
+G.GameMenu = function() {
 	var self = this;
 	self.active = false;
 	self.buttons = [];
 	
 	self.pvpno = function() {
-		GLOBAL.computerEnabled = false;
-		GLOBAL.defenseMode = false;
-		GLOBAL.menu.hide();
+		G.computerEnabled = false;
+		G.defenseMode = false;
+		G.menu.hide();
 		restartGame();
 		drawInitialGame();
 	}
 	
 	self.pvpdef = function() {
-		GLOBAL.computerEnabled = false;
-		GLOBAL.defenseMode = true;
-		GLOBAL.menu.hide();
+		G.computerEnabled = false;
+		G.defenseMode = true;
+		G.menu.hide();
 		restartGame();
 		drawInitialGame();
 	}
 	
 	self.compeasy = function() {
-		GLOBAL.computerEnabled = true;
-		GLOBAL.maximizeEntropy = false;
-		GLOBAL.defenseMode = false;
-		GLOBAL.menu.hide();
+		G.computerEnabled = true;
+		G.maximizeEntropy = false;
+		G.defenseMode = false;
+		G.menu.hide();
 		restartGame();
 		drawInitialGame();
 	}
 	
 	self.comphard = function() {
-		GLOBAL.computerEnabled = true;
-		GLOBAL.maximizeEntropy = true;
-		GLOBAL.defenseMode = true;
-		GLOBAL.menu.hide();
+		G.computerEnabled = true;
+		G.maximizeEntropy = true;
+		G.defenseMode = true;
+		G.menu.hide();
 		restartGame();
 		drawInitialGame();
 	}
 	
 	self.create = function() 
 	{
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 160, 400, 50, GLOBAL.strings.pvpEasy, self.pvpno));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 220, 400, 50, GLOBAL.strings.pvpDef, self.pvpdef));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 280, 400, 50, GLOBAL.strings.pvcEasy, self.compeasy));
-		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 340, 400, 50, GLOBAL.strings.pvcDef, self.comphard));
+		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 160, 400, 50, G.strings.pvpEasy, self.pvpno));
+		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 220, 400, 50, G.strings.pvpDef, self.pvpdef));
+		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 280, 400, 50, G.strings.pvcEasy, self.compeasy));
+		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 340, 400, 50, G.strings.pvcDef, self.comphard));
 		
 	}
 	
@@ -53,28 +53,28 @@ GLOBAL.GameMenu = function() {
 	
 	self.show = function()
 	{	
-		var width = GLOBAL.canvasWidth - 100;
-		var height = GLOBAL.canvasHeight - 100;
+		var width = G.canvasWidth - 100;
+		var height = G.canvasHeight - 100;
 		var x0 = 50;
 		var y0 = 50;
 		
-		var ctx = GLOBAL.gameContext;
+		var ctx = G.gameContext;
 		
 		ctx.fillStyle = "#FFFFFF";
-		ctx.fillRect(0,0,GLOBAL.canvasWidth,GLOBAL.canvasHeight);
+		ctx.fillRect(0,0,G.canvasWidth,G.canvasHeight);
 		ctx.strokeStyle = "#000000";
-		ctx.strokeRect(50,50,GLOBAL.canvasWidth-100, GLOBAL.canvasHeight-100);
+		ctx.strokeRect(50,50,G.canvasWidth-100, G.canvasHeight-100);
 		
 		ctx.font = "48px CustomFont, sans-serif";
 		ctx.fillStyle = "#000000";
 		
-		var textLen = ctx.measureText(GLOBAL.strings.gameName).width;
-		ctx.fillText(GLOBAL.strings.gameTitle, width/2 - textLen/2 + x0, 100);
+		var textLen = ctx.measureText(G.strings.gameName).width;
+		ctx.fillText(G.strings.gameTitle, width/2 - textLen/2 + x0, 100);
 		
 		for (var ii=0; ii < self.buttons.length; ii++)
 			self.buttons[ii].drawNormal();
 		
-		GLOBAL.gameLog.unDisplay();
+		G.gameLog.unDisplay();
 		self.active = true;
 	}
 	
@@ -86,26 +86,26 @@ GLOBAL.GameMenu = function() {
 	self.mouseDown = function(ev) {
 		var buttonPressed = false;
 		for (var ii=0; ii < self.buttons.length; ii++) {
-			buttonPressed = buttonPressed || self.buttons[ii].managePressed(GLOBAL.mouse.x, GLOBAL.mouse.y);
+			buttonPressed = buttonPressed || self.buttons[ii].managePressed(G.mouse.x, G.mouse.y);
 		}
 	}
 	
 	self.mouseMove = function(ev) {
 		for (var ii=0; ii < self.buttons.length; ii++)
-			self.buttons[ii].manageHover(GLOBAL.mouse.x, GLOBAL.mouse.y);
+			self.buttons[ii].manageHover(G.mouse.x, G.mouse.y);
 	}
 	
 	self.mouseUp = function(ev) {
 		var buttonReleased = false;
 		for (var ii=0; ii < self.buttons.length; ii++) {
-			buttonReleased = buttonReleased || self.buttons[ii].manageReleased(GLOBAL.mouse.x, GLOBAL.mouse.y);
+			buttonReleased = buttonReleased || self.buttons[ii].manageReleased(G.mouse.x, G.mouse.y);
 		}
 	}
 	
 }
 
 //-------------------------------------- PAUSE MODE
-GLOBAL.pauseManager = new function()
+G.pauseManager = new function()
 {
 	var self = this;
 	self.paused = false;

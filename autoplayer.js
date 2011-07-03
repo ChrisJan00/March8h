@@ -1,13 +1,13 @@
 //----------------------------------------------------------
 function computerPlay() {
 	var self = this;
-	var pn = GLOBAL.action.turn;
+	var pn = G.action.turn;
 	var decisionExp = 5;
 	
-	self.availableCount = GLOBAL.Piles[pn].stoneCount;
+	self.availableCount = G.Piles[pn].stoneCount;
 	
 	self.computeStones = function() {
-		self.typeCount = GLOBAL.Piles[pn].countStoneTypes();
+		self.typeCount = G.Piles[pn].countStoneTypes();
 	}
 	
 	self.computeEntropies = function() {
@@ -28,18 +28,18 @@ function computerPlay() {
 	
 	self.computeBasicScores = function() {
 		self.options = new Array();
-		for (var ix=0;ix<GLOBAL.BoardInstance.cols;ix++)
-			for (var iy=0;iy<GLOBAL.BoardInstance.rows;iy++) {
-				if (GLOBAL.BoardInstance[ix][iy])
+		for (var ix=0;ix<G.BoardInstance.cols;ix++)
+			for (var iy=0;iy<G.BoardInstance.rows;iy++) {
+				if (G.BoardInstance[ix][iy])
 					continue;
 				for (var color=0;color<4;color++) {
 					var score = 0;
 					if (self.typeCount[color]<=0)
 						continue;
-					if (GLOBAL.maximizeEntropy && self.typeCount[color]<self.maxCount)
+					if (G.maximizeEntropy && self.typeCount[color]<self.maxCount)
 						continue;
 					// rate move
-					if (GLOBAL.defenseMode) {
+					if (G.defenseMode) {
 						if (self.isDefended(ix, iy, color, pn)) {
 							score = 0;
 						} else {
@@ -57,7 +57,7 @@ function computerPlay() {
 	}
 	
 	self.check = function(x,y,color,owner) {
-		var candidate = GLOBAL.BoardInstance[x]?GLOBAL.BoardInstance[x][y]:null;
+		var candidate = G.BoardInstance[x]?G.BoardInstance[x][y]:null;
 		if ( candidate && candidate.element == color && candidate.owner == owner)
 			return true;
 		else return false;
@@ -66,7 +66,7 @@ function computerPlay() {
 	self.isDefended = function( ix, iy, color, owner )
 	{
 		// returns true if there is a neighbouring enemy tile that kills this one
-		var attackColor = GLOBAL.floodCheck.colorThatWins(color);
+		var attackColor = G.floodCheck.colorThatWins(color);
 		return  self.check(ix-1, iy, attackColor, owner) ||
 				self.check(ix+1, iy, attackColor, owner) ||
 				self.check(ix, iy-1, attackColor, owner) ||
@@ -82,7 +82,7 @@ function computerPlay() {
 			element : color
 		}
 		
-		return GLOBAL.floodCheck.countAttacks(x,y, GLOBAL.BoardInstance, fakeStone);
+		return G.floodCheck.countAttacks(x,y, G.BoardInstance, fakeStone);
 	}
 	
 	self.normalizeScores = function() 
@@ -123,9 +123,9 @@ function computerPlay() {
 function computerMove(mix,miy,elem, pn) {
 		// find one stone in own pile
 		
-		var currentPile = GLOBAL.Piles[pn];
+		var currentPile = G.Piles[pn];
 		
-		//currentPile.selection = GLOBAL.Piles[pn].getStoneByElement(elem);
+		//currentPile.selection = G.Piles[pn].getStoneByElement(elem);
 		var stone = currentPile.getStoneByElement(elem);
 		var stoneIndex = stone.ix * currentPile.rows + stone.iy;
 		currentPile.del(stone.ix, stone.iy);
@@ -133,18 +133,18 @@ function computerMove(mix,miy,elem, pn) {
 		stone.active = true;
 
 		
-		GLOBAL.BoardInstance.set(mix,miy,stone);
-		GLOBAL.BoardInstance.redrawTile(mix,miy);
+		G.BoardInstance.set(mix,miy,stone);
+		G.BoardInstance.redrawTile(mix,miy);
 		
-		GLOBAL.BoardInstance.startBorderAnimation(mix,miy);
+		G.BoardInstance.startBorderAnimation(mix,miy);
 		
-		GLOBAL.gameLog.registerMove(GLOBAL.action.turn, stone, stoneIndex);
+		G.gameLog.registerMove(G.action.turn, stone, stoneIndex);
 	
 		//startFlood(mix, miy);
-		GLOBAL.floodCheck.checkFlood(mix, miy);
+		G.floodCheck.checkFlood(mix, miy);
 		
-		//GLOBAL.BoardInstance.refreshTileBorders(mix, miy);
-		GLOBAL.BoardInstance.refreshTileBordersExpansive(mix, miy);
+		//G.BoardInstance.refreshTileBorders(mix, miy);
+		G.BoardInstance.refreshTileBordersExpansive(mix, miy);
 		
 		return true;
 	}

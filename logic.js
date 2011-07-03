@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------
-GLOBAL.FloodCheck = function() {
+G.FloodCheck = function() {
 	var self = this;
-	self.board = GLOBAL.BoardInstance;
+	self.board = G.BoardInstance;
 	self.floodMarkers = [];
 	
 	self.checkFlood = function(ix,iy, board) {
@@ -9,9 +9,9 @@ GLOBAL.FloodCheck = function() {
 	}
 	
 	self.evalBoard = function(ix, iy, board) {
-		self.board = board || GLOBAL.BoardInstance;
+		self.board = board || G.BoardInstance;
 		
-		if (GLOBAL.defenseMode) {
+		if (G.defenseMode) {
 			var defended = self.checkDefense(ix, iy);
 			if (!defended)
 				self.checkAttack(ix, iy);
@@ -22,9 +22,9 @@ GLOBAL.FloodCheck = function() {
 	}
 	
 	self.silentCheckFlood = function(ix, iy, board) {
-		var turnDelay = GLOBAL.turnDelay;
+		var turnDelay = G.turnDelay;
 		self.evalBoard(ix,iy,board);
-		GLOBAL.turnDelay = turnDelay;
+		G.turnDelay = turnDelay;
 	}
 	
 	self.resetFloodMarkers = function() {
@@ -66,9 +66,9 @@ GLOBAL.FloodCheck = function() {
 		if (defender) {
 			self.convertStone( defender, stone );
 			
-			if (self.board == GLOBAL.BoardInstance) {
-				GLOBAL.turnDelay = Math.max(GLOBAL.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2));
-				GLOBAL.BoardInstance.startTileBlinking(defender.ix, defender.iy);
+			if (self.board == G.BoardInstance) {
+				G.turnDelay = Math.max(G.turnDelay, G.animationDelay * (G.framesPerStrip+2));
+				G.BoardInstance.startTileBlinking(defender.ix, defender.iy);
 			}
 			return true;
 		}
@@ -128,12 +128,12 @@ GLOBAL.FloodCheck = function() {
 	}
 	
 	self.countAttacks = function(x,y, board, fakeStone) {
-		self.board = board || GLOBAL.BoardInstance;
+		self.board = board || G.BoardInstance;
 		return self.findAttacks(x,y, fakeStone).length;
 	}
 	
 	self.countDefenses = function(x,y, board, fakeStone) {
-		self.board = board || GLOBAL.BoardInstance;
+		self.board = board || G.BoardInstance;
 		return self.findDefender(x,y, fakeStone)?1:0;
 	}
 	
@@ -148,11 +148,11 @@ GLOBAL.FloodCheck = function() {
 			active : to.active,
 		}
 		
-		if (self.board == GLOBAL.BoardInstance) {
+		if (self.board == G.BoardInstance) {
 			self.board[to.ix][to.iy].invertedColors = true;
-			var delay = to.step*GLOBAL.animationDelay;
-			setTimeout(function(){GLOBAL.BoardInstance.startTileAnimation(to.ix, to.iy);}, delay);
-			GLOBAL.turnDelay = Math.max(GLOBAL.turnDelay, GLOBAL.animationDelay * (GLOBAL.framesPerStrip+2) + delay);
+			var delay = to.step*G.animationDelay;
+			setTimeout(function(){G.BoardInstance.startTileAnimation(to.ix, to.iy);}, delay);
+			G.turnDelay = Math.max(G.turnDelay, G.animationDelay * (G.framesPerStrip+2) + delay);
 		}
 	}
 	
@@ -183,13 +183,13 @@ GLOBAL.FloodCheck = function() {
 	}
 	
 	self.countMarkers = function() {
-		GLOBAL.counts = [];
-		GLOBAL.counts[0] = 0;
-		GLOBAL.counts[1] = 0;
+		G.counts = [];
+		G.counts[0] = 0;
+		G.counts[1] = 0;
 		for (var i=0; i<self.board.cols; i++)
 			for (var j=0; j<self.board.rows; j++) {
 				if (self.board[i][j]) {
-					GLOBAL.counts[ self.board[i][j].owner ]++;
+					G.counts[ self.board[i][j].owner ]++;
 				}
 			}
 	}

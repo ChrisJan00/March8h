@@ -1,4 +1,4 @@
-GLOBAL.PileClass = function(x0,y0, owner) {
+G.PileClass = function(x0,y0, owner) {
 	this.setDimensions(3, 6, x0, y0);
 	
 	this.border = 5;
@@ -7,15 +7,15 @@ GLOBAL.PileClass = function(x0,y0, owner) {
 	this.selection = false;
 };
 
-GLOBAL.PileClass.prototype = new GLOBAL.StoneHolder;
+G.PileClass.prototype = new G.StoneHolder;
 
-GLOBAL.PileClass.prototype.manageClicked = function( mx, my ) 
+G.PileClass.prototype.manageClicked = function( mx, my ) 
 {
 	var posInBoard = this.coordsOf( mx, my );
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
 	
-	if (GLOBAL.action.turn != this.owner)
+	if (G.action.turn != this.owner)
 		return;
 	
 	var newStone = this[mix][miy];
@@ -42,17 +42,17 @@ GLOBAL.PileClass.prototype.manageClicked = function( mx, my )
 	if (newStone) {
 		var stonex = this.x0 + mix*this.side;
 		var stoney = this.y0 + miy*this.side;
-		GLOBAL.dragndrop.startDrag(mx, my, newStone, stonex, stoney);
+		G.dragndrop.startDrag(mx, my, newStone, stonex, stoney);
 	}
 }
 
-GLOBAL.PileClass.prototype.unSelect = function()
+G.PileClass.prototype.unSelect = function()
 {
 	this.selection = false;
 }
 
 // minimum 2 tiles of each type
-GLOBAL.PileClass.prototype.prefill = function()
+G.PileClass.prototype.prefill = function()
 {
 	var minCount = 2;
 	for (var elem=0;elem<4;elem++) {
@@ -78,7 +78,7 @@ GLOBAL.PileClass.prototype.prefill = function()
 	}
 }
 
-GLOBAL.PileClass.prototype.chooseTiles = function( ) 
+G.PileClass.prototype.chooseTiles = function( ) 
 {
 	this.clearContents();
 	this.prefill();
@@ -104,8 +104,8 @@ GLOBAL.PileClass.prototype.chooseTiles = function( )
 		}
 }
 
-GLOBAL.PileClass.prototype.drawFromScratch = function() {
-	var ctx = GLOBAL.gameContext;
+G.PileClass.prototype.drawFromScratch = function() {
+	var ctx = G.gameContext;
 	
 	//ctx.fillStyle = colorForPlayer(this.owner);
 	//ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.height + 2*this.border);
@@ -119,32 +119,32 @@ GLOBAL.PileClass.prototype.drawFromScratch = function() {
 	this.strCanvas.width = this.width+4;
 	this.strCanvas.height = this.height+4;
 	this.strContext = this.strCanvas.getContext("2d");
-	this.strContext.drawImage(GLOBAL.gameCanvas, 
+	this.strContext.drawImage(G.gameCanvas, 
 		this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height,
 		0, 0, this.strCanvas.width, this.strCanvas.height);
 }
 
-GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
+G.PileClass.prototype.redrawBorder = function(strong) {
 	if (strong)
 	{
-		if (GLOBAL.BoardInstance.stoneCount == GLOBAL.BoardInstance.maxStones)
+		if (G.BoardInstance.stoneCount == G.BoardInstance.maxStones)
 			this.drawFromScratch();
 		else
-			GLOBAL.gameContext.drawImage(this.strCanvas, 
+			G.gameContext.drawImage(this.strCanvas, 
 				0, 0, this.strCanvas.width, this.strCanvas.height,
 				this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
 	} else {
-		this.strContext.drawImage(GLOBAL.bgCanvas, 
+		this.strContext.drawImage(G.bgCanvas, 
 			this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height,
 			0, 0, this.strCanvas.width, this.strCanvas.height);
-		GLOBAL.gameContext.fillStyle = "rgba(255,255,255,0.4)"
-		GLOBAL.gameContext.fillRect(this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
+		G.gameContext.fillStyle = "rgba(255,255,255,0.4)"
+		G.gameContext.fillRect(this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
 	}
 	
-	var ctx = GLOBAL.gameContext;
+	var ctx = G.gameContext;
 	for (var i=0;i<2;i++) {
 		if (i==1)
-			ctx = GLOBAL.bgContext;
+			ctx = G.bgContext;
 		var color = strong?this.borderColor(0):"#FFFFFF";
 		ctx.fillStyle = color;
 		
@@ -155,7 +155,7 @@ GLOBAL.PileClass.prototype.redrawBorder = function(strong) {
 	}
 }
 
-GLOBAL.PileClass.prototype.countStoneTypes = function()
+G.PileClass.prototype.countStoneTypes = function()
 {
 	var typeCount = [0,0,0,0];
 	
@@ -167,7 +167,7 @@ GLOBAL.PileClass.prototype.countStoneTypes = function()
 	return typeCount;
 }
 
-GLOBAL.PileClass.prototype.getStoneByElement = function(elem)
+G.PileClass.prototype.getStoneByElement = function(elem)
 {
 	for (var ix=0; ix<this.cols; ix++)
 		for (var iy=0; iy<this.rows; iy++) {
@@ -180,23 +180,23 @@ GLOBAL.PileClass.prototype.getStoneByElement = function(elem)
 
 function initPiles()
 {
-	GLOBAL.Piles = [];
-	GLOBAL.Piles[0] = new GLOBAL.PileClass(10, 70, 0);
-	GLOBAL.Piles[1] = new GLOBAL.PileClass(500, 70, 1);
-	GLOBAL.Piles[0].cellColor = function(ind) {
+	G.Piles = [];
+	G.Piles[0] = new G.PileClass(10, 70, 0);
+	G.Piles[1] = new G.PileClass(500, 70, 1);
+	G.Piles[0].cellColor = function(ind) {
 		//return ind?"#f1d9ff":"#d6b8e6";
 		//return "#f1d9ff";
 		return "#f4e2ff";
 	}
-	GLOBAL.Piles[1].cellColor = function(ind) {
+	G.Piles[1].cellColor = function(ind) {
 		//return ind?"#ffe2bf":"#ffcb8c";
 		//return "#ffe2bf";
 		return "#ffe9ce";
 	}
-	GLOBAL.Piles[0].borderColor = function(ind) {
+	G.Piles[0].borderColor = function(ind) {
 		return ind?"#660099":"#9932CC";
 	}
-	GLOBAL.Piles[1].borderColor = function(ind) {
+	G.Piles[1].borderColor = function(ind) {
 		return ind?"#ff8c00":"#ffa940";
 	}
 	
@@ -206,9 +206,9 @@ function countPiles() {
 	var pileCount = [];
 	for (var pileNum=0;pileNum<2; pileNum++) {
 		pileCount[pileNum] = [0,0,0,0];
-		for (var x=0;x<GLOBAL.Piles[pileNum].cols;x++)
-			for (var y=0;y<GLOBAL.Piles[pileNum].rows;y++) {
-				var stone = GLOBAL.Piles[pileNum][x][y];
+		for (var x=0;x<G.Piles[pileNum].cols;x++)
+			for (var y=0;y<G.Piles[pileNum].rows;y++) {
+				var stone = G.Piles[pileNum][x][y];
 				if (stone)
 					pileCount[pileNum][stone.element]++;
 			}
