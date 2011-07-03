@@ -27,11 +27,11 @@ G.StoneHolder.prototype = {
 	},
 	
 	cellColor : function(ind) {
-		return ind?"#dff2ea":"#c5e6d8";
+		return ind? G.colors.boardBgLight : G.colors.boardBgDark;
 	},
 	
 	borderColor : function(ind) {
-		return ind?"#208059":"#30bf86";
+		return ind? G.colors.boardBorderDark : G.colors.boardBorderLight;
 	},
 		
 	drawEmpty : function()
@@ -40,7 +40,7 @@ G.StoneHolder.prototype = {
 		var ctxt = G.graphicsManager.bgContext;
 		var bw = 3;
 		
-		ctxt.fillStyle="#FFFFFF";
+		ctxt.fillStyle=G.colors.white;
 		ctxt.fillRect(self.x0 - bw, self.y0 - bw, self.width + bw*2, self.height+bw*2);
 		
 		// up and left border	
@@ -167,36 +167,36 @@ G.StoneHolder.prototype = {
 					
 			// draw own border
 			ctxt.fillStyle = hideLeft? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix, iy+1, 1, this.side-2);
 			
 			ctxt.fillStyle = hideRight? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
 			
 			ctxt.fillStyle = hideUp? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix+1, iy, this.side-2, 1);
 		
 			ctxt.fillStyle = hideDown? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
 			
-			ctxt.fillStyle = G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillStyle = G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillStyle = (hideLeft && hideUp && diagLU)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix, iy, 1, 1);
 			
 			ctxt.fillStyle = (hideRight && hideUp && diagRU)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix+this.side-1, iy, 1, 1);
 				
 			ctxt.fillStyle = (hideLeft && hideDown && diagLD)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix, iy+this.side-1, 1, 1);
 				
 			ctxt.fillStyle = (hideRight && hideDown && diagRD)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
 
 		}
@@ -213,8 +213,7 @@ G.StoneHolder.prototype = {
 		var stone = this[x][y];
 		if (!stone) return;
 		
-		var color = frame%2? G.display.colorForPlayer(stone.owner) : G.display.colorForPlayerStrong(stone.owner);
-		//var color = G.display.colorForPlayerStrong(stone.owner);
+		var color = frame%2? G.display.colorForPlayer(stone.owner) : G.display.colorForPlayerBlink(stone.owner);
 		this.redrawTile(x,y,color);
 		G.graphicsManager.redraw();
 		frame--;
@@ -287,8 +286,8 @@ G.StoneHolder.prototype = {
 			
 		if (frame != 0) {
 			// draw new border
-			ctxt.fillStyle = "rgba(0,0,0,0.5)";
-			ctxt.strokeStyle = "rgba(0,0,0,0.5)";
+			ctxt.fillStyle = G.colors.semiTransparentBlack;
+			ctxt.strokeStyle = G.colors.semiTransparentBlack;
 			ctxt.fillRect(ix-frame, iy-frame, this.side+2*frame, frame);
 			ctxt.fillRect(ix-frame, iy, frame, this.side);
 			ctxt.fillRect(ix-frame, iy+this.side, this.side+2*frame, frame);
@@ -310,7 +309,7 @@ G.StoneHolder.prototype = {
 		var newStone = {
 			ix: x,
 			iy: y,
-			bgColor : "#FFFFFF",
+			bgColor : G.colors.white,
 			visible : true,
 			active : stone.active,
 			element: stone.element,

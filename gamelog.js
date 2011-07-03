@@ -50,8 +50,8 @@ G.GameLog = function() {
 	self.print = function(_who, text) 
 	{
 		self.lineCount++;
-		//var paragraphStart = "<p style=\"font-weight:bold; font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
-		var paragraphStart = "<span style=\"font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
+		//var paragraphStart = "<p style=\"font-weight:bold; font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerBorder(_who)+"\">";
+		var paragraphStart = "<span style=\"font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerBorder(_who)+"\">";
 		var paragraphEnd = "<br></span>";
 		self.outputString = paragraphStart + text + paragraphEnd + self.outputString;
 		
@@ -325,7 +325,7 @@ G.GameLog = function() {
 			iy : pileY,
 			owner : move.who,
 			element : move.element,
-			bgColor : "#FFFFFF",
+			bgColor : G.colors.white,
 			visible : true,
 			selected : false,
 			active : false

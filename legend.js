@@ -2,26 +2,19 @@ G.Display = function() {
 	var self = this;
 	
 	self.colorForPlayer = function(pn) {
-		//return pn?"#FF8C00":"#9932CC";
-		return pn?"#ffcb8c":"#d6b8e6";
-		//return G.Piles[pn].cellColor(0);
+		return pn? G.colors.orange : G.colors.purple;
 	}
 	
-	self.colorForPlayerLegend = function(pn) {
-		return pn?"#FF8C00":"#9932CC";
+	self.colorForPlayerBorder = function(pn) {
+		return pn? G.colors.orangeBorder : G.colors.purpleBorder;
 	}
 	
-	self.colorForPlayerWeak = function(pn) {
-		//return pn?"#FFA940":"#AA66CC";
-		return pn?"#ffc680":"#b485cc";
-	}
-	
-	self.colorForPlayerStrong = function(pn) {
-		return pn?"#ff5400":"#6e0c9e";
+	self.colorForPlayerBlink = function(pn) {
+		return pn? G.colors.orangeHighlight : G.colors.purpleHighlight;
 	}
 	
 	self.colorForPlayerBackground = function(pn) {
-		return pn?"#ffe9ce":"#f4e2ff"
+		return pn? G.colors.orangeBackground : G.colors.purpleBackground;
 	}
 	
 	self.showPlayerScore = function(pn) {
@@ -43,7 +36,7 @@ G.Display = function() {
 		ctxt.fillRect(x0, y0 + size - 1, size, 1);
 		
 		ctxt.font = "bold 28px CustomFont, sans-serif";
-		ctxt.fillStyle = self.colorForPlayerLegend(pn);
+		ctxt.fillStyle = self.colorForPlayerBorder(pn);
 		var numberStr = " "+G.counts[pn]+" ";
 		var textLen = ctxt.measureText(numberStr).width;
 		ctxt.fillText(numberStr, x0 + size/2 - textLen/2, y0 + size/2 + 10 );
@@ -61,7 +54,7 @@ G.Display = function() {
 		self.showPlayerScore(1);
 		
 		ctxt.font = "bold 28px CustomFont, sans-serif";
-		ctxt.fillStyle = self.colorForPlayerLegend(pn);
+		ctxt.fillStyle = self.colorForPlayerBorder(pn);
 		var msg  = (pn?G.strings.secondPlayerName:G.strings.firstPlayerName);
 		if (G.computerEnabled && pn==1)
 			msg = G.strings.thinkingMessage;
@@ -79,7 +72,7 @@ G.Display = function() {
 		// only arrows pointing to the right by now
 		var drawArrow = function(xfrom,yfrom,xto,yto) {
 			var ctxt = G.graphicsManager.messagesContext;
-			ctxt.strokeStyle = "#000000";
+			ctxt.strokeStyle = G.colors.black;
 			ctxt.beginPath();
 			ctxt.moveTo(xfrom,yfrom);
 			ctxt.lineTo(xto,yto);
@@ -134,17 +127,17 @@ G.Display = function() {
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
 		var pn = G.action.turn;
 		ctxt.font = "bold 24px CustomFont, sans-serif";
-		ctxt.fillStyle = self.colorForPlayerLegend(pn);
+		ctxt.fillStyle = self.colorForPlayerBorder(pn);
 		
 		var msg;
 		if (counts[0]>counts[1]) {
-			ctxt.fillStyle = self.colorForPlayerLegend(0);
+			ctxt.fillStyle = self.colorForPlayerBorder(0);
 			msg = G.strings.firstVictory;
 		} else if (counts[0] < counts[1]) {
-			ctxt.fillStyle = self.colorForPlayerLegend(1);
+			ctxt.fillStyle = self.colorForPlayerBorder(1);
 			msg = G.strings.secondVictory;
 		} else {
-			ctxt.fillStyle = "#000000";
+			ctxt.fillStyle = G.colors.black;
 			msg = G.strings.tieGame;
 		}
 		var msglen = ctxt.measureText(msg);

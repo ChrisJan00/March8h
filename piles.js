@@ -33,7 +33,7 @@ G.PileClass.prototype.manageClicked = function( mx, my )
 	if (newStone && (oldStone != newStone) && newStone.visible) {
 			newStone.selected = true;
 			newStone.active = true;
-			newStone.bgColor = G.display.colorForPlayerLegend(this.owner);
+			newStone.bgColor = G.display.colorForPlayerBorder(this.owner);
 			this.redrawTile(mix, miy);
 			this.selection = newStone;
 	}
@@ -67,7 +67,7 @@ G.PileClass.prototype.prefill = function()
 			var st = {
 				ix : x,
 				iy : y,
-				bgColor : "#FFFFFF",
+				bgColor : G.colors.white,
 				visible : true,
 				selected : false,
 				element : elem,
@@ -92,7 +92,7 @@ G.PileClass.prototype.chooseTiles = function( )
 			var st = {
 				ix : x,
 				iy : y,
-				bgColor : "#FFFFFF",
+				bgColor : G.colors.white,
 				visible: true,
 				selected: false,
 				element: 0,
@@ -128,7 +128,7 @@ G.PileClass.prototype.redrawBorder = function(strong) {
 		ctxt.fillRect(this.x0-this.border, this.y1+1, this.width + 2*this.border, this.border-1);
 		ctxt.fillRect(this.x1+1, this.y0-1, this.border-1, this.height+2);
 	} else {
-		ctxt.fillStyle = "rgba(255,255,255,0.4)"
+		ctxt.fillStyle = G.colors.semiTransparentWhite;
 		ctxt.fillRect(this.x0-2, this.y0-2, this.width+4, this.height+4);
 	}
 	
@@ -164,16 +164,16 @@ G.initPiles = function()
 	G.Piles[0] = new G.PileClass(10, 70, 0);
 	G.Piles[1] = new G.PileClass(500, 70, 1);
 	G.Piles[0].cellColor = function(ind) {
-		return "#f4e2ff";
+		return G.colors.purpleBackground;
 	}
 	G.Piles[1].cellColor = function(ind) {
-		return "#ffe9ce";
+		return G.colors.orangeBackground;
 	}
 	G.Piles[0].borderColor = function(ind) {
-		return ind?"#660099":"#9932CC";
+		return ind? G.colors.purpleBorderDark : G.colors.purpleBorder;
 	}
 	G.Piles[1].borderColor = function(ind) {
-		return ind?"#ff8c00":"#ffa940";
+		return ind? G.colors.orangeBorder : G.colors.orangeBorderLight;
 	}
 	
 }

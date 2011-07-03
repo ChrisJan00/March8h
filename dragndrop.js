@@ -70,7 +70,7 @@ G.DragNDrop = function() {
 		var my = y + self.dy;
 		
 		var bgColor = G.Piles[self.stoneData.owner].cellColor(0);
-		var borderColor = G.display.colorForPlayerLegend(self.stoneData.owner);
+		var borderColor = G.display.colorForPlayerBorder(self.stoneData.owner);
 		// draw background
 		ctxt.fillStyle = bgColor;
 		ctxt.fillRect(mx, my, side, side);

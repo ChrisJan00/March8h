@@ -61,11 +61,11 @@ G.GameMenu = function() {
 		var ctxt = G.graphicsManager.bgContext;
 		
 		G.graphicsManager.clearBackground();
-		ctxt.strokeStyle = "#000000";
+		ctxt.strokeStyle = G.colors.black;
 		ctxt.strokeRect(50,50,G.graphicsManager.width-100, G.graphicsManager.height-100);
 		
 		ctxt.font = "48px CustomFont, sans-serif";
-		ctxt.fillStyle = "#000000";
+		ctxt.fillStyle = G.colors.black;
 		
 		var textLen = ctxt.measureText(G.strings.gameName).width;
 		ctxt.fillText(G.strings.gameTitle, width/2 - textLen/2 + x0, 100);

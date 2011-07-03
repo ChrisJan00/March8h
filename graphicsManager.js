@@ -90,7 +90,7 @@ G.GraphicsManager = function() {
 	self.clearBackground = function() {
 		for (var ii=0; ii < self.layers.length; ii++)
 			self.getContext(self.layers[ii]).clearRect(0, 0, self.width, self.height);
-		self.bgContext.fillStyle = "#FFFFFF";
+		self.bgContext.fillStyle = G.colors.white;
 		self.bgContext.fillRect(0,0,self.width,self.height);
 		self.mark(0,0, self.width, self.height);
 	}
