@@ -40,14 +40,6 @@ GLOBAL.GameMenu = function() {
 	
 	self.create = function() 
 	{
-		//GLOBAL.playerOption = new GLOBAL.PlayerOption( 100, 100 );
-		//GLOBAL.computerEasyOption = new GLOBAL.ComputerEasyOption(100, 150);
-		//GLOBAL.computerMediumOption = new GLOBAL.ComputerMediumOption(100, 200);
-		//GLOBAL.defenseModeOption = new GLOBAL.DefenseModeOption(100, 300);
-		//self.startGameOption = new GLOBAL.StartGameOption(100,350);
-		
-		//GLOBAL.computerEasyOption.set(true);
-		//GLOBAL.defenseModeOption.set(false);
 		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 160, 400, 50, GLOBAL.strings.pvpEasy, self.pvpno));
 		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 220, 400, 50, GLOBAL.strings.pvpDef, self.pvpdef));
 		self.buttons.push(new GLOBAL.ClickableOption(GLOBAL.gameCanvas, 140, 280, 400, 50, GLOBAL.strings.pvcEasy, self.compeasy));
@@ -57,11 +49,6 @@ GLOBAL.GameMenu = function() {
 	
 	self.reloadControls = function()
 	{
-		//GLOBAL.playerOption.set(GLOBAL.playerOption.option);
-		//GLOBAL.computerEasyOption.set(GLOBAL.computerEasyOption.option);
-		//GLOBAL.computerMediumOption.set(GLOBAL.computerMediumOption.option);
-		//GLOBAL.defenseModeOption.set(GLOBAL.defenseModeOption.option);
-		//self.startGameOption.set(self.startGameOption.option);
 	}
 	
 	self.show = function()
@@ -86,18 +73,6 @@ GLOBAL.GameMenu = function() {
 		
 		for (var ii=0; ii < self.buttons.length; ii++)
 			self.buttons[ii].drawNormal();
-	
-		//ctx.fillText("Player VS Player", 150, 120);
-		//ctx.fillText("Player VS Computer (Easy)", 150, 170);
-		//ctx.fillText("Player VS Computer (Medium)", 150, 220);
-		//ctx.fillText("Defense rule", 150, 320);
-		//ctx.fillText("Start Game", 150, 370);
-		
-		//GLOBAL.playerOption.redraw();
-		//GLOBAL.computerEasyOption.redraw();
-		//GLOBAL.computerMediumOption.redraw();
-		//GLOBAL.defenseModeOption.redraw();
-		//self.startGameOption.redraw();
 		
 		GLOBAL.gameLog.unDisplay();
 		self.active = true;
@@ -109,11 +84,6 @@ GLOBAL.GameMenu = function() {
 	}
 	
 	self.mouseDown = function(ev) {
-		//GLOBAL.playerOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
-		//GLOBAL.computerEasyOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
-		//GLOBAL.computerMediumOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
-		//GLOBAL.defenseModeOption.clicked(GLOBAL.mouse.x,GLOBAL.mouse.y);
-		//self.startGameOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
 		var buttonPressed = false;
 		for (var ii=0; ii < self.buttons.length; ii++) {
 			buttonPressed = buttonPressed || self.buttons[ii].managePressed(GLOBAL.mouse.x, GLOBAL.mouse.y);
@@ -132,23 +102,6 @@ GLOBAL.GameMenu = function() {
 		}
 	}
 	
-}
-
-GLOBAL.DefenseModeOption.prototype.activate = function() {
-	GLOBAL.defenseMode = this.option;
-}
-
-GLOBAL.StartGameOption = function(x,y) {
-	this.x0 = x? x:610;
-	this.y0 = y? y:150;
-}
-
-GLOBAL.StartGameOption.prototype = new GLOBAL.OptionBox;
-GLOBAL.StartGameOption.prototype.activate = function() {
-	GLOBAL.menu.hide();
-	restartGame();
-	drawInitialGame();
-	this.option = false;
 }
 
 //-------------------------------------- PAUSE MODE
@@ -183,15 +136,8 @@ GLOBAL.pauseManager = new function()
 	}
 	
 	self.show = function() {
-		//GLOBAL.gameContext.fillStyle = "rgba(127,127,127,0.5)"
-		//GLOBAL.gameContext.fillRect(0, 0, GLOBAL.canvasWidth, GLOBAL.canvasHeight);
-		//document.getElementById("pauseButton").innerHTML = "CONT";
 	}
 	
 	self.hide = function() {
-		//drawInitialGame();
-		//GLOBAL.BoardInstance.drawAllTiles();
-		
-		//document.getElementById("pauseButton").innerHTML = "PAUSE";
 	}
 }
