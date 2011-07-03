@@ -338,6 +338,7 @@ G.GameLog = function() {
 		// delete stone from board
 		G.board[move.x][move.y] = null;
 		G.board.redrawTile(move.x,move.y);
+		G.board.refreshTileBordersExpansive(move.x, move.y);
 		G.board.stoneCount--;
 		
 		// undo attacks
