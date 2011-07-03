@@ -128,6 +128,8 @@ G.Display = function() {
 		var counts = G.counts;
 		var victory1 = counts[0]>counts[1];
 		
+		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
+		
 		var ctxt = G.graphicsManager.messagesContext;
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
 		var pn = G.action.turn;
