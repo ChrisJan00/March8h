@@ -184,13 +184,9 @@ G.initPiles = function()
 	G.Piles[0] = new G.PileClass(10, 70, 0);
 	G.Piles[1] = new G.PileClass(500, 70, 1);
 	G.Piles[0].cellColor = function(ind) {
-		//return ind?"#f1d9ff":"#d6b8e6";
-		//return "#f1d9ff";
 		return "#f4e2ff";
 	}
 	G.Piles[1].cellColor = function(ind) {
-		//return ind?"#ffe2bf":"#ffcb8c";
-		//return "#ffe2bf";
 		return "#ffe9ce";
 	}
 	G.Piles[0].borderColor = function(ind) {
