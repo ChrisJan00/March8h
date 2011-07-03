@@ -1,4 +1,4 @@
-var G= {}
+var G = {}
 
 G.findAbsoluteX = function(object) {
 	var x = 0;
@@ -17,6 +17,10 @@ G.findAbsoluteY = function(object) {
 	}
 	return y;
 }
+
+G.randint = function(n) {
+		return Math.floor(Math.random() * n);
+	}
 
 G.strings = {
 	gameTitle : "elementis",

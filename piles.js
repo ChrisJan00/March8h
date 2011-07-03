@@ -33,7 +33,7 @@ G.PileClass.prototype.manageClicked = function( mx, my )
 	if (newStone && (oldStone != newStone) && newStone.visible) {
 			newStone.selected = true;
 			newStone.active = true;
-			newStone.bgColor = colorForPlayerLegend(this.owner);
+			newStone.bgColor = G.display.colorForPlayerLegend(this.owner);
 			this.redrawTile(mix, miy);
 			this.selection = newStone;
 	}
@@ -59,8 +59,8 @@ G.PileClass.prototype.prefill = function()
 		for (var count=0;count<minCount;count++) {
 			var x,y;
 			do {
-				x = randint(this.cols);
-				y = randint(this.rows);
+				x = G.randint(this.cols);
+				y = G.randint(this.rows);
 			} while (this[x][y]);
 			var st = {
 				ix : x,
@@ -97,7 +97,7 @@ G.PileClass.prototype.chooseTiles = function( )
 				owner : 0,
 				active : false
 			}
-			st.element = randint(4);
+			st.element = G.randint(4);
 			st.owner = this.owner;
 			
 			this.set(x,y,st);
@@ -107,7 +107,7 @@ G.PileClass.prototype.chooseTiles = function( )
 G.PileClass.prototype.drawFromScratch = function() {
 	var ctx = G.gameContext;
 	
-	//ctx.fillStyle = colorForPlayer(this.owner);
+	//ctx.fillStyle = G.display.colorForPlayer(this.owner);
 	//ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.height + 2*this.border);
 	
 	this.drawEmpty();
@@ -178,7 +178,7 @@ G.PileClass.prototype.getStoneByElement = function(elem)
 	return false;
 }
 
-function initPiles()
+G.initPiles = function()
 {
 	G.Piles = [];
 	G.Piles[0] = new G.PileClass(10, 70, 0);
@@ -202,7 +202,7 @@ function initPiles()
 	
 }
 
-function countPiles() {
+G.countPiles = function() {
 	var pileCount = [];
 	for (var pileNum=0;pileNum<2; pileNum++) {
 		pileCount[pileNum] = [0,0,0,0];

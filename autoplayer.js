@@ -1,5 +1,5 @@
 //----------------------------------------------------------
-function computerPlay() {
+G.computerPlay = function() {
 	var self = this;
 	var pn = G.action.turn;
 	var decisionExp = 5;
@@ -120,7 +120,7 @@ function computerPlay() {
 	
 }
 
-function computerMove(mix,miy,elem, pn) {
+G.computerMove = function(mix,miy,elem, pn) {
 		// find one stone in own pile
 		
 		var currentPile = G.Piles[pn];

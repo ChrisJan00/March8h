@@ -8,16 +8,16 @@ G.GameMenu = function() {
 		G.computerEnabled = false;
 		G.defenseMode = false;
 		G.menu.hide();
-		restartGame();
-		drawInitialGame();
+		G.Main.restartGame();
+		G.Main.drawInitialGame();
 	}
 	
 	self.pvpdef = function() {
 		G.computerEnabled = false;
 		G.defenseMode = true;
 		G.menu.hide();
-		restartGame();
-		drawInitialGame();
+		G.Main.restartGame();
+		G.Main.drawInitialGame();
 	}
 	
 	self.compeasy = function() {
@@ -25,8 +25,8 @@ G.GameMenu = function() {
 		G.maximizeEntropy = false;
 		G.defenseMode = false;
 		G.menu.hide();
-		restartGame();
-		drawInitialGame();
+		G.Main.restartGame();
+		G.Main.drawInitialGame();
 	}
 	
 	self.comphard = function() {
@@ -34,8 +34,8 @@ G.GameMenu = function() {
 		G.maximizeEntropy = true;
 		G.defenseMode = true;
 		G.menu.hide();
-		restartGame();
-		drawInitialGame();
+		G.Main.restartGame();
+		G.Main.drawInitialGame();
 	}
 	
 	self.create = function() 
@@ -121,7 +121,7 @@ G.pauseManager = new function()
 		if (self.paused)
 			return;
 		self.paused = true;
-		disableTurn();
+		G.Main.disableTurn();
 		
 		self.show();
 	} 
@@ -132,7 +132,7 @@ G.pauseManager = new function()
 			
 		self.hide();
 		self.paused = false;
-		enableTurn();
+		G.Main.enableTurn();
 	}
 	
 	self.show = function() {

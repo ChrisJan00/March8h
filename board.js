@@ -167,36 +167,36 @@ G.StoneHolder.prototype = {
 					
 				// draw own border
 				ctx.fillStyle = hideLeft? 
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix, iy+1, 1, this.side-2);
 				
 				ctx.fillStyle = hideRight? 
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
 				
 				ctx.fillStyle = hideUp? 
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+1, iy, this.side-2, 1);
 				
 				ctx.fillStyle = hideDown? 
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
 				
-				ctx.fillStyle = colorForPlayerLegend(perceivedOwner);
+				ctx.fillStyle = G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillStyle = (hideLeft && hideUp && diagLU)?
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix, iy, 1, 1);
 				
 				ctx.fillStyle = (hideRight && hideUp && diagRU)?
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+this.side-1, iy, 1, 1);
 					
 				ctx.fillStyle = (hideLeft && hideDown && diagLD)?
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix, iy+this.side-1, 1, 1);
 					
 				ctx.fillStyle = (hideRight && hideDown && diagRD)?
-					colorForPlayer(perceivedOwner) : colorForPlayerLegend(perceivedOwner);
+					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
 				ctx.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
 
 			}
@@ -214,8 +214,8 @@ G.StoneHolder.prototype = {
 		var stone = this[x][y];
 		if (!stone) return;
 		
-		var color = frame%2? colorForPlayer(stone.owner) : colorForPlayerStrong(stone.owner);
-		//var color = colorForPlayerStrong(stone.owner);
+		var color = frame%2? G.display.colorForPlayer(stone.owner) : G.display.colorForPlayerStrong(stone.owner);
+		//var color = G.display.colorForPlayerStrong(stone.owner);
 		this.redrawTile(x,y,color);
 		frame--;
 		if (frame)
@@ -309,7 +309,7 @@ G.StoneHolder.prototype = {
 			element: stone.element,
 			owner : stone.owner
 		};
-	 	newStone.bgColor = colorForPlayer(stone.owner);
+	 	newStone.bgColor = G.display.colorForPlayer(stone.owner);
 	 	if (!this[x][y])
 	 		this.stoneCount++;
 		this[x][y] = newStone;
@@ -381,13 +381,8 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 
 	G.gameLog.registerMove(G.action.turn, stone, stoneIndex);
 	
-	//startFlood(mix, miy);
 	G.floodCheck.checkFlood(mix, miy);
-	//var def = G.floodCheck.findDefender(mix,miy);
-	
-	//this.refreshTileBorders(mix, miy);
-	//if (def)
-	//	this.refreshTileBorders(def.ix, def.iy);
+
 	this.refreshTileBordersExpansive(mix, miy);
 	
 	return true;

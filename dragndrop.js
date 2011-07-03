@@ -29,14 +29,14 @@ G.DragNDrop = function() {
 	
 	self.moveEvent = function( ev ) {
 		if (self.dragging) {
-			mouseMove(ev);
+			G.Main.mouseMove(ev);
 			self.move(G.mouse.x, G.mouse.y);
 		}
 	}
 	
 	self.releaseEvent = function( ev ) {
 		if (self.dragging) {
-			mouseMove(ev);
+			G.Main.mouseMove(ev);
 			self.release(G.mouse.x, G.mouse.y);
 			self.dragging = false;
 			G.gameCanvas.removeEventListener('mousemove', self.moveEvent, false);
@@ -64,7 +64,7 @@ G.DragNDrop = function() {
 		self.undrawStone();
 		
 		if (G.BoardInstance.isClicked(x, y))
-			manageTurn();
+			G.Main.manageTurn();
 	}
 	
 	self.drawStone = function(x,y) {
@@ -73,7 +73,7 @@ G.DragNDrop = function() {
 		var my = y + self.dy;
 		
 		var bgColor = G.Piles[self.stoneData.owner].cellColor(0);
-		var borderColor = colorForPlayerLegend(self.stoneData.owner);
+		var borderColor = G.display.colorForPlayerLegend(self.stoneData.owner);
 		// draw background
 		G.gameContext.fillStyle = bgColor;
 		G.gameContext.fillRect(mx, my, side, side);

@@ -17,13 +17,13 @@ G.OptionsMenu = function() {
 	
 	self.doRestart = function() {
 		self.deactivate();
-		restartGame();
-		drawInitialGame();
+		G.Main.restartGame();
+		G.Main.drawInitialGame();
 	}
 	
 	self.doExit = function() {
 		self.deactivate();
-		restartGame();
+		G.Main.restartGame();
 		G.menu.reloadControls();
 		G.menu.show();
 	} 
@@ -164,11 +164,6 @@ G.OptionsMenu = function() {
 
 }
 
-// it's an option in a menu
-// has a size and a position
-// if you mouseover the background turns light grey
-// if you press, it turns dark grey
-// if you release, it sends a "signal"
 G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 	var self = this;
 	

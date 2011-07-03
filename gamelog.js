@@ -50,8 +50,8 @@ G.GameLog = function() {
 	self.print = function(_who, text) 
 	{
 		self.lineCount++;
-		//var paragraphStart = "<p style=\"font-weight:bold; font-family:CustomFont, sans-serif; color:"+colorForPlayerLegend(_who)+"\">";
-		var paragraphStart = "<span style=\"font-family:CustomFont, sans-serif; color:"+colorForPlayerLegend(_who)+"\">";
+		//var paragraphStart = "<p style=\"font-weight:bold; font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
+		var paragraphStart = "<span style=\"font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
 		var paragraphEnd = "<br></span>";
 		self.outputString = paragraphStart + text + paragraphEnd + self.outputString;
 		
@@ -348,7 +348,7 @@ G.GameLog = function() {
 				var dest = G.BoardInstance[x][y];
 				dest.owner = move.attack[i].owner;
 				dest.element = move.attack[i].element;
-				dest.bgColor = colorForPlayer(dest.owner);
+				dest.bgColor = G.display.colorForPlayer(dest.owner);
 				G.BoardInstance.redrawTile(x,y);
 			}
 			
@@ -356,7 +356,7 @@ G.GameLog = function() {
 		G.floodCheck.board = G.BoardInstance;
  		G.floodCheck.countMarkers();
 		G.action.turn = move.who;
-		showPlayer();
+		G.display.showPlayer();
 		//enableTurn();
 	}
 	
@@ -380,7 +380,7 @@ G.GameLog = function() {
 			iy : move.y,
 			owner : _owner,
 			element : move.element,
-			bgColor : colorForPlayer(_owner),
+			bgColor : G.display.colorForPlayer(_owner),
 			visible : true,
 			selected : false,
 			active : true,
@@ -395,7 +395,7 @@ G.GameLog = function() {
 				var dest = G.BoardInstance[x][y];
 				dest.owner = _owner;
 				dest.element = move.element;
-				dest.bgColor = colorForPlayer(_owner);
+				dest.bgColor = G.display.colorForPlayer(_owner);
 				G.BoardInstance.redrawTile(x,y);
 			}
 			
@@ -403,7 +403,7 @@ G.GameLog = function() {
 			var dest = G.BoardInstance[move.x][move.y];
 			dest.owner = move.defense.owner;
 			dest.element = move.defense.element;
-			dest.bgColor = colorForPlayer(move.defense.owner);
+			dest.bgColor = G.display.colorForPlayer(move.defense.owner);
 			G.BoardInstance.redrawTile(move.x, move.y);
 		}
 		
@@ -412,9 +412,9 @@ G.GameLog = function() {
 		G.action.turn = 1-_owner;
 		
 		if (G.BoardInstance.stoneCount < G.BoardInstance.maxStones) {
-			showPlayer();
+			G.display.showPlayer();
 		} else {
-			checkVictory();
+			G.display.checkVictory();
 		}
 		
 		// enableTurn();
