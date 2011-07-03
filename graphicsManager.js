@@ -1,3 +1,97 @@
 G.GraphicsManager = function() {
+	var self = this;
 	
+	self.init = function() {
+		self.gameCanvas = document.getElementById("canvas1");
+		self.gameContext = self.gameCanvas.getContext("2d");
+		self.width = self.gameCanvas.width;
+		self.height = self.gameCanvas.height;
+		
+		self.layers = [];
+		self.rect = false;
+		
+		self.bgLayer = self.createLayer();
+		self.bgContext = self.getContext(self.bgLayer);
+
+		self.tileBgLayer = self.createLayer();
+		self.tileBgContext = self.getContext(self.tileBgLayer);
+
+		self.tileFgLayer = self.createLayer();
+		self.tileFgContext = self.getContext(self.tileFgLayer);
+
+		self.tileBorderLayer = self.createLayer();
+		self.tileBorderContext = self.getContext(self.tileBorderLayer);
+
+		self.messagesLayer = self.createLayer();
+		self.messagesContext = self.getContext(self.messagesLayer);
+		
+		self.floatingBorderLayer = self.createLayer();
+		self.floatingBorderContext = self.getContext(self.floatingBorderLayer);
+
+		self.dragLayer = self.createLayer();
+		self.dragContext = self.getContext(self.dragLayer);
+		
+		self.pauseLayer = self.createLayer();
+		self.pauseContext = self.getContext(self.pauseLayer);
+	}
+	
+	self.createLayer = function() {
+		var newLayer = document.createElement("canvas");
+		newLayer.width = self.width;
+		newLayer.height = self.height;
+		self.layers.push( newLayer );
+		return newLayer;
+	}
+	
+	self.getContext = function(layer) {
+		return layer.getContext("2d");
+	}
+	
+	self.mark = function(x,y,w,h) {
+		if (!self.rect)
+			self.rect = {
+				x : x,
+				y : y,
+				width : w,
+				height : h };
+		else {
+			var x1 = self.rect.x + self.rect.width;
+			var y1 = self.rect.y + self.rect.height;
+			self.rect.x = Math.min(x, self.rect.x);
+			self.rect.y = Math.min(y, self.rect.y);
+			self.rect.width = Math.max(x1, x+w) - self.rect.x;
+			self.rect.height = Math.max(y1, y+h) - self.rect.y;
+		}
+			
+		if (self.rect.x < 0) {
+			self.rect.width = self.rect.width + self.rect.x;
+			self.rect.x = 0;
+		}
+		if (self.rect.y < 0) {
+			self.rect.height = self.rect.height + self.rect.y;
+			self.rect.y = 0;
+		}
+		
+		if (self.rect.x + self.rect.width > self.width)
+			self.rect.width = self.width - self.rect.x;
+		if (self.rect.y + self.rect.height > self.height)
+			self.rect.height = self.height - self.rect.y;
+	}
+	
+	self.redraw = function() {
+		if (!self.rect)
+			return;
+		for (var ii=0; ii < self.layers.length; ii++)
+			self.gameContext.drawImage(self.layers[ii], self.rect.x, self.rect.y, self.rect.width, self.rect.height, 
+					self.rect.x, self.rect.y, self.rect.width, self.rect.height);
+		self.rect = false;
+	}
+	
+	self.clearBackground = function() {
+		for (var ii=0; ii < self.layers.length; ii++)
+			self.getContext(self.layers[ii]).clearRect(0, 0, self.width, self.height);
+		self.bgContext.fillStyle = "#FFFFFF";
+		self.bgContext.fillRect(0,0,self.width,self.height);
+		self.mark(0,0, self.width, self.height);
+	}
 }

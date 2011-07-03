@@ -40,10 +40,10 @@ G.GameMenu = function() {
 	
 	self.create = function() 
 	{
-		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 160, 400, 50, G.strings.pvpEasy, self.pvpno));
-		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 220, 400, 50, G.strings.pvpDef, self.pvpdef));
-		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 280, 400, 50, G.strings.pvcEasy, self.compeasy));
-		self.buttons.push(new G.ClickableOption(G.gameCanvas, 140, 340, 400, 50, G.strings.pvcDef, self.comphard));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 160, 400, 50, G.strings.pvpEasy, self.pvpno));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 220, 400, 50, G.strings.pvpDef, self.pvpdef));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 280, 400, 50, G.strings.pvcEasy, self.compeasy));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 340, 400, 50, G.strings.pvcDef, self.comphard));
 		
 	}
 	
@@ -53,23 +53,22 @@ G.GameMenu = function() {
 	
 	self.show = function()
 	{	
-		var width = G.canvasWidth - 100;
-		var height = G.canvasHeight - 100;
+		var width = G.graphicsManager.width - 100;
+		var height = G.graphicsManager.height - 100;
 		var x0 = 50;
 		var y0 = 50;
 		
-		var ctx = G.gameContext;
+		var ctxt = G.graphicsManager.bgContext;
 		
-		ctx.fillStyle = "#FFFFFF";
-		ctx.fillRect(0,0,G.canvasWidth,G.canvasHeight);
-		ctx.strokeStyle = "#000000";
-		ctx.strokeRect(50,50,G.canvasWidth-100, G.canvasHeight-100);
+		G.graphicsManager.clearBackground();
+		ctxt.strokeStyle = "#000000";
+		ctxt.strokeRect(50,50,G.graphicsManager.width-100, G.graphicsManager.height-100);
 		
-		ctx.font = "48px CustomFont, sans-serif";
-		ctx.fillStyle = "#000000";
+		ctxt.font = "48px CustomFont, sans-serif";
+		ctxt.fillStyle = "#000000";
 		
-		var textLen = ctx.measureText(G.strings.gameName).width;
-		ctx.fillText(G.strings.gameTitle, width/2 - textLen/2 + x0, 100);
+		var textLen = ctxt.measureText(G.strings.gameName).width;
+		ctxt.fillText(G.strings.gameTitle, width/2 - textLen/2 + x0, 100);
 		
 		for (var ii=0; ii < self.buttons.length; ii++)
 			self.buttons[ii].drawNormal();
@@ -80,6 +79,7 @@ G.GameMenu = function() {
 	
 	self.hide = function()
 	{
+		G.graphicsManager.clearBackground();
 		self.active = false;
 	}
 	

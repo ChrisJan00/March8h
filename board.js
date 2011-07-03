@@ -37,36 +37,36 @@ G.StoneHolder.prototype = {
 	drawEmpty : function()
 	{
 		var self = this;
-		var ctx = G.gameContext;
+		var ctxt = G.graphicsManager.bgContext;
+		var bw = 3;
 		
-		for (var j=0;j<2;j++) {
-			if (j==1) ctx = G.bgContext;
-			ctx.fillStyle="#FFFFFF";
-			ctx.fillRect(self.x0 - self.borderTileSide, self.y0 - self.borderTileSide,
-				self.width + 2*self.borderTileSide, self.height + 2*self.borderTileSide);
-			
-			ctx.strokeStyle = self.borderColor(0);
-			ctx.beginPath();
-			ctx.moveTo(self.x0-1, self.y0+self.height+1);
-			ctx.lineTo(self.x0-1, self.y0-1);
-			ctx.lineTo(self.x0 + self.width + 1, self.y0-1);
-			ctx.stroke();
+		ctxt.fillStyle="#FFFFFF";
+		ctxt.fillRect(self.x0 - bw, self.y0 - bw, self.width + bw*2, self.height+bw*2);
+		
+		// up and left border	
+		ctxt.strokeStyle = self.borderColor(0);
+		ctxt.beginPath();
+		ctxt.moveTo(self.x0-1, self.y0+self.height+1);
+		ctxt.lineTo(self.x0-1, self.y0-1);
+		ctxt.lineTo(self.x0 + self.width + 1, self.y0-1);
+		ctxt.stroke();
 				
-				
-			ctx.strokeStyle = self.borderColor(1);
-			ctx.beginPath();
-			ctx.moveTo(self.x0 + self.width + 1, self.y0-1);
-			ctx.lineTo(self.x0 + self.width + 1, self.y0+self.height+1);
-			ctx.lineTo(self.x0 - 1, self.y0+self.height+1);
-			ctx.stroke();
+		// down and right border
+		ctxt.strokeStyle = self.borderColor(1);
+		ctxt.beginPath();
+		ctxt.moveTo(self.x0 + self.width + 1, self.y0-1);
+		ctxt.lineTo(self.x0 + self.width + 1, self.y0+self.height+1);
+		ctxt.lineTo(self.x0 - 1, self.y0+self.height+1);
+		ctxt.stroke();
 			
-			for (var x=0;x<self.cols;x++) 
-				for (var y=0;y<self.rows;y++) {
-				ctx.fillStyle = self.cellColor((x+y)%2);
-				ctx.fillRect(self.x0 + x*self.side, self.y0 + y*self.side, self.side, self.side);
-			}
-			
+		for (var x=0;x<self.cols;x++) 
+			for (var y=0;y<self.rows;y++) {
+			ctxt.fillStyle = self.cellColor((x+y)%2);
+			ctxt.fillRect(self.x0 + x*self.side, self.y0 + y*self.side, self.side, self.side);
 		}
+		
+		G.graphicsManager.mark(self.x0 - bw, self.y0 - bw, self.width + bw*2, self.height + bw*2);
+		//G.graphicsManager.redraw();
 	},
 	
 	drawAllTiles : function() {
@@ -88,28 +88,30 @@ G.StoneHolder.prototype = {
 		var mx = this.x0 + x * this.side;
 		var my = this.y0 + y * this.side;
 	
-		var ctx = G.gameContext;
-		for (var i=0;i<2;i++) {
-			if (i==1) ctx = G.bgContext;
-			ctx.fillStyle = color;
-			ctx.fillRect(mx,my,this.side, this.side);
-		}
+		var ctxt = G.graphicsManager.tileBgContext;
+		ctxt.fillStyle = color;
+		ctxt.fillRect(mx,my,this.side, this.side);
+		G.graphicsManager.tileBorderContext.clearRect(mx,my,this.side,this.side);
+		G.graphicsManager.mark(mx,my,this.side,this.side);
 		
 		if (this[x][y] && this[x][y].active && this == G.board) {
 				this[x][y].invertedColors = false;
 				this.refreshTileBordersExpansive(x,y);
 		}
+		
 	},
 	
 	redrawTile : function(x,y,col) {
 		// if there is no tile, draw empty space
 		this.redrawTileBackground(x,y,col);
 		
+		// draw stone
+		var ix = this.x0 + x * this.side;
+		var iy = this.y0 + y * this.side;
+			
+		G.graphicsManager.tileFgContext.clearRect(ix, iy, this.side, this.side);
 		var stone = this[x][y];
-		if (stone && stone.visible) {
-			// draw stone
-			var ix = this.x0 + x * this.side;
-			var iy = this.y0 + y * this.side;
+		if (stone && stone.visible) {	
 			var img;
 			switch (stone.element) {
 				case 0:	img = G.imageFire;
@@ -122,9 +124,10 @@ G.StoneHolder.prototype = {
 				 	break;
 			}
 			
-			G.gameContext.drawImage(img, ix, iy);
-			G.bgContext.drawImage(img,ix,iy);
+			G.graphicsManager.tileFgContext.drawImage(img, ix, iy);
 		}
+		G.graphicsManager.mark(ix,iy,this.side,this.side);
+		
 	},
 	
 	refreshAllTileBorders : function() {
@@ -144,7 +147,7 @@ G.StoneHolder.prototype = {
 		if (x<0 || x>=this.cols || y<0 || y>=this.rows)
 			return;
 			
-		var ctx = G.gameContext;
+		var ctxt = G.graphicsManager.tileBorderContext;
 		var ix = this.x0 + x * this.side;
 		var iy = this.y0 + y * this.side;
 		var stone = this[x][y];
@@ -161,45 +164,41 @@ G.StoneHolder.prototype = {
 			var diagRD = (x<this.cols-1 && y<this.rows-1 && this[x+1][y+1] && this[x+1][y+1].owner == stone.owner && this[x+1][y+1].element == stone.element);
 			
 			var perceivedOwner = stone.invertedColors? (1-stone.owner) : stone.owner;
+					
+			// draw own border
+			ctxt.fillStyle = hideLeft? 
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix, iy+1, 1, this.side-2);
 			
-			for (var ctxcnt=0;ctxcnt<2;ctxcnt++) {
-				if (ctxcnt==1) ctx = G.bgContext;
-					
-				// draw own border
-				ctx.fillStyle = hideLeft? 
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix, iy+1, 1, this.side-2);
+			ctxt.fillStyle = hideRight? 
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
+			
+			ctxt.fillStyle = hideUp? 
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix+1, iy, this.side-2, 1);
+		
+			ctxt.fillStyle = hideDown? 
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
+			
+			ctxt.fillStyle = G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillStyle = (hideLeft && hideUp && diagLU)?
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix, iy, 1, 1);
+			
+			ctxt.fillStyle = (hideRight && hideUp && diagRU)?
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix+this.side-1, iy, 1, 1);
 				
-				ctx.fillStyle = hideRight? 
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
+			ctxt.fillStyle = (hideLeft && hideDown && diagLD)?
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix, iy+this.side-1, 1, 1);
 				
-				ctx.fillStyle = hideUp? 
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix+1, iy, this.side-2, 1);
-				
-				ctx.fillStyle = hideDown? 
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
-				
-				ctx.fillStyle = G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillStyle = (hideLeft && hideUp && diagLU)?
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix, iy, 1, 1);
-				
-				ctx.fillStyle = (hideRight && hideUp && diagRU)?
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix+this.side-1, iy, 1, 1);
-					
-				ctx.fillStyle = (hideLeft && hideDown && diagLD)?
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix, iy+this.side-1, 1, 1);
-					
-				ctx.fillStyle = (hideRight && hideDown && diagRD)?
-					G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
-				ctx.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
+			ctxt.fillStyle = (hideRight && hideDown && diagRD)?
+				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerLegend(perceivedOwner);
+			ctxt.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
 
-			}
 		}
 	},	
 	startTileBlinking : function(x,y) 
@@ -217,6 +216,7 @@ G.StoneHolder.prototype = {
 		var color = frame%2? G.display.colorForPlayer(stone.owner) : G.display.colorForPlayerStrong(stone.owner);
 		//var color = G.display.colorForPlayerStrong(stone.owner);
 		this.redrawTile(x,y,color);
+		G.graphicsManager.redraw();
 		frame--;
 		if (frame)
 			setTimeout(function(){self.blinkTile(x,y,frame)}, G.animationDelay);
@@ -236,7 +236,7 @@ G.StoneHolder.prototype = {
  		
  		this.redrawTileBackground(x, y);
  
-  		var ctx = G.gameContext;
+  		var ctxt = G.graphicsManager.tileFgContext;
  	
 	 	var whichAnimation;
 	 	switch(stone.element) {
@@ -249,14 +249,16 @@ G.StoneHolder.prototype = {
 	 	var offset = frame * 50;
 	 	var ix = this.x0 + x * this.side;
 		var iy = this.y0 + y * this.side;
-			
-	 	ctx.drawImage(whichAnimation, offset, 0, this.side, this.side, ix, iy, this.side, this.side);
-	 	G.bgContext.drawImage(whichAnimation,offset, 0, this.side, this.side, ix, iy, this.side, this.side);
-		var self = this;
+	
+ 		ctxt.clearRect(ix, iy, this.side, this.side)		
+	 	ctxt.drawImage(whichAnimation, offset, 0, this.side, this.side, ix, iy, this.side, this.side);
+	 	G.graphicsManager.mark(ix, iy, this.side, this.side);
+	 	G.graphicsManager.redraw();
+	 	var self = this;
 	 	if (frame<G.framesPerStrip-1) {
 	 		setTimeout(function(){self.animateTile(x, y, frame+1)}, G.animationDelay);
 	 	} else {
-	 		setTimeout(function(){self.redrawTile(stone.ix, stone.iy)}, G.animationDelay);
+	 		setTimeout(function(){self.redrawTile(stone.ix, stone.iy);G.graphicsManager.redraw();}, G.animationDelay);
 	 	}
 	},
 	
@@ -270,30 +272,35 @@ G.StoneHolder.prototype = {
 		var iy = this.y0 + y*this.side;
 		
 		var borderSide = this.side + this.borderTileSide*2;
-		var ctx = G.gameContext;
+		var ctxt = G.graphicsManager.floatingBorderContext;
 		
 		// delete old border
-		ctx.drawImage(G.bgCanvas,
-			ix - this.borderTileSide,
-			iy - this.borderTileSide,
-			borderSide, borderSide,
-			ix - this.borderTileSide,
-			iy - this.borderTileSide,
-			borderSide, borderSide );
+		ctxt.clearRect( ix - this.borderTileSide, iy - this.borderTileSide, borderSide, borderSide);
+		
+		//ctxt.drawImage(G.bgCanvas,
+		//	ix - this.borderTileSide,
+		//	iy - this.borderTileSide,
+		//	borderSide, borderSide,
+		//	ix - this.borderTileSide,
+		//	iy - this.borderTileSide,
+		//	borderSide, borderSide );
 			
-		if (frame == 0)
-			return;
-			
-		// draw new border
-		ctx.fillStyle = "rgba(0,0,0,0.5)";
-		ctx.strokeStyle = "rgba(0,0,0,0.5)";
-		ctx.fillRect(ix-frame, iy-frame, this.side+2*frame, frame);
-		ctx.fillRect(ix-frame, iy, frame, this.side);
-		ctx.fillRect(ix-frame, iy+this.side, this.side+2*frame, frame);
-		ctx.fillRect(ix+this.side, iy, frame, this.side);
+		if (frame != 0) {
+			// draw new border
+			ctxt.fillStyle = "rgba(0,0,0,0.5)";
+			ctxt.strokeStyle = "rgba(0,0,0,0.5)";
+			ctxt.fillRect(ix-frame, iy-frame, this.side+2*frame, frame);
+			ctxt.fillRect(ix-frame, iy, frame, this.side);
+			ctxt.fillRect(ix-frame, iy+this.side, this.side+2*frame, frame);
+			ctxt.fillRect(ix+this.side, iy, frame, this.side);
+		}
+		G.graphicsManager.mark(ix - this.borderTileSide, iy - this.borderTileSide, borderSide, borderSide);
+		G.graphicsManager.redraw();
 		
 		var self = this;
-		setTimeout(function(){self.borderAnimation(x,y,frame-1)}, self.borderAnimationDelay);
+		if (frame != 0) {
+			setTimeout(function(){self.borderAnimation(x,y,frame-1)}, self.borderAnimationDelay);
+		}
 	},
 	
 	// update functions

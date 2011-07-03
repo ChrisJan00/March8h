@@ -44,6 +44,8 @@ G.PileClass.prototype.manageClicked = function( mx, my )
 		var stoney = this.y0 + miy*this.side;
 		G.dragndrop.startDrag(mx, my, newStone, stonex, stoney);
 	}
+	
+	G.graphicsManager.redraw();
 }
 
 G.PileClass.prototype.unSelect = function()
@@ -106,53 +108,31 @@ G.PileClass.prototype.chooseTiles = function( )
 
 G.PileClass.prototype.drawFromScratch = function() {
 	var ctx = G.gameContext;
-	
-	//ctx.fillStyle = G.display.colorForPlayer(this.owner);
-	//ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.height + 2*this.border);
-	
+
 	this.drawEmpty();
 	for (var ix=0;ix<this.cols; ix++)
 		for (var iy=0;iy<this.rows;iy++)
 			this.redrawTile(ix,iy);
-			
-	this.strCanvas = document.createElement('canvas');
-	this.strCanvas.width = this.width+4;
-	this.strCanvas.height = this.height+4;
-	this.strContext = this.strCanvas.getContext("2d");
-	this.strContext.drawImage(G.gameCanvas, 
-		this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height,
-		0, 0, this.strCanvas.width, this.strCanvas.height);
 }
 
 G.PileClass.prototype.redrawBorder = function(strong) {
+	var ctxt = G.graphicsManager.floatingBorderContext;
+	G.graphicsManager.mark(this.x0-this.border, this.y0-this.border, this.width+2*this.border, this.height+2*this.border);
+	ctxt.clearRect(this.x0-this.border, this.y0-this.border, this.width+2*this.border, this.height+2*this.border);
 	if (strong)
 	{
-		if (G.board.stoneCount == G.board.maxStones)
-			this.drawFromScratch();
-		else
-			G.gameContext.drawImage(this.strCanvas, 
-				0, 0, this.strCanvas.width, this.strCanvas.height,
-				this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
+		ctxt.fillStyle = this.borderColor(0);
+		
+		ctxt.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border-1);
+		ctxt.fillRect(this.x0-this.border, this.y0-1, this.border-1, this.height+2);
+		ctxt.fillRect(this.x0-this.border, this.y1+1, this.width + 2*this.border, this.border-1);
+		ctxt.fillRect(this.x1+1, this.y0-1, this.border-1, this.height+2);
 	} else {
-		this.strContext.drawImage(G.bgCanvas, 
-			this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height,
-			0, 0, this.strCanvas.width, this.strCanvas.height);
-		G.gameContext.fillStyle = "rgba(255,255,255,0.4)"
-		G.gameContext.fillRect(this.x0-2, this.y0-2, this.strCanvas.width, this.strCanvas.height);
+		ctxt.fillStyle = "rgba(255,255,255,0.4)"
+		ctxt.fillRect(this.x0-2, this.y0-2, this.width+4, this.height+4);
 	}
 	
-	var ctx = G.gameContext;
-	for (var i=0;i<2;i++) {
-		if (i==1)
-			ctx = G.bgContext;
-		var color = strong?this.borderColor(0):"#FFFFFF";
-		ctx.fillStyle = color;
-		
-		ctx.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border-1);
-		ctx.fillRect(this.x0-this.border, this.y0-1, this.border-1, this.height+2);
-		ctx.fillRect(this.x0-this.border, this.y1+1, this.width + 2*this.border, this.border-1);
-		ctx.fillRect(this.x1+1, this.y0-1, this.border-1, this.height+2);
-	}
+	G.graphicsManager.redraw();
 }
 
 G.PileClass.prototype.countStoneTypes = function()

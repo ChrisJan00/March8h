@@ -33,14 +33,11 @@ G.Main = function() {
 	}
 	
 	self.prepareGame = function() {
+		G.graphicsManager = new G.GraphicsManager();
+		G.graphicsManager.init();
+		
+		// needed for the mouse events
 		G.gameCanvas = document.getElementById("canvas1");
-		G.gameContext = G.gameCanvas.getContext("2d");
-		G.bgCanvas = document.createElement('canvas');
-		G.bgCanvas.width = G.gameCanvas.width;
-		G.bgCanvas.height = G.gameCanvas.height;
-		G.bgContext = G.bgCanvas.getContext("2d");
-		G.canvasWidth = G.gameCanvas.width;
-		G.canvasHeight = G.gameCanvas.height;
 		
 		G.xoffset = G.findAbsoluteX(G.gameCanvas);
 		G.yoffset = G.findAbsoluteY(G.gameCanvas);
@@ -53,7 +50,7 @@ G.Main = function() {
 		};
 		
 		G.pauseManager = new G.PauseManager();
-		
+		G.display = new G.Display();
 		G.board = new G.BoardClass();
 	
 		G.coords = {
@@ -87,7 +84,7 @@ G.Main = function() {
 		G.dragndrop = new G.DragNDrop();
 		G.optionsMenu = new G.OptionsMenu();
 		G.optionsMenu.hide();
-		G.optionsButton = new G.ClickableOption( G.gameCanvas, 605, 5, 50, 25, G.strings.optionsButton, G.optionsMenu.activate );
+		G.optionsButton = new G.ClickableOption( G.graphicsManager.messagesLayer, 605, 5, 50, 25, G.strings.optionsButton, G.optionsMenu.activate );
 		G.optionsButton.fontSize = 10;
 	}
 	
@@ -109,7 +106,7 @@ G.Main = function() {
 	}
 	
 	self.drawInitialGame = function() {
-		self.clearCanvas();
+		G.graphicsManager.clearBackground();
 		G.Piles[0].drawFromScratch();
 		G.Piles[1].drawFromScratch();
 		G.board.drawEmpty();
@@ -117,6 +114,7 @@ G.Main = function() {
 		G.display.showOrder();
 		G.optionsButton.drawNormal();
 		G.gameLog.updateVisible();
+		G.graphicsManager.redraw();
 		self.enableTurn();
 	}
 	
@@ -246,12 +244,6 @@ G.Main = function() {
 	    	G.mouse.y = ev.offsetY;
 	  }
 	
-	}
-	
-	self.clearCanvas = function() {
-		G.gameContext.fillStyle = "#FFFFFF";
-		G.gameContext.fillRect(0, 0, G.gameCanvas.width, G.gameCanvas.height);
-		
 	}
 	
 	self.startGame = function()

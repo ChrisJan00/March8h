@@ -4,14 +4,7 @@ G.DragNDrop = function() {
 	self.dragging = false;
 	self.stoneData = null;
 	
-	self.snapCanvas = document.createElement('canvas');
-	self.snapCanvas.width = G.gameCanvas.width;
-	self.snapCanvas.height = G.gameCanvas.height;
-	
 	self.startDrag = function(fromx, fromy, stone, stonex, stoney) {
-		self.snapContext = self.snapCanvas.getContext("2d");
-		self.snapContext.drawImage(G.gameCanvas, 0, 0, G.canvasWidth, G.canvasHeight);
-
 		self.dragging = true;
 		self.drawing = false;
 		self.stoneData = stone;
@@ -58,16 +51,20 @@ G.DragNDrop = function() {
 		self.ox = x + self.dx;
 		self.oy = y + self.dy;
 		self.drawStone(x,y);
+		G.graphicsManager.redraw();
 	}
 	
 	self.release = function( x, y ) {
 		self.undrawStone();
+		G.graphicsManager.redraw();
 		
 		if (G.board.isClicked(x, y))
 			G.main.manageTurn();
 	}
 	
 	self.drawStone = function(x,y) {
+		var ctxt = G.graphicsManager.dragContext;
+		
 		var side = G.board.side;
 		var mx = x + self.dx;
 		var my = y + self.dy;
@@ -75,15 +72,15 @@ G.DragNDrop = function() {
 		var bgColor = G.Piles[self.stoneData.owner].cellColor(0);
 		var borderColor = G.display.colorForPlayerLegend(self.stoneData.owner);
 		// draw background
-		G.gameContext.fillStyle = bgColor;
-		G.gameContext.fillRect(mx, my, side, side);
-		
+		ctxt.fillStyle = bgColor;
+		ctxt.fillRect(mx, my, side, side);
+
 		// draw borders
-		G.gameContext.fillStyle = borderColor;
-		G.gameContext.fillRect(mx, my, side, 1);
-		G.gameContext.fillRect(mx, my+1, 1, side-2);
-		G.gameContext.fillRect(mx+side-1, my+1, 1, side-2);
-		G.gameContext.fillRect(mx, my+side-1, side, 1);
+		ctxt.fillStyle = borderColor;
+		ctxt.fillRect(mx, my, side, 1);
+		ctxt.fillRect(mx, my+1, 1, side-2);
+		ctxt.fillRect(mx+side-1, my+1, 1, side-2);
+		ctxt.fillRect(mx, my+side-1, side, 1);
 		
 		// draw icon
 		var img;
@@ -97,23 +94,14 @@ G.DragNDrop = function() {
 			case 3:	img = G.imageWind;
 				 break;
 		}
-			
-		G.gameContext.drawImage(img, mx, my);
+		
+		ctxt.drawImage(img, mx, my);
+		G.graphicsManager.mark(mx, my, G.board.side, side);
 	}
 	
 	self.undrawStone = function() {
-		var x = self.ox;
-		var y = self.oy;
-		var sx = G.board.side;
-		var sy = G.board.side;
-		if (x<0) x = 0;
-		if (y<0) y = 0;
-		if (x+sx > G.canvasWidth) sx = G.canvasWidth - x;
-		if (y+sy > G.canvasHeight) sy = G.canvasHeight - y;
-		
-		if (sx<1 || sy<1) return;
-		
-		G.gameContext.drawImage(self.snapCanvas, x, y, sx, sy, x, y, sx, sy);
+		G.graphicsManager.dragContext.clearRect(self.ox, self.oy, G.board.side, G.board.side);
+		G.graphicsManager.mark(self.ox, self.oy, G.board.side, G.board.side);
 	}
 	
 }

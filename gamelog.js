@@ -357,6 +357,7 @@ G.GameLog = function() {
  		G.floodCheck.countMarkers();
 		G.action.turn = move.who;
 		G.display.showPlayer();
+		G.graphicsManager.redraw();
 		//enableTurn();
 	}
 	
@@ -416,6 +417,8 @@ G.GameLog = function() {
 		} else {
 			G.display.checkVictory();
 		}
+		
+		G.graphicsManager.redraw();
 		
 		// enableTurn();
 	}

@@ -47,6 +47,8 @@ G.OptionsMenu = function() {
 		self.canvas.addEventListener('mousemove', self.moveEvent, false);
 		self.canvas.addEventListener('mouseup', self.releaseEvent, false);
 		self.canvas.addEventListener('mousedown', self.pressEvent, false);
+		
+		G.optionsButton.drawNormal();
 	}
 	
 	self.hide = function() {
@@ -236,11 +238,15 @@ G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 		ctxt.font = "bold "+self.fontSize+"px CustomFont, sans-serif";
 		var textLen = ctxt.measureText(self.label).width;
 		ctxt.fillText(self.label, self.x0 + self.width/2 - textLen/2, self.y0 + self.height / 2 + self.fontSize/2 - 2);
+
+		G.graphicsManager.mark(self.x0-1, self.y0-1, self.width+2, self.height+2);
+		G.graphicsManager.redraw();
 	}
 	
 	self.hide = function() {
-		self.ctxt.fillStyle = "#FFFFFF";
-		self.ctxt.fillRect(self.x0, self.y0, self.width, self.height);
+		self.ctxt.clearRect(self.x0-1, self.y0-1, self.width+2, self.height+2);
+		G.graphicsManager.mark(self.x0-1, self.y0-1, self.width+2, self.height+2);
+		G.graphicsManager.redraw();
 	}
 	
 }

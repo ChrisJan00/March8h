@@ -29,8 +29,8 @@ G.Display = function() {
 		var x0 = G.Piles[pn].x0 + G.Piles[pn].width/2 - size/2;
 		var y0 = G.Piles[pn].y0 / 2 - size/2;
 		
-		var ctxt = G.gameContext;
-		
+		var ctxt = G.graphicsManager.messagesContext;
+		G.graphicsManager.mark(x0, y0, size, size);
 		ctxt.fillStyle = self.colorForPlayerBackground(pn);
 		ctxt.fillRect(x0, y0, size, size);
 		
@@ -47,30 +47,26 @@ G.Display = function() {
 		var numberStr = " "+G.counts[pn]+" ";
 		var textLen = ctxt.measureText(numberStr).width;
 		ctxt.fillText(numberStr, x0 + size/2 - textLen/2, y0 + size/2 + 10 );
-		//ctx.fillStyle = self.colorForPlayerLegend(pn);
-		//ctx.fillText(G.counts[pn]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
-		//ctx.fillStyle = self.colorForPlayerLegend(pn);
 	}
 	
 	self.showPlayer = function() {
 		var data = G.coords.text
-		var ctx = G.gameContext;
-		ctx.fillStyle = "#FFFFFF";
-		ctx.fillRect(data.x0,data.y0,data.width,data.height);
+		var ctxt = G.graphicsManager.messagesContext;
+		
+		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
+		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
 		var pn = G.action.turn;
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);
 		
-		ctx.font = "bold 28px CustomFont, sans-serif";
-		ctx.fillStyle = self.colorForPlayerLegend(pn);
-		//var msg = "Player "+(pn?"orange":"purple")+"'s turn";
-		//var msg = (pn?"orange":"purple")+"'s turn";
+		ctxt.font = "bold 28px CustomFont, sans-serif";
+		ctxt.fillStyle = self.colorForPlayerLegend(pn);
 		var msg  = (pn?G.strings.secondPlayerName:G.strings.firstPlayerName);
 		if (G.computerEnabled && pn==1)
 			msg = G.strings.thinkingMessage;
-		var msglen = ctx.measureText(msg);
-		ctx.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
+		var msglen = ctxt.measureText(msg);
+		ctxt.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
 		
 		G.Piles[0].redrawBorder(G.action.turn==0);
 		G.Piles[1].redrawBorder(G.action.turn==1);
@@ -80,15 +76,15 @@ G.Display = function() {
 	//	return;
 		// only arrows pointing to the right by now
 		var drawArrow = function(xfrom,yfrom,xto,yto) {
-			var ctx = G.gameContext;
-			ctx.strokeStyle = "#000000";
-			ctx.beginPath();
-			ctx.moveTo(xfrom,yfrom);
-			ctx.lineTo(xto,yto);
-			ctx.lineTo(xto-6,yto-6);
-			ctx.moveTo(xto-6,yto+6);
-			ctx.lineTo(xto,yto);
-			ctx.stroke();
+			var ctxt = G.graphicsManager.messagesContext;
+			ctxt.strokeStyle = "#000000";
+			ctxt.beginPath();
+			ctxt.moveTo(xfrom,yfrom);
+			ctxt.lineTo(xto,yto);
+			ctxt.lineTo(xto-6,yto-6);
+			ctxt.moveTo(xto-6,yto+6);
+			ctxt.lineTo(xto,yto);
+			ctxt.stroke();
 		}
 		
 		var s = G.board.side
@@ -100,7 +96,8 @@ G.Display = function() {
 		var x0 = G.board.x0
 		var y0 = y + 15
 		var y1 = y + G.imageFire.height/2 + 5
-		var ctx = G.gameContext;
+		var ctxt = G.graphicsManager.messagesContext;
+		G.graphicsManager.mark(0, y0, G.graphicsManager.width, 25);
 		
 		xi = 5;
 		var lastElem = 0;
@@ -112,55 +109,15 @@ G.Display = function() {
 				case 2: img = G.imageEarth; break;
 				case 3: img = G.imageWater; break;
 			}
-			ctx.drawImage(img, 0, 0, 50, 50, xi, y0, 25, 25 );
+			ctxt.drawImage(img, 0, 0, 50, 50, xi, y0, 25, 25 );
 			drawArrow(xi + 30, y0+12, xi + al + 30, y0+12);
 			xi = xi + 35 + al;
 			lastElem = (lastElem+1)%4;
 		}
-	
-		//ctx.drawImage(G.imageFire, x0 + 2*b , y0);
-		//drawArrow( x0 + 3*b + s, y1, x0 + 3*b + s + al, y1 );
-		//ctx.drawImage(G.imageWind, x0 + 4*b + s + al, y0);
-		//drawArrow( x0 + 5*b + 2*s + al, y1, x0 + 5*b + 2*s + 2*al, y1 );
-		//ctx.drawImage(G.imageEarth, x0 + 6*b + 2*s + 2*al , y0);
-		//drawArrow(x0 + 7*b + 3*s + 2*al, y1, x0 + 7*b + 3*s + 3*al, y1 );
-		//ctx.drawImage(G.imageWater, x0 + 8*b + 3*s + 3*al , y0);
+		
+		G.graphicsManager.redraw();
 	}
 	
-	self.showOrderOld = function() {
-	//	return;
-		// only arrows pointing to the right by now
-		var drawArrow = function(xfrom,yfrom,xto,yto) {
-			var ctx = G.gameContext;
-			ctx.strokeStyle = "#000000";
-			ctx.beginPath();
-			ctx.moveTo(xfrom,yfrom);
-			ctx.lineTo(xto,yto);
-			ctx.lineTo(xto-6,yto-6);
-			ctx.moveTo(xto-6,yto+6);
-			ctx.lineTo(xto,yto);
-			ctx.stroke();
-		}
-		
-		var s = G.board.side
-		var width = s * G.board.cols
-		var b = Math.floor((width - 45 - 4*s)/10);
-		var al = 15;
-		var y = G.board.y0 + G.board.rows * G.board.side
-		
-		var x0 = G.board.x0
-		var y0 = y + 5
-		var y1 = y + G.imageFire.height/2 + 5
-		var ctx = G.gameContext;
-	
-		ctx.drawImage(G.imageFire, x0 + 2*b , y0);
-		drawArrow( x0 + 3*b + s, y1, x0 + 3*b + s + al, y1 );
-		ctx.drawImage(G.imageWind, x0 + 4*b + s + al, y0);
-		drawArrow( x0 + 5*b + 2*s + al, y1, x0 + 5*b + 2*s + 2*al, y1 );
-		ctx.drawImage(G.imageEarth, x0 + 6*b + 2*s + 2*al , y0);
-		drawArrow(x0 + 7*b + 3*s + 2*al, y1, x0 + 7*b + 3*s + 3*al, y1 );
-		ctx.drawImage(G.imageWater, x0 + 8*b + 3*s + 3*al , y0);
-	}
 	
 	self.checkVictory = function() {
 		var data = G.coords.text
@@ -168,36 +125,28 @@ G.Display = function() {
 		var counts = G.counts;
 		var victory1 = counts[0]>counts[1];
 		
-		var ctx = G.gameContext;
-		ctx.fillStyle = "#FFFFFF";
-		ctx.fillRect(data.x0,data.y0,data.width,data.height);
+		var ctxt = G.graphicsManager.messagesContext;
+		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
 		var pn = G.action.turn;
-		ctx.font = "bold 24px CustomFont, sans-serif";
-		
-		//ctx.fillStyle = self.colorForPlayerLegend(0);
-		//ctx.fillText(G.counts[0]+" ", data.x0+5, data.y0+data.height/2 );
-		//ctx.fillStyle = self.colorForPlayerLegend(1);
-		//ctx.fillText(G.counts[1]+" ", data.x0+data.width-ctx.measureText("88").width-5, data.y0+data.height/2 );
-		
-		ctx.fillStyle = self.colorForPlayerLegend(pn);
+		ctxt.font = "bold 24px CustomFont, sans-serif";
+		ctxt.fillStyle = self.colorForPlayerLegend(pn);
 		
 		var msg;
 		if (counts[0]>counts[1]) {
-			ctx.fillStyle = self.colorForPlayerLegend(0);
+			ctxt.fillStyle = self.colorForPlayerLegend(0);
 			msg = G.strings.firstVictory;
 		} else if (counts[0] < counts[1]) {
-			ctx.fillStyle = self.colorForPlayerLegend(1);
+			ctxt.fillStyle = self.colorForPlayerLegend(1);
 			msg = G.strings.secondVictory;
 		} else {
-			ctx.fillStyle = "#000000";
+			ctxt.fillStyle = "#000000";
 			msg = G.strings.tieGame;
 		}
-		var msglen = ctx.measureText(msg);
-		ctx.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
+		var msglen = ctxt.measureText(msg);
+		ctxt.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
 		
 		G.Piles[0].redrawBorder(true);
 		G.Piles[1].redrawBorder(true);
 	}
 }
 
-G.display = new G.Display();
