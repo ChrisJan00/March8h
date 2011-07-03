@@ -1,252 +1,271 @@
-// Todo:
-// log
-// AI random starter
-// variable sizes
-// more players? 3? 4?
-// different pile arrangement (i.e. 3x6 instead of 2x9)
-// in-game options: surrender, exit to menu, restart game, replay at end
-
-
-function preload() {
-	//images
-	GLOBAL.imageFire = new Image();
-	GLOBAL.imageFire.src = "graphics/fire.png";
-	GLOBAL.imageWater = new Image();
-	GLOBAL.imageWater.src = "graphics/water.png";
-	GLOBAL.imageEarth = new Image();
-	GLOBAL.imageEarth.src = "graphics/earth.png";
-	GLOBAL.imageWind = new Image();
-	GLOBAL.imageWind.src = "graphics/air.png";
-	GLOBAL.fireAnimation = new Image();
- 	GLOBAL.fireAnimation.src = "graphics/strip_fire-wind.png";
- 	GLOBAL.earthAnimation = new Image();
- 	GLOBAL.earthAnimation.src = "graphics/strip_earth-water.png";
- 	GLOBAL.waterAnimation = new Image();
- 	GLOBAL.waterAnimation.src = "graphics/strip_water-fire.png";
- 	GLOBAL.airAnimation = new Image();
- 	GLOBAL.airAnimation.src = "graphics/strip_wind-earth.png";
-}
-
-function imagesLoaded() {
-	return GLOBAL.imageFire.complete
-		&& GLOBAL.imageWater.complete 
-		&& GLOBAL.imageEarth.complete
-		&& GLOBAL.imageWind.complete
-		&& GLOBAL.fireAnimation.complete
- 		&& GLOBAL.waterAnimation.complete
- 		&& GLOBAL.earthAnimation.complete
- 		&& GLOBAL.airAnimation.complete;
-}
-
-function prepareGame()
-{ 
-	GLOBAL.gameCanvas = document.getElementById("canvas1");
-	GLOBAL.gameContext = GLOBAL.gameCanvas.getContext("2d");
-	GLOBAL.bgCanvas = document.createElement('canvas');
-	GLOBAL.bgCanvas.width = GLOBAL.gameCanvas.width;
-	GLOBAL.bgCanvas.height = GLOBAL.gameCanvas.height;
-	GLOBAL.bgContext = GLOBAL.bgCanvas.getContext("2d");
-	GLOBAL.canvasWidth = GLOBAL.gameCanvas.width;
-	GLOBAL.canvasHeight = GLOBAL.gameCanvas.height;
+G.Main = function() {
+	var self = this;
 	
-	GLOBAL.xoffset = GLOBAL.findAbsoluteX(GLOBAL.gameCanvas);
-	GLOBAL.yoffset = GLOBAL.findAbsoluteY(GLOBAL.gameCanvas);
+	self.preload = function() {
+		//images
+		G.imageFire = new Image();
+		G.imageFire.src = "graphics/fire.png";
+		G.imageWater = new Image();
+		G.imageWater.src = "graphics/water.png";
+		G.imageEarth = new Image();
+		G.imageEarth.src = "graphics/earth.png";
+		G.imageWind = new Image();
+		G.imageWind.src = "graphics/air.png";
+		G.fireAnimation = new Image();
+	 	G.fireAnimation.src = "graphics/strip_fire-wind.png";
+	 	G.earthAnimation = new Image();
+	 	G.earthAnimation.src = "graphics/strip_earth-water.png";
+	 	G.waterAnimation = new Image();
+	 	G.waterAnimation.src = "graphics/strip_water-fire.png";
+	 	G.airAnimation = new Image();
+	 	G.airAnimation.src = "graphics/strip_wind-earth.png";
+	}
 	
-	// true: don't use worker, false: use worker
-	noWorker = false;
+	self.imagesLoaded = function() {
+		return G.imageFire.complete
+			&& G.imageWater.complete 
+			&& G.imageEarth.complete
+			&& G.imageWind.complete
+			&& G.fireAnimation.complete
+	 		&& G.waterAnimation.complete
+	 		&& G.earthAnimation.complete
+	 		&& G.airAnimation.complete;
+	}
 	
-	GLOBAL.animationDelay = 250;
-	GLOBAL.framesPerStrip = 4;
+	self.prepareGame = function() {
+		G.graphicsManager = new G.GraphicsManager();
+		G.graphicsManager.init();
+		
+		// needed for the mouse events
+		G.gameCanvas = document.getElementById("canvas1");
+		
+		G.xoffset = G.findAbsoluteX(G.gameCanvas);
+		G.yoffset = G.findAbsoluteY(G.gameCanvas);
+		
+		G.animationDelay = 250;
+		G.framesPerStrip = 4;
+		
+		G.action = {
+			turn:0,
+		};
+		
+		G.pauseManager = new G.PauseManager();
+		G.display = new G.Display();
+		G.board = new G.BoardClass();
 	
-	GLOBAL.action = {
-		turn:0,
-	};
+		G.coords = {
+			text : {
+				x0: 180,
+				y0: 5,
+				width: 300,
+				height: 62
+			}
+		};
 	
-	GLOBAL.BoardInstance = new GLOBAL.BoardClass();
-
-	GLOBAL.coords = {
-		text : {
-			x0: 160,
-			y0: 15,
-			width: 300,
-			height: 52
+		G.computerEnabled = true;
+		G.computerDelay = 1000;//1500;
+		G.maximizeEntropy = false;
+		G.defenseMode = true;
+		G.computerHard = false;
+		G.computerChoice = [0,0,0];
+		
+		G.initPiles();
+		
+		G.floodCheck = new G.FloodCheck();
+		
+		// clicking on the board
+		G.mouse = {
+			x : 0,
+			y : 0,
+			button : false
+		};
+		
+		G.gameLog = new G.GameLog();
+		G.dragndrop = new G.DragNDrop();
+		G.optionsMenu = new G.OptionsMenu();
+		G.optionsMenu.init();
+		G.optionsMenu.hide();
+		G.optionsButton = new G.ClickableOption( G.graphicsManager.messagesLayer, 605, 5, 50, 25, G.strings.optionsButton, G.optionsMenu.activate );
+		G.optionsButton.fontSize = 10;
+	}
+	
+	self.restartMenu = function() {
+		self.restartGame();
+		G.menu.reloadControls();
+		G.menu.show();
+	}
+	
+	self.restartGame = function() {
+		G.pauseManager.disablePause();
+		G.action.turn = 0;
+		G.board.clearContents();
+		G.Piles[0].chooseTiles();
+		G.Piles[1].chooseTiles();
+		G.floodCheck.countMarkers();
+		G.gameLog.init();
+		self.enableTurn();
+	}
+	
+	self.drawInitialGame = function() {
+		G.graphicsManager.clearBackground();
+		G.Piles[0].drawFromScratch();
+		G.Piles[1].drawFromScratch();
+		G.board.drawEmpty();
+		G.display.showPlayer();
+		G.display.showOrder();
+		G.optionsButton.drawNormal();
+		G.gameLog.updateVisible();
+		G.graphicsManager.redraw();
+		self.enableTurn();
+	}
+	
+	self.connectMouse = function() {
+		G.gameCanvas.addEventListener('mousedown', self.mouseDown, false);
+		G.gameCanvas.addEventListener('mouseup', self.mouseRaise, false);
+		G.gameCanvas.addEventListener('mousemove', self.mouseMv, false);
+	}
+	
+	self.mouseDown = function( ev ) {
+		G.mouse.button = true;
+		
+		self.mouseMove( ev );
+		
+		
+		if (G.menu.active) {
+			G.menu.mouseDown(ev);
+			return;
 		}
-	};
-
-	GLOBAL.computerEnabled = true;
-	GLOBAL.computerDelay = 1000;//1500;
-	GLOBAL.maximizeEntropy = false;
-	GLOBAL.defenseMode = true;
-	GLOBAL.computerHard = false;
-	GLOBAL.computerChoice = [0,0,0];
-	
-	initPiles();
-	
-	GLOBAL.floodCheck = new GLOBAL.FloodCheck();
-	
-	// clicking on the board
-	GLOBAL.mouse = {
-		x : 0,
-		y : 0,
-		button : false
-	};
-	
-	GLOBAL.exitOption = new GLOBAL.ExitOption();
-	GLOBAL.gameLog = new GLOBAL.GameLog();
-	//restartGame();
-}
-
-function restartGame() {
-	GLOBAL.action.turn = 0;
-	GLOBAL.BoardInstance.clearContents();
-	GLOBAL.Piles[0].chooseTiles();
-	GLOBAL.Piles[1].chooseTiles();
-	GLOBAL.floodCheck.countMarkers();
-	GLOBAL.gameLog.init();
-	enableTurn();
-}
-
-function drawInitialGame() {
-	clearCanvas();
-	GLOBAL.Piles[0].drawFromScratch();
-	GLOBAL.Piles[1].drawFromScratch();
-	GLOBAL.BoardInstance.drawEmpty();
-	showPlayer();
-	showOrder();
-	GLOBAL.exitOption.redraw();
-	enableTurn();
-}
-
-function connectMouse() {
-	GLOBAL.gameCanvas.addEventListener('mousedown', mouseDown, false);
-}
-
-function randint(n) {
-	return Math.floor(Math.random() * n);
-}
-
-function mouseDown( ev ) {
-	GLOBAL.mouse.button = true;	
-	
-	mouseMove( ev );
-	
-	if (GLOBAL.menu.active) {
-		GLOBAL.menu.mouseDown(ev);
-		return;
-	}
 		
-	
-	GLOBAL.exitOption.clicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
-	
-	if (!GLOBAL.turnEnabled)
-		return;
-	
-	if (GLOBAL.action.turn == -1) {
-		restartGame();
-		drawInitialGame();
-		return;
+		if (G.pauseManager.paused) {
+			G.pauseManager.disablePause();
+			G.optionsMenu.hide();
+			return;
+		}
+		
+		G.optionsButton.managePressed(G.mouse.x, G.mouse.y );
+		
+		if (!G.turnEnabled)
+			return;
+			
+		
+		if (G.action.turn == -1) {
+			self.restartGame();
+			self.drawInitialGame();
+			return;
+		}
+		
+		if (G.action.turn==0 || !G.computerEnabled)
+			self.manageTurn();
 	}
 	
-	if (GLOBAL.action.turn==0 || !GLOBAL.computerEnabled)
-		manageTurn();
-	
-}
-
-function enableTurn()
-{
-	GLOBAL.turnEnabled = true;
-	GLOBAL.turnDelay = 0;
-	GLOBAL.exitOption.activate();
-	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		if (GLOBAL.computerHard) {
-			// wait for the worker message
-			//manageTurn(); // don't wait for now
-		} else
-			setTimeout(manageTurn, GLOBAL.computerDelay);
+	self.mouseRaise = function( ev ) {	
+		if (G.pauseManager.paused)
+			return;
+		self.mouseMove( ev );
+		if (G.menu.active) {
+			G.menu.mouseUp(ev);
+			return;
+		}
+		G.optionsButton.manageReleased( G.mouse.x, G.mouse.y );
 	}
-}
-
-function disableTurn()
-{
-	GLOBAL.turnEnabled = false;
-}
-
-function manageTurn()
-{
-	var turnIsReady = false;
-	GLOBAL.turnDelay = 0;
-		
 	
-	if (GLOBAL.computerEnabled && GLOBAL.action.turn == 1) {
-		GLOBAL.computerChoice = computerPlay();
-		var c = GLOBAL.computerChoice;
-		turnIsReady = computerMove(c[0],c[1],c[2], 1);
-	} else {
-		if (GLOBAL.Piles[0].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
-			GLOBAL.Piles[0].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
-		else if (GLOBAL.Piles[1].isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
-			GLOBAL.Piles[1].manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
-		else if (GLOBAL.BoardInstance.isClicked(GLOBAL.mouse.x, GLOBAL.mouse.y))
-	 		turnIsReady = GLOBAL.BoardInstance.manageClicked(GLOBAL.mouse.x, GLOBAL.mouse.y);
- 	}
- 		
- 	if (turnIsReady) {	
- 		GLOBAL.floodCheck.board = GLOBAL.BoardInstance;
- 		GLOBAL.floodCheck.countMarkers();
-		GLOBAL.action.turn = 1-GLOBAL.action.turn;
+	self.mouseMv = function( ev ) {
+		if (G.pauseManager.paused)
+			return;
+		self.mouseMove( ev );
+		if (G.menu.active) {
+			G.menu.mouseMove(ev);
+			return;
+		}
+		G.optionsButton.manageHover( G.mouse.x, G.mouse.y );
+	}
+	
+	self.enableTurn = function()
+	{
+		G.turnEnabled = true;
+		G.turnDelay = 0;
 		
-		if (GLOBAL.BoardInstance.stoneCount < GLOBAL.BoardInstance.maxStones) {
-			showPlayer();
+		G.Piles[0].redrawBorder(G.action.turn == 0);
+		G.Piles[1].redrawBorder(G.action.turn == 1);
+		
+		if (G.computerEnabled && G.action.turn == 1) {
+				setTimeout(self.manageTurn, G.computerDelay);
+		}
+	}
+	
+	self.disableTurn = function()
+	{
+		G.turnEnabled = false;
+	}
+	
+	self.manageTurn = function()
+	{
+		var turnIsReady = false;
+		G.turnDelay = 0;
+			
+		
+		if (G.computerEnabled && G.action.turn == 1) {
+			G.computerChoice = G.computerPlay();
+			var c = G.computerChoice;
+			turnIsReady = G.computerMove(c[0],c[1],c[2], 1);
 		} else {
-			checkVictory();
+			if (G.Piles[0].isClicked(G.mouse.x, G.mouse.y))
+				G.Piles[0].manageClicked(G.mouse.x, G.mouse.y);
+			else if (G.Piles[1].isClicked(G.mouse.x, G.mouse.y))
+				G.Piles[1].manageClicked(G.mouse.x, G.mouse.y);
+			else if (G.board.isClicked(G.mouse.x, G.mouse.y))
+		 		turnIsReady = G.board.manageClicked(G.mouse.x, G.mouse.y);
+	 	}
+	 		
+	 	if (turnIsReady) {	
+	 		G.floodCheck.board = G.board;
+	 		G.floodCheck.countMarkers();
+			G.action.turn = 1-G.action.turn;
+			
+			if (G.board.stoneCount < G.board.maxStones) {
+				 G.display.showPlayer();
+			} else {
+				 G.display.checkVictory();
+			}
+		}
+		
+		if (G.turnDelay>0) {
+			self.disableTurn();
+			setTimeout(self.enableTurn, G.turnDelay);
 		}
 	}
 	
-	if (GLOBAL.turnDelay>0) {
-		disableTurn();
-		setTimeout(enableTurn, GLOBAL.turnDelay);
+	self.mouseUp = function( ev ) {
+		G.mouse.button = false;
 	}
-}
-
-function mouseUp( ev ) {
-	GLOBAL.mouse.button = false;
-}
-
-function mouseMove( ev ) {
-	if (ev.layerX || ev.layerX == 0) { // Firefox
-    	GLOBAL.mouse.x = ev.layerX - GLOBAL.xoffset;
-    	GLOBAL.mouse.y = ev.layerY - GLOBAL.yoffset;
-  } else if (ev.offsetX || ev.offsetX == 0) { // Opera
-    	GLOBAL.mouse.x = ev.offsetX - GLOBAL.xoffset;
-    	GLOBAL.mouse.y = ev.offsetY - GLOBAL.yoffset;
-  }
-
-}
-
-function clearCanvas() {
-	GLOBAL.gameContext.fillStyle = "#FFFFFF";
-	GLOBAL.gameContext.fillRect(0, 0, GLOBAL.gameCanvas.width, GLOBAL.gameCanvas.height);
 	
-}
-
-function startGame()
-{
-	preload();
-	setTimeout(waitForImages, 500);
-}
-
-function waitForImages()
-{
-	if (!imagesLoaded())
-		setTimeout(waitForImages, 500);
-	else {
-		prepareGame();
-		//restartGame();
-		connectMouse();
-		GLOBAL.menu = new GLOBAL.GameMenu();
-		GLOBAL.menu.create();
-		GLOBAL.menu.show();
-		//drawInitialGame();
-		//connectMouse();
+	self.mouseMove = function( ev ) {
+		if (ev.layerX || ev.layerX == 0) { // Firefox
+	    	G.mouse.x = ev.layerX - G.xoffset;
+	    	G.mouse.y = ev.layerY - G.yoffset;
+	  } else if (ev.offsetX || ev.offsetX == 0) { // Opera
+	    	G.mouse.x = ev.offsetX;
+	    	G.mouse.y = ev.offsetY;
+	  }
+	
+	}
+	
+	self.startGame = function()
+	{
+		self.preload();
+		setTimeout(self.waitForImages, 500);
+	}
+	
+	self.waitForImages = function()
+	{
+		if (!self.imagesLoaded())
+			setTimeout(self.waitForImages, 500);
+		else {
+			self.prepareGame();
+			self.connectMouse();
+			G.menu = new G.GameMenu();
+			G.menu.create();
+			G.menu.show();
+		}
 	}
 }

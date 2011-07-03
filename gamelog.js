@@ -1,4 +1,4 @@
-GLOBAL.GameLog = function() {
+G.GameLog = function() {
 	var self = this;
 	self.moves = [];
 	self.index = 0;
@@ -11,12 +11,47 @@ GLOBAL.GameLog = function() {
 		self.output = document.getElementById("logWindow");
 		self.output.innerHTML = "";
 	}
-
+	
+	self.visible = false;
+	self.show = function() {
+		self.visible = true;
+		document.getElementById("logContainer").style.visibility = "visible";
+		document.getElementById("logWindow").style.visibility = "visible";
+	}
+	
+	self.hide = function() {
+		self.visible = false;
+		document.getElementById("logContainer").style.visibility = "hidden";
+		document.getElementById("logWindow").style.visibility = "hidden";
+	}
+	
+	self.toggle = function() {
+		if (self.visible)
+			self.hide();
+		else
+			self.show();
+	}
+	
+	self.updateVisible = function()
+	{
+		if (self.visible)
+			self.show();
+		else
+			self.hide();	
+	}
+	
+	self.unDisplay = function()
+	{
+		document.getElementById("logContainer").style.visibility = "hidden";
+		document.getElementById("logWindow").style.visibility = "hidden";
+		
+	}
+	
 	self.print = function(_who, text) 
 	{
 		self.lineCount++;
-		//var paragraphStart = "<p style=\"font-weight:bold; font-family:sans-serif; color:"+colorForPlayer(_who)+"\">";
-		var paragraphStart = "<span style=\"font-family:sans-serif; color:"+colorForPlayer(_who)+"\">";
+		//var paragraphStart = "<p style=\"font-weight:bold; font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
+		var paragraphStart = "<span style=\"font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
 		var paragraphEnd = "<br></span>";
 		self.outputString = paragraphStart + text + paragraphEnd + self.outputString;
 		
@@ -29,28 +64,28 @@ GLOBAL.GameLog = function() {
 	self.elementName = function(_element) 
 	{
 		switch (_element) {
-			case 0: return "fire"; break;
-			case 1: return "earth"; break;
-			case 2: return "water"; break;
-			case 3: return "wind"; break;
+			case 0: return G.strings.fireName; break;
+			case 1: return G.strings.earthName; break;
+			case 2: return G.strings.waterName; break;
+			case 3: return G.strings.airName; break;
 		}
 	}
 	
 	self.verb = function(_element)
 	{
 		switch (_element) {
-			case 0: return "burns"; break;
-			case 1: return "dries"; break;
-			case 2: return "extinguishes"; break;
-			case 3: return "blows"; break;
+			case 0: return G.strings.fireAttack; break;
+			case 1: return G.strings.earthAttack; break;
+			case 2: return G.strings.waterAttack; break;
+			case 3: return G.strings.airAttack; break;
 		}
 	}
 	
 	self.playerName = function(_who)
 	{
-		if (_who==1 && GLOBAL.computerEnabled)
-			return "computer";
-		return _who?"orange":"purple";
+		if (_who==1 && G.computerEnabled)
+			return G.strings.computerPlayerName;
+		return _who?G.strings.secondPlayerName:G.strings.firstPlayerName;
 	}
 	
 	self.registerMove = function(_who, _stone, _fromPosition) 
@@ -58,7 +93,7 @@ GLOBAL.GameLog = function() {
 		var playerName = self.playerName(_who);
 		var elementName = self.elementName(_stone.element);
 		var turnNumber = self.index + 1;
-		var playString = playerName+" played "+elementName+" at ("+_stone.ix+", "+_stone.iy+")";
+		var playString = playerName+" "+G.strings.playAction+" "+elementName+" "+G.strings.prePosition+" ("+_stone.ix+", "+_stone.iy+")";
 		
 		self.moves[self.index] = {
 			who: _who,
@@ -73,12 +108,16 @@ GLOBAL.GameLog = function() {
 		self.outputString = "</div>";
 		self.countChanges(_stone);
 		self.print(_who, playString);
-		self.outputString = "<span style=\"font-family:sans-serif\">" + turnNumber + ". " + "</span>" + self.outputString;
+		self.outputString = "<span style=\"font-family:CustomFont, sans-serif\">" + turnNumber + ". " + "</span>" + self.outputString;
 		self.outputString = "<div id=\"turn" + turnNumber + "\">" + self.outputString;
 		
 		self.output.innerHTML = self.outputString + self.output.innerHTML;
 		
 		self.index++;
+		
+		// force end of memory here
+		if (self.moves.length > self.index)
+			self.moves.splice(self.index, self.moves.length - self.index + 1);
 	}
 	
 	self.showResult = function(_who, stoneFrom, stoneTo, stoneCount) 
@@ -90,13 +129,11 @@ GLOBAL.GameLog = function() {
 		var verb = self.verb(stoneFrom.element);
 
 		var playString = "<span style=\"padding-left:40px\">" 
-		+ attackerName + "'s " + attackerElement + " " + verb + " "
-		+ stoneCount + " " + defenderName + "'s " + defenderElement + (stoneCount>1?"s":"")
+		+ attackerName + G.strings.possessive + " " + attackerElement + " " + verb + " "
+		+ stoneCount + " " + defenderName + G.strings.possessive + " " + defenderElement + (stoneCount>1?G.strings.plural:"")
 		+ "</span>";
 		 
 		self.print(_who, playString);
-		
-		// todo: register that in moves
 	}
 	
 	self.copyStone = function(stone) {
@@ -116,19 +153,19 @@ GLOBAL.GameLog = function() {
 	}
 	
 	self.countChanges = function(stone) {
-		GLOBAL.floodCheck.board = GLOBAL.BoardInstance;
-		var attackList = GLOBAL.floodCheck.findAttacks(stone.ix,stone.iy,stone);
-		var defenseList = GLOBAL.floodCheck.findDefender(stone.ix,stone.iy,stone);
+		G.floodCheck.board = G.board;
+		var attackList = G.floodCheck.findAttacks(stone.ix,stone.iy,stone);
+		var defenseList = G.floodCheck.findDefender(stone.ix,stone.iy,stone);
 		var attackCount = attackList.length;
 		var defenseCount = defenseList?1:0;
 		
-		if (GLOBAL.defenseMode) {
+		if (G.defenseMode) {
 			if (defenseCount > 0) {
 				self.moves[self.index].defense = self.copyStone(defenseList);
-				GLOBAL.gameLog.showResult(
-					GLOBAL.action.turn, 
+				G.gameLog.showResult(
+					G.action.turn, 
 					{
-						element: GLOBAL.floodCheck.colorThatWins(stone.element),
+						element: G.floodCheck.colorThatWins(stone.element),
 						owner : 1-stone.owner,
 					}, 
 					stone,
@@ -137,11 +174,11 @@ GLOBAL.GameLog = function() {
 			else
 			if (attackCount > 0) {
 				self.moves[self.index].attack = self.copyList(attackList);
-				GLOBAL.gameLog.showResult(
-					GLOBAL.action.turn, 
+				G.gameLog.showResult(
+					G.action.turn, 
 					stone,
 					{
-						element: GLOBAL.floodCheck.colorWonBy(stone.element),
+						element: G.floodCheck.colorWonBy(stone.element),
 						owner : 1-stone.owner
 					}, 
 					attackCount );
@@ -149,21 +186,21 @@ GLOBAL.GameLog = function() {
 		} else {
 			if (attackCount > 0) {
 				self.moves[self.index].attack = self.copyList(attackList);
-				GLOBAL.gameLog.showResult(
-					GLOBAL.action.turn, 
+				G.gameLog.showResult(
+					G.action.turn, 
 					stone,
 					{
-						element: GLOBAL.floodCheck.colorWonBy(stone.element),
+						element: G.floodCheck.colorWonBy(stone.element),
 						owner : 1-stone.owner
 					}, 
 					attackCount );
 			}
 			if (defenseCount > 0) {
 				self.moves[self.index].defense = self.copyStone(defenseList);
-				GLOBAL.gameLog.showResult(
-					GLOBAL.action.turn, 
+				G.gameLog.showResult(
+					G.action.turn, 
 					{
-						element: GLOBAL.floodCheck.colorThatWins(stone.element),
+						element: G.floodCheck.colorThatWins(stone.element),
 						owner : 1-stone.owner
 					}, 
 					stone,
@@ -176,9 +213,9 @@ GLOBAL.GameLog = function() {
 		var defenseItem = self.moves[self.index].defense;
 		var attackList = self.moves[self.index].attack;
 		
-		if (GLOBAL.defenseMode) {
+		if (G.defenseMode) {
 			if (defenseItem) {
-				GLOBAL.gameLog.showResult(
+				G.gameLog.showResult(
 					self.moves[self.index].who, 
 					{
 						element: defenseItem.element,
@@ -192,7 +229,7 @@ GLOBAL.GameLog = function() {
 			}
 			else
 			if (attackList) {
-				GLOBAL.gameLog.showResult(
+				G.gameLog.showResult(
 					self.moves[self.index].who, 
 					{
 						element: self.moves[self.index].element,
@@ -206,7 +243,7 @@ GLOBAL.GameLog = function() {
 			}
 		} else {
 			if (attackList) {
-				GLOBAL.gameLog.showResult(
+				G.gameLog.showResult(
 					self.moves[self.index].who, 
 					{
 						element: self.moves[self.index].element,
@@ -219,7 +256,7 @@ GLOBAL.GameLog = function() {
 					attackList.length );
 			}
 			if (defenseItem) {
-				GLOBAL.gameLog.showResult(
+				G.gameLog.showResult(
 					self.moves[self.index].who, 
 					{
 						element: defenseItem.element,
@@ -238,9 +275,11 @@ GLOBAL.GameLog = function() {
 	{
 		if (self.index==0)
 			return;
-			
+		
+		G.pauseManager.enablePause();
+		
 		// undo the changes from the last move
-		var turnName = "turn" + self.index;
+		var turnName = G.strings.turn + self.index;
 		var turnSpan = document.getElementById(turnName);
 		var container = document.getElementById("logWindow");
 		container.removeChild(turnSpan);
@@ -254,16 +293,18 @@ GLOBAL.GameLog = function() {
 		if (self.index >= self.moves.length)
 			return;
 		
+		G.pauseManager.enablePause();
+		
 		var _who = self.moves[self.index].who;
 		var playerName = self.playerName(_who);
 		var elementName = self.elementName(self.moves[self.index].element);
 		var turnNumber = self.index + 1;
-		var playString = playerName+" played "+elementName+" at ("+self.moves[self.index].x+", "+self.moves[self.index].y+")";
+		var playString = playerName+" " + G.strings.playAction +" "+elementName+" "+G.strings.prePosition+" ("+self.moves[self.index].x+", "+self.moves[self.index].y+")";
 		
 		self.outputString = "</div>";
 		self.tellChanges();
 		self.print(_who, playString);
-		self.outputString = "<span style=\"font-family:sans-serif\">" + turnNumber + ". " + "</span>" + self.outputString;
+		self.outputString = "<span style=\"font-family:CustomFont, sans-serif\">" + turnNumber + ". " + "</span>" + self.outputString;
 		self.outputString = "<div id=\"turn" + turnNumber + "\">" + self.outputString;
 		
 		self.output.innerHTML = self.outputString + self.output.innerHTML;
@@ -276,7 +317,7 @@ GLOBAL.GameLog = function() {
 	{
 		var move = self.moves[self.index-1];
 		// repaint stone in pile
-		var currentPile = GLOBAL.Piles[move.who];
+		var currentPile = G.Piles[move.who];
 		var pileX = Math.floor(move.pileIndex/currentPile.rows);
 		var pileY = move.pileIndex % currentPile.rows;
 		currentPile[pileX][pileY] = {
@@ -289,29 +330,36 @@ GLOBAL.GameLog = function() {
 			selected : false,
 			active : false
 		}
+		currentPile.selection = null;
+		currentPile.redrawBorder( true );
 		currentPile.redrawTile(pileX, pileY);
+		currentPile.redrawBorder( false );
 		
 		// delete stone from board
-		GLOBAL.BoardInstance[move.x][move.y] = null;
-		GLOBAL.BoardInstance.redrawTile(move.x,move.y);
+		G.board[move.x][move.y] = null;
+		G.board.redrawTile(move.x,move.y);
+		G.board.refreshTileBordersExpansive(move.x, move.y);
+		G.board.stoneCount--;
 		
 		// undo attacks
 		if (move.attack)
 			for (var i=0;i<move.attack.length; i++) {
 				var x = move.attack[i].ix;
 				var y = move.attack[i].iy;
-				var dest = GLOBAL.BoardInstance[x][y];
+				var dest = G.board[x][y];
 				dest.owner = move.attack[i].owner;
 				dest.element = move.attack[i].element;
-				dest.bgColor = colorForPlayer(dest.owner);
-				GLOBAL.BoardInstance.redrawTile(x,y);
+				dest.bgColor = G.display.colorForPlayer(dest.owner);
+				G.board.redrawTile(x,y);
 			}
 			
 		// change the turn
-		GLOBAL.floodCheck.board = GLOBAL.BoardInstance;
- 		GLOBAL.floodCheck.countMarkers();
-		GLOBAL.action.turn = move.who;
-		showPlayer();
+		G.floodCheck.board = G.board;
+ 		G.floodCheck.countMarkers();
+		G.action.turn = move.who;
+		G.display.showPlayer();
+		G.graphicsManager.redraw();
+		//enableTurn();
 	}
 	
 	self.reapply = function()
@@ -320,49 +368,60 @@ GLOBAL.GameLog = function() {
 		var _owner = move.who;
 
 		// delete stone from pile
-		var currentPile = GLOBAL.Piles[_owner];
+		var currentPile = G.Piles[_owner];
 		var pileX = Math.floor(move.pileIndex/currentPile.rows);
 		var pileY = move.pileIndex % currentPile.rows;
 		
+		currentPile.selection = null;
 		currentPile.del(pileX, pileY);
 		currentPile.redrawTile(pileX, pileY);
 		
 		// move stone to board
-		GLOBAL.BoardInstance[move.x][move.y] = {
+		G.board[move.x][move.y] = {
 			ix : move.x,
 			iy : move.y,
 			owner : _owner,
 			element : move.element,
-			bgColor : colorForPlayer(_owner),
+			bgColor : G.display.colorForPlayer(_owner),
 			visible : true,
 			selected : false,
 			active : true,
 		};
-		GLOBAL.BoardInstance.redrawTile(move.x, move.y);
+		G.board.redrawTile(move.x, move.y);
+		G.board.stoneCount++;
 		
 		if (move.attack)
 			for (var i=0;i<move.attack.length; i++) {
 				var x = move.attack[i].ix;
 				var y = move.attack[i].iy;
-				var dest = GLOBAL.BoardInstance[x][y];
+				var dest = G.board[x][y];
 				dest.owner = _owner;
 				dest.element = move.element;
-				dest.bgColor = colorForPlayer(_owner);
-				GLOBAL.BoardInstance.redrawTile(x,y);
+				dest.bgColor = G.display.colorForPlayer(_owner);
+				G.board.redrawTile(x,y);
 			}
 			
 		if (move.defense) {
-			var dest = GLOBAL.BoardInstance[move.x][move.y];
+			var dest = G.board[move.x][move.y];
 			dest.owner = move.defense.owner;
 			dest.element = move.defense.element;
-			dest.bgColor = colorForPlayer(move.defense.owner);
-			GLOBAL.BoardInstance.redrawTile(move.x, move.y);
+			dest.bgColor = G.display.colorForPlayer(move.defense.owner);
+			G.board.redrawTile(move.x, move.y);
 		}
 		
-		GLOBAL.floodCheck.board = GLOBAL.BoardInstance;
- 		GLOBAL.floodCheck.countMarkers();
-		GLOBAL.action.turn = 1-_owner;
-		showPlayer();
+		G.floodCheck.board = G.board;
+ 		G.floodCheck.countMarkers();
+		G.action.turn = 1-_owner;
+		
+		if (G.board.stoneCount < G.board.maxStones) {
+			G.display.showPlayer();
+		} else {
+			G.display.checkVictory();
+		}
+		
+		G.graphicsManager.redraw();
+		
+		// enableTurn();
 	}
 	// todo: replay
 }

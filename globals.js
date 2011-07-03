@@ -1,6 +1,6 @@
-var GLOBAL = {}
+var G = {}
 
-GLOBAL.findAbsoluteX = function(object) {
+G.findAbsoluteX = function(object) {
 	var x = 0;
 	while (object) {
 		x += object.offsetLeft;
@@ -9,7 +9,7 @@ GLOBAL.findAbsoluteX = function(object) {
 	return x;
 }
 
-GLOBAL.findAbsoluteY = function(object) {
+G.findAbsoluteY = function(object) {
 	var y = 0;
 	while(object) {
 		y += object.offsetTop;
@@ -17,3 +17,7 @@ GLOBAL.findAbsoluteY = function(object) {
 	}
 	return y;
 }
+
+G.randint = function(n) {
+		return Math.floor(Math.random() * n);
+	}
