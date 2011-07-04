@@ -30,6 +30,7 @@ G.StoneHolder.prototype = {
 		if (this.holes)
 			this.stoneCount -= this.holes.length;
 		this.holes = [[2,0], [5,2], [3,5], [0,3], [3,2], [2,3]];
+		//this.holes = [[3,1], [4,3], [2,4], [1,2]];
 		this.stonecount += this.holes.length;
 	},
 	
