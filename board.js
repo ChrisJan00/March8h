@@ -26,6 +26,13 @@ G.StoneHolder.prototype = {
 		this.clearContents();
 	},
 	
+	addHoles : function() {
+		if (this.holes)
+			this.stoneCount -= this.holes.length;
+		this.holes = [[2,0], [5,2], [3,5], [0,3], [3,2], [2,3]];
+		this.stonecount += this.holes.length;
+	},
+	
 	cellColor : function(ind) {
 		return ind? G.colors.boardBgLight : G.colors.boardBgDark;
 	},
@@ -65,8 +72,69 @@ G.StoneHolder.prototype = {
 			ctxt.fillRect(self.x0 + x*self.side, self.y0 + y*self.side, self.side, self.side);
 		}
 		
+		self.drawHoles( ctxt );	
 		G.graphicsManager.mark(self.x0 - bw, self.y0 - bw, self.width + bw*2, self.height + bw*2);
 		//G.graphicsManager.redraw();
+	},
+	
+	drawHoles : function( ctxt ) {
+		var self = this;
+		if (!self.holes)
+			return;
+			
+		// holes
+		for (var ii=0; ii<self.holes.length; ii++) {
+			var hx = self.x0 + self.holes[ii][0] * self.side;
+			var hy = self.y0 + self.holes[ii][1] * self.side;
+			ctxt.fillStyle = G.colors.white;
+			ctxt.fillRect(hx, hy, self.side, self.side);
+			
+			// left
+			if (self.holes[ii][0] > 0) {
+				ctxt.strokeStyle = self.borderColor(1);
+				ctxt.beginPath();
+				ctxt.moveTo(hx, hy);
+				ctxt.lineTo(hx, hy+self.side);
+				ctxt.stroke();
+			} else {
+				ctxt.fillRect(hx-2, hy, 2, self.side);
+			}
+			
+			// right
+			if (self.holes[ii][0] < self.cols - 1) {
+				ctxt.strokeStyle = self.borderColor(0);
+				ctxt.beginPath();
+				ctxt.moveTo(hx + self.side, hy);
+				ctxt.lineTo(hx + self.side, hy+self.side);
+				ctxt.stroke();
+			} else {
+				ctxt.fillRect(hx + self.side, hy, 2, self.side);
+			}
+			
+			// up
+			if (self.holes[ii][1] > 0) {
+				ctxt.strokeStyle = self.borderColor(1);
+				ctxt.beginPath();
+				ctxt.moveTo(hx, hy);
+				ctxt.lineTo(hx+self.side, hy);
+				ctxt.stroke();
+			} else {
+				ctxt.fillRect(hx, hy-2, self.side, 2);
+			}
+			
+			// down
+			if (self.holes[ii][1] < self.rows - 1) {
+				ctxt.strokeStyle = self.borderColor(0);
+				ctxt.beginPath();
+				ctxt.moveTo(hx, hy  + self.side);
+				ctxt.lineTo(hx + self.side, hy+self.side);
+				ctxt.stroke();
+			} else {
+				ctxt.fillRect(hx, hy + self.side, self.side, 2);
+			}
+			
+			G.graphicsManager.mark(hx-2, hy-2, self.side+4, self.side+4);
+		}
 	},
 	
 	drawAllTiles : function() {
@@ -336,6 +404,9 @@ G.StoneHolder.prototype = {
 		for (var i=0;i<self.cols;i++)
 			self[i] = [];
 		self.stoneCount = 0;
+
+		if (self.holes)
+			self.stoneCount = self.stoneCount + self.holes.length;
 	},
 	
 	isClicked : function( mouseX, mouseY ) {
@@ -349,12 +420,22 @@ G.StoneHolder.prototype = {
 		var x = Math.floor((mouseX - self.x0)/self.side);
 		var y = Math.floor((mouseY - self.y0)/self.side);
 		return [ x , y ];
-	}
+	},
+	
+	hasHole : function( ix, iy ) {
+		if (this.holes) {
+			for (var ii=0; ii<this.holes.length; ii++)
+				if (this.holes[ii][0]==ix && this.holes[ii][1]==iy)
+					return true;
+		}
+		return false;
+	},
 	
 }
 
 G.BoardClass = function() {
 	this.setDimensions(6,6, 180, 70);
+	this.addHoles();
 }
 G.BoardClass.prototype = new G.StoneHolder;
 
@@ -370,6 +451,10 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	if (this[mix][miy])
 		return false;
 		
+	// is it a hole?
+	if (this.hasHole(mix, miy))
+		return false;
+			
 	// no selection?
 	var stone = currentPile.selection;
 	if (!stone)

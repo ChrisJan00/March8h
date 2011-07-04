@@ -84,11 +84,18 @@ G.PileClass.prototype.chooseTiles = function( )
 {
 	this.clearContents();
 	this.prefill();
+	
+	var totalHoles = G.board.holes? G.board.holes.length/2 : 0;
+	var holeCount = totalHoles;
+	// two tiles of each element already set
+	var tileCount = 2*4;
+	
 	for (var x=0; x<this.cols; x++)
 		for (var y=0; y<this.rows; y++)
 		{
 			if (this[x][y])
 				continue;
+			tileCount++;
 			var st = {
 				ix : x,
 				iy : y,
@@ -103,6 +110,13 @@ G.PileClass.prototype.chooseTiles = function( )
 			st.owner = this.owner;
 			
 			this.set(x,y,st);
+			// holes
+			if (holeCount > 0 && (tileCount >= this.cols*this.rows-holeCount ||
+				G.randint(Math.floor(this.cols * this.rows / (totalHoles+1)))==0)) {
+					this.del(x,y);
+					holeCount--;
+				}
+			
 		}
 }
 
@@ -175,7 +189,6 @@ G.initPiles = function()
 	G.Piles[1].borderColor = function(ind) {
 		return ind? G.colors.orangeBorderDark : G.colors.orangeBorderLight;
 	}
-	
 }
 
 G.countPiles = function() {

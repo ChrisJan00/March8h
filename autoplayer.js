@@ -32,6 +32,8 @@ G.computerPlay = function() {
 			for (var iy=0;iy<G.board.rows;iy++) {
 				if (G.board[ix][iy])
 					continue;
+				if (G.board.hasHole(ix,iy))
+					continue;
 				for (var color=0;color<4;color++) {
 					var score = 0;
 					if (self.typeCount[color]<=0)
