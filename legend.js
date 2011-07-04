@@ -143,6 +143,9 @@ G.Display = function() {
 		var msglen = ctxt.measureText(msg);
 		ctxt.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
 		
+		self.showPlayerScore(0);
+		self.showPlayerScore(1);
+		
 		G.Piles[0].redrawBorder(true);
 		G.Piles[1].redrawBorder(true);
 	}
