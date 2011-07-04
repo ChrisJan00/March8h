@@ -199,6 +199,7 @@ G.StoneHolder.prototype = {
 				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
 			ctxt.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
 
+			G.graphicsManager.mark(ix, iy, this.side, this.side);
 		}
 	},	
 	startTileBlinking : function(x,y) 
@@ -257,7 +258,9 @@ G.StoneHolder.prototype = {
 	 	if (frame<G.framesPerStrip-1) {
 	 		setTimeout(function(){self.animateTile(x, y, frame+1)}, G.animationDelay);
 	 	} else {
-	 		setTimeout(function(){self.redrawTile(stone.ix, stone.iy);G.graphicsManager.redraw();}, G.animationDelay);
+	 		setTimeout(function(){
+	 			self.redrawTile(stone.ix, stone.iy);
+	 			G.graphicsManager.redraw();}, G.animationDelay);
 	 	}
 	},
 	
