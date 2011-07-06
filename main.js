@@ -95,7 +95,7 @@ G.Main = function() {
 	
 	self.restartGame = function() {
 		G.pauseManager.disablePause();
-		G.turn = 0;
+		G.turn = G.randint(2);
 		G.board.clearContents();
 		G.Piles[0].chooseTiles();
 		G.Piles[1].chooseTiles();
