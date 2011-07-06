@@ -140,17 +140,12 @@ G.StoneHolder.prototype = {
 	drawAllTiles : function() {
 		var self = this;
 		for (var x=0;x<self.cols;x++)
-			for (var y=0;y<self.rows;y++)
+			for (var y=0;y<self.rows;y++) {
+				if (self.hasHole(x,y))
+					continue;
 				self.redrawTile(x,y);
+			}
 		//this.refreshAllTileBorders();
-	},
-	
-	redrawAllTilesThatExist : function() {
-		var self = this;
-		for (var x=0;x<self.cols;x++)
-			for (var y=0;y<self.rows;y++)
-				if (self[x][y])
-					self.redrawTile(x,y);
 	},
 	
 	redrawTileBackground : function(x,y, col) {

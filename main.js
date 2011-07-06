@@ -113,7 +113,7 @@ G.Main = function() {
 		G.Piles[0].drawFromScratch();
 		G.Piles[1].drawFromScratch();
 		G.board.drawEmpty();
-		G.board.redrawAllTilesThatExist();
+		G.board.drawAllTiles();
 		G.display.showPlayer();
 		G.display.showOrder();
 		G.optionsButton.drawNormal();
