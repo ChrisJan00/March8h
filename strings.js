@@ -1,5 +1,5 @@
 G.strings = {
-	gameTitle : "elementis",
+	gameTitle : "ELEMENTIS",
 	firstPlayerName : "purple",
 	secondPlayerName : "orange",
 	computerPlayerName : "computer",
