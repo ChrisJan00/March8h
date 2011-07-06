@@ -2,19 +2,35 @@ G.Display = function() {
 	var self = this;
 	
 	self.colorForPlayer = function(pn) {
-		return pn? G.colors.orange : G.colors.purple;
+		switch(pn) {
+			case -1: return G.colors.grey;
+			case 0: return G.colors.purple;
+			case 1: return G.colors.orange;
+		}
 	}
 	
 	self.colorForPlayerBorder = function(pn) {
-		return pn? G.colors.orangeBorder : G.colors.purpleBorder;
+		switch(pn) {
+			case -1: return G.colors.greyBorder;
+			case 0: return G.colors.purpleBorder;
+			case 1: return G.colors.orangeBorder;
+		}
 	}
 	
 	self.colorForPlayerBlink = function(pn) {
-		return pn? G.colors.orangeHighlight : G.colors.purpleHighlight;
+		switch(pn) {
+			case -1: return G.colors.greyHighLight;
+			case 0: return G.colors.purpleHighLight;
+			case 1: return G.colors.orangeHighLight;
+		}
 	}
 	
 	self.colorForPlayerBackground = function(pn) {
-		return pn? G.colors.orangeBackground : G.colors.purpleBackground;
+		switch(pn) {
+			case -1: return G.colors.greyBackground;
+			case 0: return G.colors.purpleBackground;
+			case 1: return G.colors.orangeBackground;
+		}
 	}
 	
 	self.showPlayerScore = function(pn) {

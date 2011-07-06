@@ -49,5 +49,8 @@ G.colors = {
 	orangeHighlight : "#ff5400",
 	orangeBackground : "#ffe9ce",
 
-	
+	grey : "#CCCCCC",
+	greyBorder : "#AAAAAA",
+	greyHighLight: "#777777",
+	greyBackground: "#EEEEEE"
 }

@@ -145,6 +145,14 @@ G.StoneHolder.prototype = {
 		//this.refreshAllTileBorders();
 	},
 	
+	redrawAllTilesThatExist : function() {
+		var self = this;
+		for (var x=0;x<self.cols;x++)
+			for (var y=0;y<self.rows;y++)
+				if (self[x][y])
+					self.redrawTile(x,y);
+	},
+	
 	redrawTileBackground : function(x,y, col) {
 		var color = this.cellColor((x+y)%2);
 		if (this[x][y] && this[x][y].active)
@@ -433,13 +441,6 @@ G.StoneHolder.prototype = {
 	
 	holeCount : function() {
 		return this.holes?this.holes.length:0;
-	},
-	
-	excessTiles : function() {
-		// total tiles
-		var totalTiles = this.rows * this.columns - this.holecount();
-		var tilesPerPlayer = Math.floor(totalTiles / G.playerCount);
-		return totalTiles - tilesPerPlayer * G.playerCount;
 	}
 }
 
@@ -491,6 +492,34 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	return true;
 }
 
+G.BoardClass.prototype.excessTiles = function() {
+		var totalTiles = this.rows * this.cols - this.holeCount();
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerCount);
+		return totalTiles - tilesPerPlayer * G.playerCount;
+}
+
+G.BoardClass.prototype.putExcessTiles = function() {
+	for (var ii=0; ii<this.excessTiles(); ii++) {
+		var x,y;
+		do {
+			x = G.randint(this.cols);
+			y = G.randint(this.rows);
+		} while (this.hasHole(x,y) || this[x][y]);
+		var elem = G.randint(4);
+		var st = {
+				ix : x,
+				iy : y,
+				bgColor : G.colors.white,
+				visible: true,
+				selected: false,
+				element: elem,
+				owner : -1,
+				active : true
+		};
+		this.set(x,y,st);
+	}
+}
+	
 // boards
 G.BoardClass.prototype.set4x4 = function() {
 	this.setDimensions(4, 4, 180, 70);

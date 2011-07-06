@@ -39,7 +39,7 @@ G.FloodCheck = function() {
 	self.findDefender = function(ix, iy, fakeStone) {
 		function getDefender(x,y) {
 			var candidate = self.board[x]?self.board[x][y]:null;
-			if (candidate && candidate.owner == ownerWanted && candidate.element == elemWanted)
+			if (candidate && candidate.owner != ownerAttacked && candidate.element == elemWanted)
 				return candidate;
 			else
 				return false;
@@ -51,8 +51,8 @@ G.FloodCheck = function() {
 		}
 		
 		var attacker = false;
-		elemWanted = self.colorThatWins(stone.element);
-		ownerWanted = 1-stone.owner;
+		var elemWanted = self.colorThatWins(stone.element);
+		var ownerAttacked = stone.owner;
 		
 		return getDefender(ix-1,iy) ||
 			   getDefender(ix+1,iy) || 
@@ -79,7 +79,7 @@ G.FloodCheck = function() {
 	self.findAttacks = function(sx, sy, fakeStone) {
 		function parsePosition(ix,iy) {
 			var victim = self.board[ix]?self.board[ix][iy]:null;
-			if (victim && victim.owner == ownerWanted && victim.element == elemWanted && 
+			if (victim && victim.owner != ownerAttacker && victim.element == elemWanted && 
 				self.floodMarkers[ix][iy]) {
 				victim.step = step+1;
 				attackStack.push(victim);
@@ -99,7 +99,7 @@ G.FloodCheck = function() {
 		attackStack.push(masterStone);
 		masterStone.step = -1;
 		var elemWanted = self.colorWonBy(masterStone.element);
-		var ownerWanted = 1-masterStone.owner;
+		var ownerAttacker = masterStone.owner;
 		var step = masterStone.step;
 		
 		while (attackStack.length) {

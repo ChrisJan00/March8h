@@ -99,6 +99,7 @@ G.Main = function() {
 		G.turn = 0;
 		G.board.set6x6full();
 		G.board.clearContents();
+		G.board.putExcessTiles();
 		G.Piles[0].chooseTiles();
 		G.Piles[1].chooseTiles();
 		G.floodCheck.countMarkers();
@@ -112,6 +113,7 @@ G.Main = function() {
 		G.Piles[0].drawFromScratch();
 		G.Piles[1].drawFromScratch();
 		G.board.drawEmpty();
+		G.board.redrawAllTilesThatExist();
 		G.display.showPlayer();
 		G.display.showOrder();
 		G.optionsButton.drawNormal();
