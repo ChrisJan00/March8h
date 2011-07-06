@@ -59,7 +59,7 @@ G.Display = function() {
 		if (G.computerEnabled && pn==1)
 			msg = G.strings.thinkingMessage;
 		var msglen = ctxt.measureText(msg);
-		ctxt.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
+		ctxt.fillText(msg, data.x0+data.width/2 - msglen.width/2, data.y0+data.height/2+14 );
 		
 		//G.Piles[0].redrawBorder(G.turn==0);
 		//G.Piles[1].redrawBorder(G.turn==1);
@@ -86,10 +86,10 @@ G.Display = function() {
 		var width = s * G.board.cols
 		var b = Math.floor((width - 45 - 4*s)/10);
 		var al = 15;
-		var y = G.board.y0 + G.board.rows * G.board.side
+		var y = G.board.y0 + G.board.height
 		
 		var x0 = G.board.x0
-		var y0 = y + 15
+		var y0 = y + 20
 		var y1 = y + G.imageFire.height/2 + 5
 		var ctxt = G.graphicsManager.messagesContext;
 		G.graphicsManager.mark(0, y0, G.graphicsManager.width, 25);

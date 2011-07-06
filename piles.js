@@ -66,13 +66,13 @@ G.PileClass.prototype.chooseTiles = function() {
 	var rowCount, colCount;
 	
 	// this condition is wrong... I have to come up with something else
-	if (this.x0 < G.board.x0 || this.x0 > G.board.x0+G.board.width) {
+	//if (this.x0 < G.board.x0 || this.x0 > G.board.x0+G.board.width) {
 		colCount = Math.ceil(tilesPerPlayer / G.board.rows);
 		rowCount = Math.ceil(tilesPerPlayer / colCount);
-	} else {
-		rowCount = Math.ceil(tilesPerPlayer / G.board.cols);
-		colCount = Math.ceil(tilesPerPlayer / rowCount);
-	}
+	//} else {
+	//	rowCount = Math.ceil(tilesPerPlayer / G.board.cols);
+	//	colCount = Math.ceil(tilesPerPlayer / rowCount);
+	//}
 	
 	this.setDimensions(colCount, rowCount, this.x0, this.y0);
 	
@@ -140,8 +140,8 @@ G.PileClass.prototype.redrawBorder = function(strong) {
 		
 		ctxt.fillRect(this.x0-this.border, this.y0 - this.border, this.width + 2*this.border, this.border-1);
 		ctxt.fillRect(this.x0-this.border, this.y0-1, this.border-1, this.height+2);
-		ctxt.fillRect(this.x0-this.border, this.y1+1, this.width + 2*this.border, this.border-1);
-		ctxt.fillRect(this.x1+1, this.y0-1, this.border-1, this.height+2);
+		ctxt.fillRect(this.x0-this.border, this.y1()+1, this.width + 2*this.border, this.border-1);
+		ctxt.fillRect(this.x1()+1, this.y0-1, this.border-1, this.height+2);
 	} else {
 		ctxt.fillStyle = G.colors.semiTransparentWhite;
 		ctxt.fillRect(this.x0-2, this.y0-2, this.width+4, this.height+4);

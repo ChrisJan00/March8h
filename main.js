@@ -107,6 +107,7 @@ G.Main = function() {
 	}
 	
 	self.drawInitialGame = function() {
+		self.repositionEverything();
 		G.graphicsManager.clearBackground();
 		G.Piles[0].drawFromScratch();
 		G.Piles[1].drawFromScratch();
@@ -117,6 +118,47 @@ G.Main = function() {
 		G.gameLog.updateVisible();
 		G.graphicsManager.redraw();
 		self.enableTurn();
+	}
+	
+	self.repositionEverything = function() {
+		var extraWidth = 60;
+		var minHorzSpace = G.Piles[0].width + G.Piles[1].width + G.board.width + extraWidth;
+		if (minHorzSpace < 640) {
+			// center stuff
+			G.graphicsManager.resizeCanvas(640, 480);
+			G.board.x0 = Math.floor(G.graphicsManager.width / 2 - G.board.width/2);
+			G.board.y0 = Math.floor(G.graphicsManager.height / 2 - G.board.height/2);
+			G.Piles[0].x0 = Math.floor(G.board.x0 / 2 - G.Piles[0].width/2);
+			G.Piles[0].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles[0].height/2);
+			G.Piles[1].x0 = Math.floor((G.board.x0 + G.board.width + G.graphicsManager.width)/2 - G.Piles[1].width/2);
+			G.Piles[1].y0 = G.Piles[0].y0;
+			
+			G.coords.text.x0 = G.board.x0;
+			G.coords.text.width = G.board.width;
+			G.optionsButton.x0 = G.graphicsManager.width - G.optionsButton.width - 5;
+			G.optionsButton.y0 = 10;
+		} else {
+			// resize canvas
+			var newWidth = minHorzSpace;
+			// centered board, 90 on top (50 for player score + 20 margin on each side)
+			var newHeight = G.board.height + 180;
+			G.graphicsManager.resizeCanvas(newWidth, newHeight);
+			G.Piles[0].x0 = 10;
+			G.Piles[0].y0 = Math.floor(newHeight/2 - G.Piles[0].height/2);
+			G.board.x0 = G.Piles[0].width + 30;
+			G.board.y0 = Math.floor(newHeight/2 - G.board.height/2);
+			G.Piles[1].x0 = G.Piles[0].width + G.board.width + 50;
+			G.Piles[1].y0 = G.Piles[0].y0;
+			
+			G.coords.text.x0 = G.board.x0;
+			G.coords.text.width = G.board.width;
+			G.optionsButton.x0 = newWidth - G.optionsButton.width - 5;
+			G.optionsButton.y0 = 10; //G.Piles[1].y0 - G.optionsButton.height - 10;
+		}
+		
+		// probably the graphicsmanager should do this
+		G.xoffset = G.findAbsoluteX(G.gameCanvas);
+		G.yoffset = G.findAbsoluteY(G.gameCanvas);
 	}
 	
 	self.connectMouse = function() {
@@ -142,8 +184,7 @@ G.Main = function() {
 			return;
 		}
 		
-		G.optionsButton.managePressed(G.mouse.x, G.mouse.y );
-		
+		G.optionsButton.managePressed(G.mouse.x, G.mouse.y);
 		if (!G.turnEnabled)
 			return;
 			

@@ -7,8 +7,6 @@ G.StoneHolder.prototype = {
 	cols : 1,
 	width : 50,
 	height : 50,
-	x1 : 50,
-	y1 : 50,
 	stoneCount : 0,
 	borderTileSide : 6,
 	borderAnimationDelay : 150,
@@ -20,11 +18,12 @@ G.StoneHolder.prototype = {
 		this.rows = numRows;
 		this.width = this.side * numCols;
 		this.height = this.side * numRows;
-		this.x1 = this.x0 + this.width;
-		this.y1 = this.y0 + this.height;
 		this.maxStones = this.cols * this.rows;
 		this.clearContents();
 	},
+	
+	x1 : function() { return this.x0 + this.width; },
+	y1 : function() { return this.y0 + this.height; },
 	
 	addHoles : function(holeList) {
 		if (this.holes)
@@ -412,7 +411,7 @@ G.StoneHolder.prototype = {
 	
 	isClicked : function( mouseX, mouseY ) {
 		var self = this;
-		return mouseX>=self.x0 && mouseX<self.x1 && mouseY>=self.y0 && mouseY<self.y1;
+		return mouseX>=self.x0 && mouseX<self.x1() && mouseY>=self.y0 && mouseY<self.y1();
 	},
 	
 	coordsOf : function( mouseX, mouseY ) {
