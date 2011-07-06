@@ -26,12 +26,12 @@ G.StoneHolder.prototype = {
 		this.clearContents();
 	},
 	
-	addHoles : function() {
+	addHoles : function(holeList) {
 		if (this.holes)
 			this.stoneCount -= this.holes.length;
-		this.holes = [[2,0], [5,2], [3,5], [0,3], [3,2], [2,3]];
-		//this.holes = [[3,1], [4,3], [2,4], [1,2]];
-		this.stonecount += this.holes.length;
+		this.holes = holeList;
+		if (holeList)
+			this.stonecount += this.holes.length;
 	},
 	
 	cellColor : function(ind) {
@@ -91,49 +91,49 @@ G.StoneHolder.prototype = {
 			ctxt.fillRect(hx, hy, self.side, self.side);
 			
 			// left
-			if (self.holes[ii][0] > 0) {
+			if (self.holes[ii][0] == 0) {
+				ctxt.fillRect(hx-2, hy, 2, self.side);
+			} else if (!self.hasHole(self.holes[ii][0]-1, self.holes[ii][1])) {
 				ctxt.strokeStyle = self.borderColor(1);
 				ctxt.beginPath();
 				ctxt.moveTo(hx, hy);
 				ctxt.lineTo(hx, hy+self.side);
 				ctxt.stroke();
-			} else {
-				ctxt.fillRect(hx-2, hy, 2, self.side);
 			}
 			
 			// right
-			if (self.holes[ii][0] < self.cols - 1) {
+			if (self.holes[ii][0] == self.cols - 1) {
+				ctxt.fillRect(hx + self.side, hy, 2, self.side);
+			} else if (!self.hasHole(self.holes[ii][0]+1, self.holes[ii][1])) {
 				ctxt.strokeStyle = self.borderColor(0);
 				ctxt.beginPath();
 				ctxt.moveTo(hx + self.side, hy);
 				ctxt.lineTo(hx + self.side, hy+self.side);
 				ctxt.stroke();
-			} else {
-				ctxt.fillRect(hx + self.side, hy, 2, self.side);
 			}
 			
 			// up
-			if (self.holes[ii][1] > 0) {
+			if (self.holes[ii][1] == 0) {
+				ctxt.fillRect(hx, hy-2, self.side, 2);
+			} else if (!self.hasHole(self.holes[ii][0], self.holes[ii][1]-1)) {
 				ctxt.strokeStyle = self.borderColor(1);
 				ctxt.beginPath();
 				ctxt.moveTo(hx, hy);
 				ctxt.lineTo(hx+self.side, hy);
 				ctxt.stroke();
-			} else {
-				ctxt.fillRect(hx, hy-2, self.side, 2);
 			}
 			
 			// down
-			if (self.holes[ii][1] < self.rows - 1) {
+			if (self.holes[ii][1] == self.rows - 1) {
+				ctxt.fillRect(hx, hy + self.side, self.side, 2);
+			} else if (!self.hasHole(self.holes[ii][0], self.holes[ii][1]+1)) {
 				ctxt.strokeStyle = self.borderColor(0);
 				ctxt.beginPath();
 				ctxt.moveTo(hx, hy  + self.side);
 				ctxt.lineTo(hx + self.side, hy+self.side);
 				ctxt.stroke();
-			} else {
-				ctxt.fillRect(hx, hy + self.side, self.side, 2);
 			}
-			
+						
 			G.graphicsManager.mark(hx-2, hy-2, self.side+4, self.side+4);
 		}
 	},
@@ -436,8 +436,9 @@ G.StoneHolder.prototype = {
 
 G.BoardClass = function() {
 	this.setDimensions(6,6, 180, 70);
-	this.addHoles();
+	this.addHoles(false);
 }
+
 G.BoardClass.prototype = new G.StoneHolder;
 
 G.BoardClass.prototype.manageClicked = function( mx, my ) 
@@ -479,5 +480,51 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	this.refreshTileBordersExpansive(mix, miy);
 	
 	return true;
+}
+
+// boards
+G.BoardClass.prototype.set4x4 = function() {
+	this.setDimensions(4, 4, 180, 70);
+	this.addHoles(false);
+}
+
+G.BoardClass.prototype.set6x6full = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles(false);
+}
+
+G.BoardClass.prototype.set6x6h4 = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles([[3,1], [4,3], [2,4], [1,2]]);
+}
+
+G.BoardClass.prototype.set6x6h5 = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles([[2,1], [1,2], [4,2], [4,3], [2,5]]);
+}
+
+G.BoardClass.prototype.set6x6h6 = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles([[2,0], [5,2], [3,5], [0,3], [3,2], [2,3]]);
+}
+
+G.BoardClass.prototype.set8x8full = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles(false);
+}
+
+G.BoardClass.prototype.set8x8h4 = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[2,2],[2,5],[5,2],[5,5]]);
+}
+
+G.BoardClass.prototype.set8x8h8 = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[2,2],[2,5],[5,2],[5,5],[4,0],[7,4],[3,7],[0,3]]);
+}
+
+G.BoardClass.prototype.set8x8h12 = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[2,0],[5,0],[0,2],[4,2],[7,2],[5,3],[2,4],[0,5],[4,5],[7,5],[2,7],[5,7]]);
 }
 
