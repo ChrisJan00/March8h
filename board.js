@@ -432,6 +432,16 @@ G.StoneHolder.prototype = {
 		return false;
 	},
 	
+	holeCount : function() {
+		return this.holes?this.holes.length:0;
+	},
+	
+	excessTiles : function() {
+		// total tiles
+		var totalTiles = this.rows * this.columns - this.holecount();
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerCount);
+		return totalTiles - tilesPerPlayer * G.playerCount;
+	}
 }
 
 G.BoardClass = function() {
@@ -525,6 +535,6 @@ G.BoardClass.prototype.set8x8h8 = function() {
 
 G.BoardClass.prototype.set8x8h12 = function() {	
 	this.setDimensions(8, 8, 180, 70);
-	this.addHoles([[2,0],[5,0],[0,2],[4,2],[7,2],[5,3],[2,4],[0,5],[4,5],[7,5],[2,7],[5,7]]);
+	this.addHoles([[2,0],[5,0],[0,2],[3,2],[7,2],[5,3],[2,4],[0,5],[4,5],[7,5],[2,7],[5,7]]);
 }
 

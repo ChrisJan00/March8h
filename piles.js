@@ -53,72 +53,73 @@ G.PileClass.prototype.unSelect = function()
 	this.selection = false;
 }
 
-// minimum 2 tiles of each type
-G.PileClass.prototype.prefill = function()
-{
-	var minCount = 2;
-	for (var elem=0;elem<4;elem++) {
-		for (var count=0;count<minCount;count++) {
-			var x,y;
-			do {
-				x = G.randint(this.cols);
-				y = G.randint(this.rows);
-			} while (this[x][y]);
-			var st = {
-				ix : x,
-				iy : y,
-				bgColor : G.colors.white,
-				visible : true,
-				selected : false,
-				element : elem,
-				owner : 0,
-				active : false
-			}
-			st.owner = this.owner;
-			this.set(x,y,st);
-		}
-	}
-}
-
-G.PileClass.prototype.chooseTiles = function( ) 
-{
+////////////////////////////////
+G.PileClass.prototype.chooseTiles = function() {
 	this.clearContents();
-	this.prefill();
 	
-	var totalHoles = G.board.holes? G.board.holes.length/2 : 0;
-	var holeCount = totalHoles;
-	// two tiles of each element already set
-	var tileCount = 2*4;
+	// compute dimensions, needed number of tiles
+	var totalTiles = G.board.rows * G.board.cols - G.board.holeCount();
+	var tilesPerPlayer = Math.floor(totalTiles / G.playerCount);
+	this.totalItems = tilesPerPlayer;
 	
-	for (var x=0; x<this.cols; x++)
-		for (var y=0; y<this.rows; y++)
-		{
-			if (this[x][y])
-				continue;
-			tileCount++;
-			var st = {
-				ix : x,
-				iy : y,
+	// find number of rows and columns
+	var rowCount, colCount;
+	
+	// this condition is wrong... I have to come up with something else
+	if (this.x0 < G.board.x0 || this.x0 > G.board.x0+G.board.width) {
+		colCount = Math.ceil(tilesPerPlayer / G.board.rows);
+		rowCount = Math.ceil(tilesPerPlayer / colCount);
+	} else {
+		rowCount = Math.ceil(tilesPerPlayer / G.board.cols);
+		colCount = Math.ceil(tilesPerPlayer / rowCount);
+	}
+	
+	this.setDimensions(colCount, rowCount, this.x0, this.y0);
+	
+	// generate a list of tiles
+	var tileList = [];
+	for (var ii=0; ii < tilesPerPlayer; ii++) {
+		var st = {
+				ix : 0,
+				iy : 0,
 				bgColor : G.colors.white,
 				visible: true,
 				selected: false,
 				element: 0,
 				owner : 0,
 				active : false
-			}
-			st.element = G.randint(4);
-			st.owner = this.owner;
-			
-			this.set(x,y,st);
-			// holes
-			if (holeCount > 0 && (tileCount >= this.cols*this.rows-holeCount ||
-				G.randint(Math.floor(this.cols * this.rows / (totalHoles+1)))==0)) {
-					this.del(x,y);
-					holeCount--;
-				}
-			
 		}
+		st.element = G.randint(4);
+		st.owner = this.owner;
+		tileList.push(st);
+	}
+	
+	// overwrite the first ones to ensure minimum element count
+	var iterations = Math.max(1, Math.floor( Math.floor(tilesPerPlayer/2)/4));
+	var j = 0;
+	for (var ii=0; ii < iterations; ii++)
+		for (var elem=0; elem<4; elem++)
+			tileList[j++].element = elem;
+	
+	// generate list of positions
+	var posList = [];
+	j = 0;
+	for (var yy=0; yy<this.rows; yy++)
+		for (var xx=0; xx<this.cols; xx++) 
+			posList[j++] = [xx,yy];
+			
+	// now use both lists to populate pool
+	while (tileList.length)
+	{
+		var st = tileList.splice(G.randint(tileList.length), 1)[0];
+		var pos = posList.splice(G.randint(posList.length), 1)[0];
+		st.ix = pos[0];
+		st.iy = pos[1];
+		this.set(st.ix,st.iy, st);
+	}
 }
+
+////////////////////////////////
 
 G.PileClass.prototype.drawFromScratch = function() {
 	var ctx = G.gameContext;

@@ -46,6 +46,7 @@ G.Main = function() {
 		G.framesPerStrip = 4;
 		
 		G.turn = 0;
+		G.playerCount = 2;
 		
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
