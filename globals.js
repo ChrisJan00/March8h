@@ -20,7 +20,13 @@ G.findAbsoluteY = function(object) {
 
 G.randint = function(n) {
 		return Math.floor(Math.random() * n);
-	}
+}
+
+G.playerTypes = {
+	human: 0,
+	computerEasy: 1,
+	computerHard: 2
+},
 
 G.colors = {
 	white : "#FFFFFF",

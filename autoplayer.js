@@ -45,7 +45,7 @@ G.computerPlay = function() {
 						if (self.isDefended(ix, iy, color, pn)) {
 							score = 0;
 						} else {
-							score = 1 + self.countAttacks(ix,iy,color,pn);
+							score = 4 + self.countAttacks(ix,iy,color,pn);
 						}
 					} else {
 						score = 1 + self.countAttacks(ix,iy,color,pn);
