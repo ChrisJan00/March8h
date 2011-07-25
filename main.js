@@ -45,8 +45,10 @@ G.Main = function() {
 		G.animationDelay = 250;
 		G.framesPerStrip = 4;
 		
-		G.turn = 0;
-		G.playerCount = 2;
+		G.playerManager = new G.PlayerManager();
+		G.playerManager.init();
+		G.playerCount = G.playerManager.count();
+		//G.playerManager.rand();
 		
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
@@ -65,7 +67,6 @@ G.Main = function() {
 		G.computerDelay = 1000;//1500;
 		G.maximizeEntropy = false;
 		G.defenseMode = true;
-		G.computerHard = false;
 		G.computerChoice = [0,0,0];
 		
 		G.initPiles();
@@ -86,6 +87,8 @@ G.Main = function() {
 		G.optionsMenu.hide();
 		G.optionsButton = new G.ClickableOption( G.graphicsManager.messagesLayer, 605, 5, 50, 25, G.strings.optionsButton, G.optionsMenu.activate );
 		G.optionsButton.fontSize = 10;
+		
+		G.waitingForRestart = false;
 	}
 	
 	self.restartMenu = function() {
@@ -95,13 +98,13 @@ G.Main = function() {
 	}
 	
 	self.restartGame = function() {
+		G.waitingForRestart = false;
 		G.pauseManager.disablePause();
-		G.turn = 0;
-		G.board.set8x8h8();
+		G.playerManager.rand();
+		G.board.set6x6full();
 		G.board.clearContents();
 		G.board.putExcessTiles();
-		G.Piles[0].chooseTiles();
-		G.Piles[1].chooseTiles();
+		G.Piles.chooseAll();
 		G.floodCheck.countMarkers();
 		G.gameLog.init();
 		self.enableTurn();
@@ -191,13 +194,13 @@ G.Main = function() {
 			return;
 			
 		
-		if (G.turn == -1) {
+		if (G.waitingForRestart) {
 			self.restartGame();
 			self.drawInitialGame();
 			return;
 		}
 		
-		if (G.turn==0 || !G.computerEnabled)
+		if (G.playerManager.isHuman())
 			self.manageTurn();
 	}
 	
@@ -228,11 +231,11 @@ G.Main = function() {
 		G.turnEnabled = true;
 		G.turnDelay = 0;
 		
-		G.Piles[0].redrawBorder(G.turn == 0);
-		G.Piles[1].redrawBorder(G.turn == 1);
+		G.Piles[0].redrawBorder(G.playerManager.current == 0);
+		G.Piles[1].redrawBorder(G.playerManager.current == 1);
 		
-		if (G.computerEnabled && G.turn == 1) {
-				setTimeout(self.manageTurn, G.computerDelay);
+		if (!G.playerManager.isHuman()) {
+			setTimeout(self.manageTurn, G.computerDelay);
 		}
 	}
 	
@@ -247,10 +250,10 @@ G.Main = function() {
 		G.turnDelay = 0;
 			
 		
-		if (G.computerEnabled && G.turn == 1) {
+		if (!G.playerManager.isHuman()) {
 			G.computerChoice = G.computerPlay();
 			var c = G.computerChoice;
-			turnIsReady = G.computerMove(c[0],c[1],c[2], 1);
+			turnIsReady = G.computerMove(c[0],c[1],c[2]);
 		} else {
 			if (G.Piles[0].isClicked(G.mouse.x, G.mouse.y))
 				G.Piles[0].manageClicked(G.mouse.x, G.mouse.y);
@@ -263,7 +266,7 @@ G.Main = function() {
 	 	if (turnIsReady) {	
 	 		G.floodCheck.board = G.board;
 	 		G.floodCheck.countMarkers();
-			G.turn = 1-G.turn;
+			G.playerManager.next();
 			
 			if (G.board.stoneCount < G.board.maxStones) {
 				 G.display.showPlayer();

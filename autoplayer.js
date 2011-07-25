@@ -1,7 +1,7 @@
 //----------------------------------------------------------
 G.computerPlay = function() {
 	var self = this;
-	var pn = G.turn;
+	var pn = G.playerManager.current;
 	var decisionExp = 5;
 	
 	self.availableCount = G.Piles[pn].stoneCount;
@@ -122,12 +122,11 @@ G.computerPlay = function() {
 	
 }
 
-G.computerMove = function(mix,miy,elem, pn) {
+G.computerMove = function(mix,miy,elem) {
 		// find one stone in own pile
 		
-		var currentPile = G.Piles[pn];
+		var currentPile = G.Piles[G.playerManager.current];
 		
-		//currentPile.selection = G.Piles[pn].getStoneByElement(elem);
 		var stone = currentPile.getStoneByElement(elem);
 		var stoneIndex = stone.ix * currentPile.rows + stone.iy;
 		currentPile.del(stone.ix, stone.iy);
@@ -140,7 +139,7 @@ G.computerMove = function(mix,miy,elem, pn) {
 		
 		G.board.startBorderAnimation(mix,miy);
 		
-		G.gameLog.registerMove(G.turn, stone, stoneIndex);
+		G.gameLog.registerMove(G.playerManager.current, stone, stoneIndex);
 	
 		//startFlood(mix, miy);
 		G.floodCheck.checkFlood(mix, miy);

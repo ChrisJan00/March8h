@@ -64,7 +64,7 @@ G.Display = function() {
 		
 		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		var pn = G.turn;
+		var pn = G.playerManager.current;
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);
@@ -72,13 +72,11 @@ G.Display = function() {
 		ctxt.font = "bold 28px CustomFont, sans-serif";
 		ctxt.fillStyle = self.colorForPlayerBorder(pn);
 		var msg  = (pn?G.strings.secondPlayerName:G.strings.firstPlayerName);
-		if (G.computerEnabled && pn==1)
+		if (!G.playerManager.isHuman())
 			msg = G.strings.thinkingMessage;
 		var msglen = ctxt.measureText(msg);
 		ctxt.fillText(msg, data.x0+data.width/2 - msglen.width/2, data.y0+data.height/2+14 );
 		
-		//G.Piles[0].redrawBorder(G.turn==0);
-		//G.Piles[1].redrawBorder(G.turn==1);
 		G.Piles[0].redrawBorder(false);
 		G.Piles[1].redrawBorder(false);
 	}
@@ -133,17 +131,17 @@ G.Display = function() {
 	
 	self.checkVictory = function() {
 		var data = G.coords.text
-		G.turn = -1;
 		var counts = G.counts;
 		var victory1 = counts[0]>counts[1];
+		
+		// TODO: this does NOT belong here! it is logic!
+		G.waitingForRestart = true;
 		
 		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
 		
 		var ctxt = G.graphicsManager.messagesContext;
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		var pn = G.turn;
 		ctxt.font = "bold 24px CustomFont, sans-serif";
-		ctxt.fillStyle = self.colorForPlayerBorder(pn);
 		
 		var msg;
 		if (counts[0]>counts[1]) {

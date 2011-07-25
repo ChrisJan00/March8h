@@ -23,9 +23,10 @@ G.randint = function(n) {
 }
 
 G.playerTypes = {
-	human: 0,
-	computerEasy: 1,
-	computerHard: 2
+	none: 0,
+	human: 1,
+	computerEasy: 2,
+	computerHard: 3
 },
 
 G.colors = {
