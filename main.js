@@ -65,7 +65,6 @@ G.Main = function() {
 	
 		G.computerEnabled = true;
 		G.computerDelay = 1000;//1500;
-		G.maximizeEntropy = false;
 		G.defenseMode = true;
 		G.computerChoice = [0,0,0];
 		
@@ -89,6 +88,7 @@ G.Main = function() {
 		G.optionsButton.fontSize = 10;
 		
 		G.waitingForRestart = false;
+		G.waitingForTurn = false;
 	}
 	
 	self.restartMenu = function() {
@@ -234,7 +234,8 @@ G.Main = function() {
 		G.Piles[0].redrawBorder(G.playerManager.current == 0);
 		G.Piles[1].redrawBorder(G.playerManager.current == 1);
 		
-		if (!G.playerManager.isHuman()) {
+		if ((!G.waitingForTurn) && (!G.playerManager.isHuman())) {
+			G.waitingForTurn = true;
 			setTimeout(self.manageTurn, G.computerDelay);
 		}
 	}
@@ -247,8 +248,8 @@ G.Main = function() {
 	self.manageTurn = function()
 	{
 		var turnIsReady = false;
+		G.waitingForTurn = false;
 		G.turnDelay = 0;
-			
 		
 		if (!G.playerManager.isHuman()) {
 			G.computerChoice = G.computerPlay();

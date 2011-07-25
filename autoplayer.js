@@ -4,6 +4,7 @@ G.computerPlay = function() {
 	var pn = G.playerManager.current;
 	var decisionExp = 5;
 	
+	self.maximizeEntropy = G.playerManager.currentType() == G.playerTypes.computerHard;
 	self.availableCount = G.Piles[pn].stoneCount;
 	
 	self.computeStones = function() {
@@ -38,7 +39,7 @@ G.computerPlay = function() {
 					var score = 0;
 					if (self.typeCount[color]<=0)
 						continue;
-					if (G.maximizeEntropy && self.typeCount[color]<self.maxCount)
+					if (self.maximizeEntropy && self.typeCount[color]<self.maxCount)
 						continue;
 					// rate move
 					if (G.defenseMode) {
