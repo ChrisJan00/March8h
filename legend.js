@@ -6,6 +6,8 @@ G.Display = function() {
 			case -1: return G.colors.grey;
 			case 0: return G.colors.purple;
 			case 1: return G.colors.orange;
+			case 2: return G.colors.blue;
+			case 3: return G.colors.magenta;
 		}
 	}
 	
@@ -14,14 +16,18 @@ G.Display = function() {
 			case -1: return G.colors.greyBorder;
 			case 0: return G.colors.purpleBorder;
 			case 1: return G.colors.orangeBorder;
+			case 2: return G.colors.blueBorder;
+			case 3: return G.colors.magentaBorder;
 		}
 	}
 	
 	self.colorForPlayerBlink = function(pn) {
 		switch(pn) {
-			case -1: return G.colors.greyHighLight;
-			case 0: return G.colors.purpleHighLight;
-			case 1: return G.colors.orangeHighLight;
+			case -1: return G.colors.greyHighlight;
+			case 0: return G.colors.purpleHighlight;
+			case 1: return G.colors.orangeHighlight;
+			case 2: return G.colors.blueHighlight;
+			case 3: return G.colors.magentaHighlight;
 		}
 	}
 	
@@ -30,6 +36,8 @@ G.Display = function() {
 			case -1: return G.colors.greyBackground;
 			case 0: return G.colors.purpleBackground;
 			case 1: return G.colors.orangeBackground;
+			case 2: return G.colors.blueBackground;
+			case 3: return G.colors.magentaBackground;
 		}
 	}
 	

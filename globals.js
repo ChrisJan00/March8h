@@ -55,6 +55,20 @@ G.colors = {
 	orangeBorderDark : "ff8c00",
 	orangeHighlight : "#ff5400",
 	orangeBackground : "#ffe9ce",
+	
+	blue: "#bacfff",
+	blueBorder: "#2067ff",
+	blueBorderLight: "#4d85ff",
+	blueBorderDark: "#2067ff",
+	blueHighlight: "#004fff",
+	blueBackground: "#d6e3ff",
+	
+	magenta: "#ffbfc7",
+	magentaBorder: "#ff203a",
+	magentaBorderLight: "#ff596d",
+	magentaBorderDark: "#ff203a",
+	magentaHighlight: "#ff0020",
+	magentaBackground: "#ffd9de",
 
 	grey : "#CCCCCC",
 	greyBorder : "#AAAAAA",

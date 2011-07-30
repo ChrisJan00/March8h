@@ -187,11 +187,23 @@ G.initPiles = function()
 	G.Piles[1].cellColor = function(ind) {
 		return G.colors.orangeBackground;
 	}
+	G.Piles[2].cellColor = function(ind) {
+		return G.colors.blueBackground;
+	}
+	G.Piles[3].cellColor = function(ind) {
+		return G.colors.magentaBackground;
+	}
 	G.Piles[0].borderColor = function(ind) {
 		return ind? G.colors.purpleBorderDark : G.colors.purpleBorderLight;
 	}
 	G.Piles[1].borderColor = function(ind) {
 		return ind? G.colors.orangeBorderDark : G.colors.orangeBorderLight;
+	}
+	G.Piles[2].borderColor = function(ind) {
+		return ind? G.colors.blueBorderDark : G.colors.blueBorderLight;
+	}
+	G.Piles[3].borderColor = function(ind) {
+		return ind? G.colors.mangentaBorderDark : G.colors.magentaBorderLight;
 	}
 	
 	G.Piles.chooseAll = function() {
