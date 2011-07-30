@@ -76,6 +76,8 @@ G.Display = function() {
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);
+		//self.showPlayerScore(2);
+		//self.showPlayerScore(3);
 		
 		ctxt.font = "bold 28px CustomFont, sans-serif";
 		ctxt.fillStyle = self.colorForPlayerBorder(pn);
@@ -87,6 +89,8 @@ G.Display = function() {
 		
 		G.Piles[0].redrawBorder(false);
 		G.Piles[1].redrawBorder(false);
+		//G.Piles[2].redrawBorder(false);
+		//G.Piles[3].redrawBorder(false);
 	}
 	
 	self.showOrder = function() {
@@ -167,9 +171,13 @@ G.Display = function() {
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);
+		//self.showPlayerScore(2);
+		//self.showPlayerScore(3);
 		
 		G.Piles[0].redrawBorder(true);
 		G.Piles[1].redrawBorder(true);
+		//G.Piles[2].redrawBorder(true);
+		//G.Piles[3].redrawBorder(true);
 	}
 }
 
