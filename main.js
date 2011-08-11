@@ -115,6 +115,7 @@ G.Main = function() {
 		G.graphicsManager.clearBackground();
 		G.Piles[0].drawFromScratch();
 		G.Piles[1].drawFromScratch();
+		G.Piles[2].drawFromScratch();
 		G.board.drawEmpty();
 		G.board.drawAllTiles();
 		G.display.showPlayer();
@@ -233,6 +234,7 @@ G.Main = function() {
 		
 		G.Piles[0].redrawBorder(G.playerManager.current == 0);
 		G.Piles[1].redrawBorder(G.playerManager.current == 1);
+		G.Piles[2].redrawBorder(G.playerManager.current == 2);
 		
 		if ((!G.waitingForTurn) && (!G.playerManager.isHuman())) {
 			G.waitingForTurn = true;
@@ -260,6 +262,8 @@ G.Main = function() {
 				G.Piles[0].manageClicked(G.mouse.x, G.mouse.y);
 			else if (G.Piles[1].isClicked(G.mouse.x, G.mouse.y))
 				G.Piles[1].manageClicked(G.mouse.x, G.mouse.y);
+			else if (G.Piles[2].isClicked(G.mouse.x, G.mouse.y))
+				G.Piles[2].manageClicked(G.mouse.x, G.mouse.y);
 			else if (G.board.isClicked(G.mouse.x, G.mouse.y))
 		 		turnIsReady = G.board.manageClicked(G.mouse.x, G.mouse.y);
 	 	}

@@ -1,7 +1,7 @@
 G.PlayerManager = function() {
 	var self = this;
 	
-	self.types = [G.playerTypes.human, G.playerTypes.computerEasy, G.playerTypes.none, G.playerTypes.none];
+	self.types = [G.playerTypes.human, G.playerTypes.computerHard, G.playerTypes.computerHard, G.playerTypes.none];
 	self.current = 0;
 	
 	self.init = function() {

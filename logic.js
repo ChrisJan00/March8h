@@ -186,6 +186,8 @@ G.FloodCheck = function() {
 		G.counts = [];
 		G.counts[0] = 0;
 		G.counts[1] = 0;
+		G.counts[2] = 0;
+		G.counts[3] = 0;
 		for (var i=0; i<self.board.cols; i++)
 			for (var j=0; j<self.board.rows; j++) {
 				if (self.board[i][j]) {

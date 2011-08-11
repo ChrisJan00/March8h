@@ -41,10 +41,28 @@ G.Display = function() {
 		}
 	}
 	
+	self.playerNameForIndex = function(pn) {
+		if (!G.playerManager.isHuman())
+			return G.strings.thinkingMessage;
+		switch(pn) {
+			case 0: return G.strings.firstPlayerName;
+			case 1: return G.strings.secondPlayerName;
+			case 2: return G.strings.thirdPlayerName;
+			case 3: return G.strings.fourthPlayerName;
+		}
+	}
+	
 	self.showPlayerScore = function(pn) {
 		var size = 50;
-		var x0 = G.Piles[pn].x0 + G.Piles[pn].width/2 - size/2;
-		var y0 = G.Piles[pn].y0 / 2 - size/2;
+		var x0, y0;
+		
+		if (G.Piles[pn].vertical) {
+			x0 = G.Piles[pn].x0 + G.Piles[pn].width/2 - size/2;
+			y0 = G.Piles[pn].y0 / 2 - size/2;
+		} else {
+			x0 = G.Piles[pn].x0 / 2 - size/2;
+			y0 = G.Piles[pn].y0 + G.Piles[pn].height/2 - size/2;
+		}
 		
 		var ctxt = G.graphicsManager.messagesContext;
 		G.graphicsManager.mark(x0, y0, size, size);
@@ -76,20 +94,18 @@ G.Display = function() {
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);
-		//self.showPlayerScore(2);
+		self.showPlayerScore(2);
 		//self.showPlayerScore(3);
 		
 		ctxt.font = "bold 28px CustomFont, sans-serif";
 		ctxt.fillStyle = self.colorForPlayerBorder(pn);
-		var msg  = (pn?G.strings.secondPlayerName:G.strings.firstPlayerName);
-		if (!G.playerManager.isHuman())
-			msg = G.strings.thinkingMessage;
+		var msg  = self.playerNameForIndex(pn);
 		var msglen = ctxt.measureText(msg);
 		ctxt.fillText(msg, data.x0+data.width/2 - msglen.width/2, data.y0+data.height/2+14 );
 		
 		G.Piles[0].redrawBorder(false);
 		G.Piles[1].redrawBorder(false);
-		//G.Piles[2].redrawBorder(false);
+		G.Piles[2].redrawBorder(false);
 		//G.Piles[3].redrawBorder(false);
 	}
 	
@@ -143,8 +159,22 @@ G.Display = function() {
 	
 	self.checkVictory = function() {
 		var data = G.coords.text
-		var counts = G.counts;
-		var victory1 = counts[0]>counts[1];
+		
+		// ToDo: this also doesn't belong here, we should separate logic from display
+		var victorious = -1;
+		var victorycount = -1;
+		for (var i=0; i<4; i++)
+			if (G.counts[i] > victorycount) {
+				victorious = i;
+				victorycount = G.counts[i]
+			}
+		
+		var tiecount = 0;
+		for (var i = 0; i < 4; i++)
+			if (G.counts[i] == victorycount)
+				tiecount++;
+				
+		var tiegame = (tiecount > 1);
 		
 		// TODO: this does NOT belong here! it is logic!
 		G.waitingForRestart = true;
@@ -156,27 +186,33 @@ G.Display = function() {
 		ctxt.font = "bold 24px CustomFont, sans-serif";
 		
 		var msg;
-		if (counts[0]>counts[1]) {
-			ctxt.fillStyle = self.colorForPlayerBorder(0);
-			msg = G.strings.firstVictory;
-		} else if (counts[0] < counts[1]) {
-			ctxt.fillStyle = self.colorForPlayerBorder(1);
-			msg = G.strings.secondVictory;
-		} else {
+		if (tiegame) {
 			ctxt.fillStyle = G.colors.black;
 			msg = G.strings.tieGame;
+		} else if (victorious == 0) {
+			ctxt.fillStyle = self.colorForPlayerBorder(0);
+			msg = G.strings.firstVictory;
+		} else if (victorious == 1) {
+			ctxt.fillStyle = self.colorForPlayerBorder(1);
+			msg = G.strings.secondVictory;
+		} else if (victorious == 2) {
+			ctxt.fillStyle = self.colorForPlayerBorder(2);
+			msg = G.strings.thirdVictory;
+		} else if (victorious == 3) {
+			ctxt.fillStyle = self.colorForPlayerBorder(3);
+			msg = G.strings.fourthVictory;
 		}
 		var msglen = ctxt.measureText(msg);
 		ctxt.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);
-		//self.showPlayerScore(2);
+		self.showPlayerScore(2);
 		//self.showPlayerScore(3);
 		
 		G.Piles[0].redrawBorder(true);
 		G.Piles[1].redrawBorder(true);
-		//G.Piles[2].redrawBorder(true);
+		G.Piles[2].redrawBorder(true);
 		//G.Piles[3].redrawBorder(true);
 	}
 }

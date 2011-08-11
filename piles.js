@@ -1,10 +1,11 @@
-G.PileClass = function(x0,y0, owner) {
+G.PileClass = function(x0,y0, owner, vertical) {
 	this.setDimensions(3, 6, x0, y0);
 	
 	this.border = 5;
 	this.totalItems = this.rows * this.cols;
 	this.owner = owner;
 	this.selection = false;
+	this.vertical = typeof(vertical)=="boolean" ? vertical : true;
 };
 
 G.PileClass.prototype = new G.StoneHolder;
@@ -67,12 +68,13 @@ G.PileClass.prototype.chooseTiles = function() {
 	
 	// this condition is wrong... I have to come up with something else
 	//if (this.x0 < G.board.x0 || this.x0 > G.board.x0+G.board.width) {
+	if (this.vertical) {
 		colCount = Math.ceil(tilesPerPlayer / G.board.rows);
 		rowCount = Math.ceil(tilesPerPlayer / colCount);
-	//} else {
-	//	rowCount = Math.ceil(tilesPerPlayer / G.board.cols);
-	//	colCount = Math.ceil(tilesPerPlayer / rowCount);
-	//}
+	} else {
+		rowCount = Math.ceil(tilesPerPlayer / G.board.cols);
+		colCount = Math.ceil(tilesPerPlayer / rowCount);
+	}
 	
 	this.setDimensions(colCount, rowCount, this.x0, this.y0);
 	
@@ -178,8 +180,8 @@ G.initPiles = function()
 	G.Piles = [];
 	G.Piles[0] = new G.PileClass(10, 70, 0);
 	G.Piles[1] = new G.PileClass(500, 70, 1);
-	G.Piles[2] = new G.PileClass(10, 70, 2);
-	G.Piles[3] = new G.PileClass(10, 70, 3);
+	G.Piles[2] = new G.PileClass(200, 400, 2, false);
+	G.Piles[3] = new G.PileClass(200, 10, 3, false);
 	
 	G.Piles[0].cellColor = function(ind) {
 		return G.colors.purpleBackground;
