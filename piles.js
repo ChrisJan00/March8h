@@ -137,9 +137,11 @@ G.PileClass.prototype.setVertical = function( vert ) {
 			this[x] = [];
 			for (var y = 0; y < this.rows; y++) {
 				var st = stoneList.splice(0,1)[0];
-				st.ix = x;
-				st.iy = y;
-				this.set(st.ix, st.iy, st);
+				if (st) {
+					st.ix = x;
+					st.iy = y;
+					this.set(st.ix, st.iy, st);
+				}
 			}
 		}
 		this.width = this.cols * this.side;

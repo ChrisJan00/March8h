@@ -58,10 +58,16 @@ G.Display = function() {
 		
 		if (G.Piles[pn].vertical) {
 			x0 = G.Piles[pn].x0 + G.Piles[pn].width/2 - size/2;
-			y0 = G.Piles[pn].y0 / 2 - size/2;
+			y0 = G.Piles[pn].y0 - 55 - size/2;
+			if (G.playerManager.count() == 4
+				&& x0 > G.graphicsManager.width/2)
+					y0 = G.Piles[pn].y0 + G.Piles[pn].height + 55 - size / 2;
 		} else {
-			x0 = G.Piles[pn].x0 / 2 - size/2;
+			x0 = G.Piles[pn].x0 - 55 - size/2;
 			y0 = G.Piles[pn].y0 + G.Piles[pn].height/2 - size/2;
+			if (G.playerManager.count() == 4
+				&& y0 < G.graphicsManager.height/2)
+					x0 = G.Piles[pn].x0 + G.Piles[pn].width + 55 - size/2;
 		}
 		
 		var ctxt = G.graphicsManager.messagesContext;
@@ -92,21 +98,22 @@ G.Display = function() {
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
 		var pn = G.playerManager.currentId();
 		
-		self.showPlayerScore(0);
-		self.showPlayerScore(1);
-		self.showPlayerScore(2);
-		//self.showPlayerScore(3);
+		for (var i=0; i<4; i++) {
+			if (G.playerManager.isVisible(i))
+				self.showPlayerScore(i);
+		}
 		
-		ctxt.font = "bold 28px CustomFont, sans-serif";
-		ctxt.fillStyle = self.colorForPlayerBorder(pn);
-		var msg  = self.playerNameForIndex(pn);
-		var msglen = ctxt.measureText(msg);
-		ctxt.fillText(msg, data.x0+data.width/2 - msglen.width/2, data.y0+data.height/2+14 );
-		
-		G.Piles[0].redrawBorder(false);
-		G.Piles[1].redrawBorder(false);
-		G.Piles[2].redrawBorder(false);
-		//G.Piles[3].redrawBorder(false);
+		if (G.playerManager.count() < 4) {
+			ctxt.font = "bold 28px CustomFont, sans-serif";
+			ctxt.fillStyle = self.colorForPlayerBorder(pn);
+			var msg  = self.playerNameForIndex(pn);
+			var msglen = ctxt.measureText(msg);
+			ctxt.fillText(msg, data.x0+data.width/2 - msglen.width/2, data.y0+data.height/2+14 );
+		}
+		for (var i=0; i<4; i++) {
+			if (G.playerManager.isVisible(i))
+					G.Piles[i].redrawBorder(false);
+		}
 	}
 	
 	self.showOrder = function() {
@@ -181,39 +188,36 @@ G.Display = function() {
 		
 		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
 		
-		var ctxt = G.graphicsManager.messagesContext;
-		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		ctxt.font = "bold 24px CustomFont, sans-serif";
-		
-		var msg;
-		if (tiegame) {
-			ctxt.fillStyle = G.colors.black;
-			msg = G.strings.tieGame;
-		} else if (victorious == 0) {
-			ctxt.fillStyle = self.colorForPlayerBorder(0);
-			msg = G.strings.firstVictory;
-		} else if (victorious == 1) {
-			ctxt.fillStyle = self.colorForPlayerBorder(1);
-			msg = G.strings.secondVictory;
-		} else if (victorious == 2) {
-			ctxt.fillStyle = self.colorForPlayerBorder(2);
-			msg = G.strings.thirdVictory;
-		} else if (victorious == 3) {
-			ctxt.fillStyle = self.colorForPlayerBorder(3);
-			msg = G.strings.fourthVictory;
+		if (G.playerManager.count() < 4) {
+			var ctxt = G.graphicsManager.messagesContext;
+			ctxt.clearRect(data.x0,data.y0,data.width,data.height);
+			ctxt.font = "bold 24px CustomFont, sans-serif";
+			
+			var msg;
+			if (tiegame) {
+				ctxt.fillStyle = G.colors.black;
+				msg = G.strings.tieGame;
+			} else if (victorious == 0) {
+				ctxt.fillStyle = self.colorForPlayerBorder(0);
+				msg = G.strings.firstVictory;
+			} else if (victorious == 1) {
+				ctxt.fillStyle = self.colorForPlayerBorder(1);
+				msg = G.strings.secondVictory;
+			} else if (victorious == 2) {
+				ctxt.fillStyle = self.colorForPlayerBorder(2);
+				msg = G.strings.thirdVictory;
+			} else if (victorious == 3) {
+				ctxt.fillStyle = self.colorForPlayerBorder(3);
+				msg = G.strings.fourthVictory;
+			}
+			var msglen = ctxt.measureText(msg);
+			ctxt.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
 		}
-		var msglen = ctxt.measureText(msg);
-		ctxt.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
-		
-		self.showPlayerScore(0);
-		self.showPlayerScore(1);
-		self.showPlayerScore(2);
-		//self.showPlayerScore(3);
-		
-		G.Piles[0].redrawBorder(true);
-		G.Piles[1].redrawBorder(true);
-		G.Piles[2].redrawBorder(true);
-		//G.Piles[3].redrawBorder(true);
+		for (var i=0; i<4; i++)
+			if (G.playerManager.isVisible(i)) {
+				self.showPlayerScore(i);
+				G.Piles[i].redrawBorder(true);
+		}
 	}
 }
 

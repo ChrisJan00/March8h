@@ -115,9 +115,10 @@ G.Main = function() {
 	self.drawInitialGame = function() {
 		self.repositionEverything();
 		G.graphicsManager.clearBackground();
-		G.Piles[0].drawFromScratch();
-		G.Piles[1].drawFromScratch();
-		G.Piles[2].drawFromScratch();
+		for (var i=0; i<4; i++)
+			if (G.playerManager.isVisible(i)) {
+				G.Piles[i].drawFromScratch();
+		}
 		G.board.drawEmpty();
 		G.board.drawAllTiles();
 		G.display.showPlayer();
@@ -126,47 +127,6 @@ G.Main = function() {
 		G.gameLog.updateVisible();
 		G.graphicsManager.redraw();
 		self.enableTurn();
-	}
-	
-	self.repositionEverythingOld = function() {
-		var extraWidth = 60;
-		var minHorzSpace = G.Piles[0].width + G.Piles[1].width + G.board.width + extraWidth;
-		if (minHorzSpace < 640) {
-			// center stuff
-			G.graphicsManager.resizeCanvas(640, 480);
-			G.board.x0 = Math.floor(G.graphicsManager.width / 2 - G.board.width/2);
-			G.board.y0 = Math.floor(G.graphicsManager.height / 2 - G.board.height/2);
-			G.Piles[0].x0 = Math.floor(G.board.x0 / 2 - G.Piles[0].width/2);
-			G.Piles[0].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles[0].height/2);
-			G.Piles[1].x0 = Math.floor((G.board.x0 + G.board.width + G.graphicsManager.width)/2 - G.Piles[1].width/2);
-			G.Piles[1].y0 = G.Piles[0].y0;
-			
-			G.coords.text.x0 = G.board.x0;
-			G.coords.text.width = G.board.width;
-			G.optionsButton.x0 = G.graphicsManager.width - G.optionsButton.width - 5;
-			G.optionsButton.y0 = 10;
-		} else {
-			// resize canvas
-			var newWidth = minHorzSpace;
-			// centered board, 90 on top (50 for player score + 20 margin on each side)
-			var newHeight = G.board.height + 180;
-			G.graphicsManager.resizeCanvas(newWidth, newHeight);
-			G.Piles[0].x0 = 10;
-			G.Piles[0].y0 = Math.floor(newHeight/2 - G.Piles[0].height/2);
-			G.board.x0 = G.Piles[0].width + 30;
-			G.board.y0 = Math.floor(newHeight/2 - G.board.height/2);
-			G.Piles[1].x0 = G.Piles[0].width + G.board.width + 50;
-			G.Piles[1].y0 = G.Piles[0].y0;
-			
-			G.coords.text.x0 = G.board.x0;
-			G.coords.text.width = G.board.width;
-			G.optionsButton.x0 = newWidth - G.optionsButton.width - 5;
-			G.optionsButton.y0 = 10; //G.Piles[1].y0 - G.optionsButton.height - 10;
-		}
-		
-		// probably the graphicsmanager should do this
-		G.xoffset = G.findAbsoluteX(G.gameCanvas);
-		G.yoffset = G.findAbsoluteY(G.gameCanvas);
 	}
 	
 	self.repositionEverything = function() {
@@ -202,6 +162,8 @@ G.Main = function() {
 		G.Piles[pn].x0 = Math.floor(G.board.x0 / 2 - G.Piles.widthOfVertical()/2);
 		if (vertDimension < vertSpace)
 			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles.heightOfVertical()/2);
+		else if (G.Piles.heightOfVertical() < G.board.height)
+			G.Piles[pn].y0 = Math.floor(G.board.y0 + G.board.height/2 - G.Piles.heightOfVertical()/2);
 		else
 			G.Piles[pn].y0 = topSpace;
 			
@@ -213,6 +175,8 @@ G.Main = function() {
 		G.Piles[pn].x0 = G.board.x0 + G.board.width + Math.floor(G.board.x0 / 2 - G.Piles.widthOfVertical()/2);
 		if (vertDimension < vertSpace)
 			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles.heightOfVertical()/2);
+		else if (G.Piles.heightOfVertical() < G.board.height)
+			G.Piles[pn].y0 = Math.floor(G.board.y0 + G.board.height/2 - G.Piles.heightOfVertical()/2);
 		else
 			G.Piles[pn].y0 = topSpace;
 			
@@ -311,9 +275,10 @@ G.Main = function() {
 		G.turnEnabled = true;
 		G.turnDelay = 0;
 		
-		G.Piles[0].redrawBorder(G.playerManager.currentId() == 0);
-		G.Piles[1].redrawBorder(G.playerManager.currentId() == 1);
-		G.Piles[2].redrawBorder(G.playerManager.currentId() == 2);
+		if (!G.waitingForRestart)
+			for (var i=0; i<4; i++)
+				if (G.playerManager.isVisible(i))
+					G.Piles[i].redrawBorder(G.playerManager.currentId() == i);
 		
 		if ((!G.waitingForTurn) && (!G.playerManager.isHuman())) {
 			G.waitingForTurn = true;
@@ -337,14 +302,17 @@ G.Main = function() {
 			var c = G.computerChoice;
 			turnIsReady = G.computerMove(c[0],c[1],c[2]);
 		} else {
-			if (G.Piles[0].isClicked(G.mouse.x, G.mouse.y))
-				G.Piles[0].manageClicked(G.mouse.x, G.mouse.y);
-			else if (G.Piles[1].isClicked(G.mouse.x, G.mouse.y))
-				G.Piles[1].manageClicked(G.mouse.x, G.mouse.y);
-			else if (G.Piles[2].isClicked(G.mouse.x, G.mouse.y))
-				G.Piles[2].manageClicked(G.mouse.x, G.mouse.y);
-			else if (G.board.isClicked(G.mouse.x, G.mouse.y))
-		 		turnIsReady = G.board.manageClicked(G.mouse.x, G.mouse.y);
+			for (var i=0; i<5; i++) {
+				if (i==4) {
+					if (G.board.isClicked(G.mouse.x, G.mouse.y))
+						 turnIsReady = G.board.manageClicked(G.mouse.x, G.mouse.y);
+					break;
+				}
+				if (G.playerManager.isVisible(i) && G.Piles[i].isClicked(G.mouse.x, G.mouse.y)) {
+					G.Piles[i].manageClicked(G.mouse.x, G.mouse.y);
+					break;
+				}
+			}
 	 	}
 	 		
 	 	if (turnIsReady) {	
