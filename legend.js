@@ -41,14 +41,32 @@ G.Display = function() {
 		}
 	}
 	
-	self.playerNameForIndex = function(pn) {
+	self.playerTextForIndex = function(pn) {
 		if (!G.playerManager.isHuman())
 			return G.strings.thinkingMessage;
+		return self.playerNameForIndex(pn);
+	}
+	
+	self.playerNameForIndex = function(pn) {
 		switch(pn) {
 			case 0: return G.strings.firstPlayerName;
 			case 1: return G.strings.secondPlayerName;
 			case 2: return G.strings.thirdPlayerName;
 			case 3: return G.strings.fourthPlayerName;
+		}
+	}
+	
+	self.boardName = function(bn) {
+		switch (bn) {
+			case 0: return G.strings.b6x6;
+			case 1: return G.strings.b4x4;
+			case 2: return G.strings.b6x6h4;
+			case 3: return G.strings.b6x6h5;
+			case 4: return G.strings.b6x6h6;
+			case 5: return G.strings.b8x8;
+			case 6: return G.strings.b8x8h4;
+			case 7: return G.strings.b8x8h8;
+			case 8: return G.strings.b8x8h12;
 		}
 	}
 	
@@ -106,7 +124,7 @@ G.Display = function() {
 		if (G.playerManager.count() < 4) {
 			ctxt.font = "bold 28px CustomFont, sans-serif";
 			ctxt.fillStyle = self.colorForPlayerBorder(pn);
-			var msg  = self.playerNameForIndex(pn);
+			var msg  = self.playerTextForIndex(pn);
 			var msglen = ctxt.measureText(msg);
 			ctxt.fillText(msg, data.x0+data.width/2 - msglen.width/2, data.y0+data.height/2+14 );
 		}

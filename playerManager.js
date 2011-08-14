@@ -74,4 +74,19 @@ G.PlayerManager = function() {
 	self.isVisible = function(id) {
 		return self.types[id] != G.playerTypes.none;
 	}
+	
+	self.typeName = function(pn) {
+		var ptype;
+		switch (self.types[pn]) {
+			case G.playerTypes.none: ptype = G.strings.noplayer; break;
+			case G.playerTypes.human: ptype =  G.strings.human; break;
+			case G.playerTypes.computerEasy: ptype =  G.strings.computerEasy; break;
+			case G.playerTypes.computerHard: ptype =  G.strings.computerHard; break;
+		}
+		return G.display.playerNameForIndex(pn)+":"+ptype;
+	}
+	
+	self.increaseType = function(pn) {
+		self.types[pn] = (self.types[pn] + 1) % 4;
+	}
 }

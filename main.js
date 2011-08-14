@@ -51,6 +51,7 @@ G.Main = function() {
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
 		G.board = new G.BoardClass();
+		G.boardCount = 9;
 	
 		G.coords = {
 			text : {
@@ -89,6 +90,10 @@ G.Main = function() {
 		G.optionsButton = new G.ClickableOption( G.graphicsManager.messagesLayer, 605, 5, 50, 25, G.strings.optionsButton, G.optionsMenu.activate );
 		G.optionsButton.fontSize = 10;
 		
+		G.boardMenu = new G.BoardMenu();
+		G.boardMenu.init();
+		G.boardMenu.hide();
+		
 		G.waitingForRestart = false;
 		G.waitingForTurn = false;
 	}
@@ -103,7 +108,7 @@ G.Main = function() {
 		G.waitingForRestart = false;
 		G.pauseManager.disablePause();
 		G.playerManager.rand();
-		G.board.set6x6full();
+		self.setBoard();
 		G.board.clearContents();
 		G.board.putExcessTiles();
 		G.Piles.chooseAll();
@@ -127,6 +132,21 @@ G.Main = function() {
 		G.gameLog.updateVisible();
 		G.graphicsManager.redraw();
 		self.enableTurn();
+	}
+	
+	self.setBoard = function() {
+		var bn = G.boardMenu.selectedBoard;
+		switch (bn) {
+			case 0: G.board.set6x6full(); break;
+			case 1: G.board.set4x4(); break;
+			case 2: G.board.set6x6h4(); break;
+			case 3: G.board.set6x6h5(); break;
+			case 4: G.board.set6x6h6(); break;
+			case 5: G.board.set8x8full(); break;
+			case 6: G.board.set8x8h4(); break;
+			case 7: G.board.set8x8h8(); break;
+			case 8: G.board.set8x8h12(); break;
+		}
 	}
 	
 	self.repositionEverything = function() {

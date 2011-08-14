@@ -1,12 +1,17 @@
-G.OptionsMenuWidth = 230;
-G.OptionsMenuHeight = 350;
+G.BoardMenuWidth = 230;
+G.BoardMenuHeight = 350;
 
-G.OptionsMenu = function() {
+// TODO: button color when string change (should be hover, not pressed)
+// Todo: player names with corresponding colors in the button labels!
+// Todo: flood cannot change color (when more than 2 players)
+// Todo: check that player settings are valid before start game
+G.BoardMenu = function() {
 	var self = this;
 	
 	self.canvas = document.getElementById("optionsmenu");
-	self.canvas.width = G.OptionsMenuWidth;
-	self.canvas.height = G.OptionsMenuHeight;
+	self.canvas.width = G.BoardMenuWidth;
+	self.canvas.height = G.BoardMenuHeight;
+	self.selectedBoard = 0;
 	
 	self.mouse = {
 		x: 0,
@@ -17,26 +22,29 @@ G.OptionsMenu = function() {
 	
 	self.init = function() {
 		self.optionButtons = [];
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 60, 200, 40, G.strings.undoButton, G.gameLog.undo ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 105, 200, 40, G.strings.redoButton, G.gameLog.redo ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 150, 200, 40, G.strings.gamelogToggleButton, G.gameLog.toggle ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 195, 200, 40, G.strings.newGameButton, self.doRestart ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 240, 200, 40, G.strings.exitGameButton, self.doExit ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 60, 200, 40, G.playerManager.typeName(0), 
+			function(){self.selectPlayer(0);} ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 105, 200, 40, G.playerManager.typeName(1), 
+			function(){self.selectPlayer(1);} ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 150, 200, 40, G.playerManager.typeName(2),
+			function(){self.selectPlayer(2);} ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 195, 200, 40, G.playerManager.typeName(3), 
+			function(){self.selectPlayer(3);} ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 240, 200, 40, G.display.boardName(self.selectedBoard), self.selectBoard ));
 		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 285, 200, 40, G.strings.closeMenuButton, self.deactivate ));
 	}
 	
-	self.doRestart = function() {
-		self.deactivate();
-		G.main.restartGame();
-		G.main.drawInitialGame();
+	self.selectPlayer = function(n) {
+		G.playerManager.increaseType(n);
+		self.optionButtons[n].label = G.playerManager.typeName(n);
+		self.optionButtons[n].redraw();
 	}
 	
-	self.doExit = function() {
-		self.deactivate();
-		G.main.restartGame();
-		G.menu.reloadControls();
-		G.menu.show();
-	} 
+	self.selectBoard = function() {
+		self.selectedBoard = self.selectedBoard + 1 % G.boardCount;
+		self.optionButtons[4].label = G.display.boardName(self.selectedBoard);
+		self.optionButtons[4].redraw();
+	}
 	
 	self.activate = function() {
 		G.pauseManager.enablePause();
@@ -50,8 +58,8 @@ G.OptionsMenu = function() {
 	
 	// show / hide
 	self.show = function() {
-		self.canvas.style.width = G.OptionsMenuWidth;
-		self.canvas.style.height = G.OptionsMenuHeight;
+		self.canvas.style.width = G.BoardMenuWidth;
+		self.canvas.style.height = G.BoardMenuHeight;
 		self.repaint();
 		
 		self.canvas.addEventListener('mousemove', self.moveEvent, false);
@@ -84,7 +92,7 @@ G.OptionsMenu = function() {
 		ctxt.fillStyle = G.colors.black;
 		ctxt.font = "bold 18px CustomFont, sans-serif";
 		var textLen = ctxt.measureText("OPTIONS").width;
-		ctxt.fillText(G.strings.optionsMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
+		ctxt.fillText(G.strings.BoardMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
 		
 		for (var i=0; i<self.optionButtons.length; i++)
 			self.optionButtons[i].drawNormal();
@@ -167,97 +175,3 @@ G.OptionsMenu = function() {
 	
 }
 
-G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
-	var self = this;
-	
-	self.label = text;
-	self.x0 = x;
-	self.y0 = y;
-	self.width = w;
-	self.height = h;
-	self.canvas = canvas;
-	self.ctxt = self.canvas.getContext("2d");
-	self.fontSize = 18;
-	self.callback = callBack;
-	self.hovered = false;
-	self.pressed = false;
-	
-	self.isHover = function(x,y) {
-		return x>=self.x0 && x<self.x0 + self.width && y>=self.y0 && y<self.y0 + self.height;
-	}
-	
-	self.manageHover = function(x,y) {
-		if (self.pressed)
-			return;
-		if (self.hovered && !self.isHover(x,y)) {
-			self.hovered = false;
-			self.drawNormal();
-		} else if ((!self.hovered) && self.isHover(x,y)) {
-			self.hovered = true;
-			self.drawHover();
-		}
-	}
-	
-	self.managePressed = function(x,y) {
-		if (!self.isHover(x,y))
-			return false;
-		self.pressed = true;
-		self.drawPressed();
-		return true;
-	}
-	
-	self.manageReleased = function(x,y) {
-		if (!self.isHover(x,y))
-			return false;
-		self.drawHover();
-		if (self.pressed)
-			self.callback();
-		self.pressed = false;
-		return true;
-	}
-	
-	self.drawNormal = function() {
-		self.draw(G.colors.white);
-	}
-	
-	self.drawHover = function() {
-		self.draw(G.colors.lightGrey);
-	}
-	
-	self.drawPressed = function() {
-		self.draw(G.colors.darkGrey);
-	}
-	
-	self.redraw = function() {
-		if (self.pressed)
-			self.drawPressed();
-		else
-		if (self.hovered)
-			self.drawHover();
-		else
-			self.drawNormal();
-	}
-	
-	self.draw = function(bgColor) {
-		var ctxt = self.ctxt;
-		ctxt.fillStyle = bgColor;
-		ctxt.strokeStyle = G.colors.lightGrey;
-		ctxt.fillRect(self.x0, self.y0, self.width, self.height);
-		ctxt.strokeRect(self.x0, self.y0, self.width, self.height);
-		
-		ctxt.fillStyle = G.colors.black;
-		ctxt.font = "bold "+self.fontSize+"px CustomFont, sans-serif";
-		var textLen = ctxt.measureText(self.label).width;
-		ctxt.fillText(self.label, self.x0 + self.width/2 - textLen/2, self.y0 + self.height / 2 + self.fontSize/2 - 2);
-
-		G.graphicsManager.mark(self.x0-1, self.y0-1, self.width+2, self.height+2);
-		G.graphicsManager.redraw();
-	}
-	
-	self.hide = function() {
-		self.ctxt.clearRect(self.x0-1, self.y0-1, self.width+2, self.height+2);
-		G.graphicsManager.mark(self.x0-1, self.y0-1, self.width+2, self.height+2);
-		G.graphicsManager.redraw();
-	}
-	
-}

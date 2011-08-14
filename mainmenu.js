@@ -43,7 +43,8 @@ G.GameMenu = function() {
 		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 160, 400, 50, G.strings.pvpEasy, self.pvpno));
 		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 220, 400, 50, G.strings.pvpDef, self.pvpdef));
 		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 280, 400, 50, G.strings.pvcEasy, self.compeasy));
-		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 340, 400, 50, G.strings.pvcDef, self.comphard));
+		//self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 340, 400, 50, G.strings.pvcDef, self.comphard));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 340, 400, 50, G.strings.pvcDef, G.boardMenu.show));
 		
 	}
 	

@@ -36,6 +36,17 @@ G.strings = {
 	newGameButton : "start new game",
 	exitGameButton : "exit game",
 	closeMenuButton : "continue",
-
-
+	noplayer : "none",
+	human : "player",
+	computerEasy: "easy AI",
+	computerHard: "medium AI",
+	b4x4 : "4x4 board",
+	b6x6 : "6x6 board",
+	b6x6h4 : "6x6, 4 holes",
+	b6x6h5 : "6x6, 5 holes",
+	b6x6h6 : "6x6, 6 holes",
+	b8x8 : "8x8 board",
+	b8x8h4 : "8x8, 4 holes",
+	b8x8h8 : "8x8, 8 holes",
+	b8x8h12 : "8x8, 12 holes",
 };
