@@ -452,7 +452,7 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
 	
-	var currentPile = G.Piles[G.playerManager.current];
+	var currentPile = G.Piles[G.playerManager.currentId()];
 	
 	// place taken?
 	if (this[mix][miy])
@@ -478,7 +478,7 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	this.startBorderAnimation(mix,miy);
 
-	G.gameLog.registerMove(G.playerManager.current, stone, stoneIndex);
+	G.gameLog.registerMove(G.playerManager.currentId(), stone, stoneIndex);
 	
 	G.floodCheck.checkFlood(mix, miy);
 
@@ -489,8 +489,8 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 
 G.BoardClass.prototype.excessTiles = function() {
 		var totalTiles = this.rows * this.cols - this.holeCount();
-		var tilesPerPlayer = Math.floor(totalTiles / G.playerCount);
-		return totalTiles - tilesPerPlayer * G.playerCount;
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerManager.count());
+		return totalTiles - tilesPerPlayer * G.playerManager.count();
 }
 
 G.BoardClass.prototype.putExcessTiles = function() {

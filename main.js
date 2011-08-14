@@ -47,8 +47,6 @@ G.Main = function() {
 		
 		G.playerManager = new G.PlayerManager();
 		G.playerManager.init();
-		G.playerCount = G.playerManager.count();
-		//G.playerManager.rand();
 		
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
@@ -232,9 +230,9 @@ G.Main = function() {
 		G.turnEnabled = true;
 		G.turnDelay = 0;
 		
-		G.Piles[0].redrawBorder(G.playerManager.current == 0);
-		G.Piles[1].redrawBorder(G.playerManager.current == 1);
-		G.Piles[2].redrawBorder(G.playerManager.current == 2);
+		G.Piles[0].redrawBorder(G.playerManager.currentId() == 0);
+		G.Piles[1].redrawBorder(G.playerManager.currentId() == 1);
+		G.Piles[2].redrawBorder(G.playerManager.currentId() == 2);
 		
 		if ((!G.waitingForTurn) && (!G.playerManager.isHuman())) {
 			G.waitingForTurn = true;

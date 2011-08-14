@@ -90,7 +90,7 @@ G.Display = function() {
 		
 		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		var pn = G.playerManager.current;
+		var pn = G.playerManager.currentId();
 		
 		self.showPlayerScore(0);
 		self.showPlayerScore(1);

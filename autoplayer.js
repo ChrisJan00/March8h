@@ -1,7 +1,7 @@
 //----------------------------------------------------------
 G.computerPlay = function() {
 	var self = this;
-	var pn = G.playerManager.current;
+	var pn = G.playerManager.currentId();
 	var decisionExp = 5;
 	
 	self.maximizeEntropy = G.playerManager.currentType() == G.playerTypes.computerHard;
@@ -126,7 +126,7 @@ G.computerPlay = function() {
 G.computerMove = function(mix,miy,elem) {
 		// find one stone in own pile
 		
-		var currentPile = G.Piles[G.playerManager.current];
+		var currentPile = G.Piles[G.playerManager.currentId()];
 		
 		var stone = currentPile.getStoneByElement(elem);
 		var stoneIndex = stone.ix * currentPile.rows + stone.iy;
@@ -140,7 +140,7 @@ G.computerMove = function(mix,miy,elem) {
 		
 		G.board.startBorderAnimation(mix,miy);
 		
-		G.gameLog.registerMove(G.playerManager.current, stone, stoneIndex);
+		G.gameLog.registerMove(G.playerManager.currentId(), stone, stoneIndex);
 	
 		//startFlood(mix, miy);
 		G.floodCheck.checkFlood(mix, miy);

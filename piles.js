@@ -16,7 +16,7 @@ G.PileClass.prototype.manageClicked = function( mx, my )
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
 	
-	if (G.playerManager.current != this.owner)
+	if (G.playerManager.currentId() != this.owner)
 		return;
 	
 	var newStone = this[mix][miy];
@@ -60,7 +60,7 @@ G.PileClass.prototype.chooseTiles = function() {
 	
 	// compute dimensions, needed number of tiles
 	var totalTiles = G.board.rows * G.board.cols - G.board.holeCount();
-	var tilesPerPlayer = Math.floor(totalTiles / G.playerCount);
+	var tilesPerPlayer = Math.floor(totalTiles / G.playerManager.count());
 	this.totalItems = tilesPerPlayer;
 	
 	// find number of rows and columns

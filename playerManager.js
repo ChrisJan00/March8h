@@ -2,6 +2,7 @@ G.PlayerManager = function() {
 	var self = this;
 	
 	self.types = [G.playerTypes.human, G.playerTypes.computerHard, G.playerTypes.computerHard, G.playerTypes.none];
+	self.order = [];
 	self.current = 0;
 	
 	self.init = function() {
@@ -13,36 +14,56 @@ G.PlayerManager = function() {
 	}
 	
 	self.count = function() {
+		if (self.order.length > 0)
+			return self.order.length;
+		
 		var cnt = 0;
-		for (var i=0; i<self.types.length; i++)
+		for (var i = 0; i < self.types.length; i++)
 			if (self.types[i] != G.playerTypes.none)
 				cnt++;
 		return cnt;
 	}
 	
-	// todo: random order, but sequential positioning of piles
 	self.next = function() {
-		while (self.types[++self.current % self.types.length] == G.playerTypes.none);
-		self.current = self.current % self.types.length;
+		self.current = (self.current+1) % self.order.length;
 	}
 	
 	self.rand = function() {
-		var n = G.randint(self.count());
-		for (var i=0; i<self.types.length; i++)
-			if (self.types[i] != G.playerTypes.none && n-- <= 0) {
+		// random sort
+		self.order = [];
+		var playerStack = [];
+		
+		for (var i = 0; i<self.types.length; i++)
+			if (self.types[i] != G.playerTypes.none)
+				playerStack.push(i);
+		
+		while (playerStack.length > 0) {
+			self.order.push(playerStack.splice(G.randint(playerStack.length),1)[0]);
+		}
+		
+		self.current = 0;
+	}
+	
+	self.currentId = function() {
+		return self.order[self.current];
+	}
+	
+	self.setCurrentId = function(id) {
+		for (var i = 0; i < self.order.length; i++)
+			if (self.order[i] == id) {
 				self.current = i;
-				return i;
+				break;
 			}
 	}
 	
 	self.currentType = function() {
-		return self.types[self.current];
+		return self.types[self.order[self.current]];
 	}
 	
 	self.isHuman = function(pn) {
 		if (typeof(pn) == "undefined")
-			return self.types[self.current] == G.playerTypes.human;
+			return self.types[self.order[self.current]] == G.playerTypes.human;
 		else
-			return self.types[pn] == G.playerTypes.human;
+			return self.types[self.order[pn]] == G.playerTypes.human;
 	}
 }
