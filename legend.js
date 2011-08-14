@@ -131,7 +131,7 @@ G.Display = function() {
 		var y = G.board.y0 + G.board.height
 		
 		var x0 = G.board.x0
-		var y0 = y + 20
+		var y0 = G.coords.legend.y0
 		var y1 = y + G.imageFire.height/2 + 5
 		var ctxt = G.graphicsManager.messagesContext;
 		G.graphicsManager.mark(0, y0, G.graphicsManager.width, 25);

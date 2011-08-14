@@ -48,6 +48,10 @@ G.PlayerManager = function() {
 		return self.order[self.current];
 	}
 	
+	self.idForOrder = function(id) {
+		return self.order[id];
+	}
+	
 	self.setCurrentId = function(id) {
 		for (var i = 0; i < self.order.length; i++)
 			if (self.order[i] == id) {

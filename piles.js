@@ -121,6 +121,32 @@ G.PileClass.prototype.chooseTiles = function() {
 	}
 }
 
+G.PileClass.prototype.setVertical = function( vert ) {
+	if (this.vertical != vert) {
+		// transpose
+		var stoneList = [];
+		for (var y = 0; y < this.rows; y++)
+			for (var x = 0; x < this.cols; x++)
+				stoneList.push(this[x][y]);
+		
+		var tmp = this.cols;
+		this.cols = this.rows;
+		this.rows = tmp;
+		this.vertical = !this.vertical;
+		for (var x = 0; x < this.cols; x++) {
+			this[x] = [];
+			for (var y = 0; y < this.rows; y++) {
+				var st = stoneList.splice(0,1)[0];
+				st.ix = x;
+				st.iy = y;
+				this.set(st.ix, st.iy, st);
+			}
+		}
+		this.width = this.cols * this.side;
+		this.height = this.rows * this.side;
+	}
+}
+
 ////////////////////////////////
 
 G.PileClass.prototype.drawFromScratch = function() {
@@ -175,6 +201,7 @@ G.PileClass.prototype.getStoneByElement = function(elem)
 	return false;
 }
 
+// todo: G.Piles should become a PileManager
 G.initPiles = function()
 {
 	G.Piles = [];
@@ -213,6 +240,36 @@ G.initPiles = function()
 		G.Piles[1].chooseTiles();
 		G.Piles[2].chooseTiles();
 		G.Piles[3].chooseTiles();
+	}
+
+	G.Piles.widthOfVertical = function() {
+		var totalTiles = G.board.rows * G.board.cols - G.board.holeCount();
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerManager.count());
+		
+		return Math.ceil(tilesPerPlayer / G.board.rows) * G.board.side;
+	}
+	
+	G.Piles.widthOfHorizontal = function() {
+		var totalTiles = G.board.rows * G.board.cols - G.board.holeCount();
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerManager.count());
+			
+		var rowCount = Math.ceil(tilesPerPlayer / G.board.cols);
+		return Math.ceil(tilesPerPlayer / rowCount) * G.board.side;
+	}
+	
+	G.Piles.heightOfVertical = function() {
+		var totalTiles = G.board.rows * G.board.cols - G.board.holeCount();
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerManager.count());
+			
+		var colCount = Math.ceil(tilesPerPlayer / G.board.rows);
+		return Math.ceil(tilesPerPlayer / colCount) * G.board.side;
+	}
+	
+	G.Piles.heightOfHorizontal = function() {
+		var totalTiles = G.board.rows * G.board.cols - G.board.holeCount();
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerManager.count());
+			
+		return Math.ceil(tilesPerPlayer / G.board.cols) * G.board.side;
 	}
 }
 

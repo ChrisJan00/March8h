@@ -58,6 +58,10 @@ G.Main = function() {
 				y0: 5,
 				width: 300,
 				height: 62
+			},
+			legend : {
+				x0: 0,
+				y0: 440
 			}
 		};
 	
@@ -124,7 +128,7 @@ G.Main = function() {
 		self.enableTurn();
 	}
 	
-	self.repositionEverything = function() {
+	self.repositionEverythingOld = function() {
 		var extraWidth = 60;
 		var minHorzSpace = G.Piles[0].width + G.Piles[1].width + G.board.width + extraWidth;
 		if (minHorzSpace < 640) {
@@ -159,6 +163,83 @@ G.Main = function() {
 			G.optionsButton.x0 = newWidth - G.optionsButton.width - 5;
 			G.optionsButton.y0 = 10; //G.Piles[1].y0 - G.optionsButton.height - 10;
 		}
+		
+		// probably the graphicsmanager should do this
+		G.xoffset = G.findAbsoluteX(G.gameCanvas);
+		G.yoffset = G.findAbsoluteY(G.gameCanvas);
+	}
+	
+	self.repositionEverything = function() {
+		var pn;
+		var extraWidth = 60;
+		var horzPileCount = Math.max(G.playerManager.count() - 2, 0);
+		// 90 = 50 player score + 20 on each side
+		var topSpace = 90;
+		if (G.playerManager.count() == 4)
+			topSpace = Math.max(90, G.Piles.heightOfHorizontal() + 30);
+		var legendSpace = 40;
+		var extraBottomSpace = G.playerManager.count() >= 3 ? G.Piles.heightOfHorizontal() + 30 : 0;
+		var horzSpace = G.Piles.widthOfVertical() * 2 + G.board.width + extraWidth;
+		var vertSpace = topSpace + G.board.height + extraBottomSpace + legendSpace;
+		var vertDimension = vertSpace;
+		
+		if (horzSpace  < 640)
+			horzSpace = 640;
+		if (vertSpace < 480)
+			vertSpace = 480;
+
+		G.graphicsManager.resizeCanvas(horzSpace, vertSpace);
+		
+		G.board.x0 = Math.floor(G.graphicsManager.width / 2 - G.board.width/2);
+		if (vertDimension < vertSpace)
+			G.board.y0 = Math.floor(G.graphicsManager.height / 2 - G.board.height/2);
+		else
+			G.board.y0 = topSpace;
+		
+		// first pile
+		pn = G.playerManager.idForOrder(0);
+		G.Piles[pn].setVertical(true);
+		G.Piles[pn].x0 = Math.floor(G.board.x0 / 2 - G.Piles.widthOfVertical()/2);
+		if (vertDimension < vertSpace)
+			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles.heightOfVertical()/2);
+		else
+			G.Piles[pn].y0 = topSpace;
+			
+		// second pile
+		pn = G.playerManager.idForOrder(1);
+		if (G.playerManager.count() == 4)
+			pn = G.playerManager.idForOrder(2);
+		G.Piles[pn].setVertical(true);
+		G.Piles[pn].x0 = G.board.x0 + G.board.width + Math.floor(G.board.x0 / 2 - G.Piles.widthOfVertical()/2);
+		if (vertDimension < vertSpace)
+			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles.heightOfVertical()/2);
+		else
+			G.Piles[pn].y0 = topSpace;
+			
+		// third
+		if (G.playerManager.count() >= 3) {
+			pn = G.playerManager.idForOrder(2);
+			if (G.playerManager.count() == 4)
+				pn = G.playerManager.idForOrder(3);
+			G.Piles[pn].setVertical(false);
+			G.Piles[pn].x0 = Math.floor(G.graphicsManager.width / 2 - G.Piles.widthOfHorizontal()/2);
+			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height - legendSpace - extraBottomSpace/2 - G.Piles.heightOfHorizontal()/2);
+		}
+		
+		// fourth
+		if (G.playerManager.count() == 4) {
+			pn = G.playerManager.idForOrder(1);
+			G.Piles[pn].setVertical(false);
+			G.Piles[pn].x0 = Math.floor(G.graphicsManager.width / 2 - G.Piles.widthOfHorizontal()/2);
+			G.Piles[pn].y0 = Math.floor(topSpace/2 - G.Piles.heightOfHorizontal()/2);
+		}
+		
+		G.coords.text.x0 = G.board.x0;
+		G.coords.text.width = G.board.width;
+		G.optionsButton.x0 = G.graphicsManager.width - G.optionsButton.width - 5;
+		G.optionsButton.y0 = 10; //G.Piles[1].y0 - G.optionsButton.height - 10;
+		
+		G.coords.legend.y0 = G.graphicsManager.height - 40;
 		
 		// probably the graphicsmanager should do this
 		G.xoffset = G.findAbsoluteX(G.gameCanvas);
