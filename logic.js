@@ -138,6 +138,7 @@ G.FloodCheck = function() {
 	}
 	
 	self.convertStone = function(from, to) {
+		var formerOwner = self.board[to.ix][to.iy].owner;
 		self.board[to.ix][to.iy] = {
 			ix : to.ix,
 			iy : to.iy,
@@ -146,10 +147,10 @@ G.FloodCheck = function() {
 			bgColor : from.bgColor,
 			visible : true,
 			active : to.active,
+			perceivedOwner : formerOwner,
 		}
 		
 		if (self.board == G.board) {
-			self.board[to.ix][to.iy].invertedColors = true;
 			var delay = to.step*G.animationDelay;
 			setTimeout(function(){G.board.startTileAnimation(to.ix, to.iy);}, delay);
 			G.turnDelay = Math.max(G.turnDelay, G.animationDelay * (G.framesPerStrip+2) + delay);

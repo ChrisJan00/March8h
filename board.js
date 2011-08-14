@@ -166,7 +166,7 @@ G.StoneHolder.prototype = {
 		G.graphicsManager.mark(mx,my,this.side,this.side);
 		
 		if (this[x][y] && this[x][y].active && this == G.board) {
-				this[x][y].invertedColors = false;
+				this[x][y].perceivedOwner = this[x][y].owner;
 				this.refreshTileBordersExpansive(x,y);
 		}
 		
@@ -234,40 +234,32 @@ G.StoneHolder.prototype = {
 			var diagLD = (x>0 && y<this.rows-1 && this[x-1][y+1] && this[x-1][y+1].owner == stone.owner && this[x-1][y+1].element == stone.element);
 			var diagRD = (x<this.cols-1 && y<this.rows-1 && this[x+1][y+1] && this[x+1][y+1].owner == stone.owner && this[x+1][y+1].element == stone.element);
 			
-			var perceivedOwner = stone.invertedColors? (1-stone.owner) : stone.owner;
+			var colorSoft = G.display.colorForPlayer(stone.perceivedOwner);
+			var colorHard = G.display.colorForPlayerBorder(stone.perceivedOwner);
 					
 			// draw own border
-			ctxt.fillStyle = hideLeft? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideLeft? colorSoft : colorHard;
 			ctxt.fillRect(ix, iy+1, 1, this.side-2);
 			
-			ctxt.fillStyle = hideRight? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideRight? colorSoft : colorHard;
 			ctxt.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
 			
-			ctxt.fillStyle = hideUp? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideUp? colorSoft : colorHard;
 			ctxt.fillRect(ix+1, iy, this.side-2, 1);
 		
-			ctxt.fillStyle = hideDown? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideDown? colorSoft : colorHard;
 			ctxt.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
 			
-			ctxt.fillStyle = G.display.colorForPlayerBorder(perceivedOwner);
-			ctxt.fillStyle = (hideLeft && hideUp && diagLU)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideLeft && hideUp && diagLU)? colorSoft : colorHard;
 			ctxt.fillRect(ix, iy, 1, 1);
 			
-			ctxt.fillStyle = (hideRight && hideUp && diagRU)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideRight && hideUp && diagRU)? colorSoft : colorHard;
 			ctxt.fillRect(ix+this.side-1, iy, 1, 1);
 				
-			ctxt.fillStyle = (hideLeft && hideDown && diagLD)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideLeft && hideDown && diagLD)? colorSoft : colorHard;
 			ctxt.fillRect(ix, iy+this.side-1, 1, 1);
 				
-			ctxt.fillStyle = (hideRight && hideDown && diagRD)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideRight && hideDown && diagRD)? colorSoft : colorHard;
 			ctxt.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
 
 			G.graphicsManager.mark(ix, iy, this.side, this.side);

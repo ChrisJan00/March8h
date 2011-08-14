@@ -70,4 +70,8 @@ G.PlayerManager = function() {
 		else
 			return self.types[self.order[pn]] == G.playerTypes.human;
 	}
+	
+	self.isVisible = function(id) {
+		return self.types[id] != G.playerTypes.none;
+	}
 }
