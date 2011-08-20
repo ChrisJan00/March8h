@@ -30,6 +30,7 @@ G.strings = {
 	pvcDef : "player vs computer (hard)",
 	optionsButton : "options",
 	optionsMenu : "options",
+	boardMenu : "Custom Game",
 	undoButton : "undo",
 	redoButton : "redo",
 	gamelogToggleButton : "toggle log",
@@ -49,4 +50,7 @@ G.strings = {
 	b8x8h4 : "8x8, 4 holes",
 	b8x8h8 : "8x8, 8 holes",
 	b8x8h12 : "8x8, 12 holes",
+	startGame : "start game",
+	normalMode : "normal mode",
+	aggressiveMode : "aggressive mode"
 };

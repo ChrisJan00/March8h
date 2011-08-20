@@ -54,6 +54,7 @@ G.GameMenu = function() {
 	
 	self.show = function()
 	{	
+		G.graphicsManager.resizeCanvas(680, 480);
 		var width = G.graphicsManager.width - 100;
 		var height = G.graphicsManager.height - 100;
 		var x0 = 50;
@@ -80,6 +81,7 @@ G.GameMenu = function() {
 	
 	self.hide = function()
 	{
+		G.boardMenu.hide();
 		G.graphicsManager.clearBackground();
 		self.active = false;
 	}

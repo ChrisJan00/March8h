@@ -9,7 +9,7 @@ G.PlayerManager = function() {
 		
 	}
 	
-	self.valid = function() {
+	self.isValid = function() {
 		return self.count() >= 2;
 	}
 	
@@ -83,7 +83,7 @@ G.PlayerManager = function() {
 			case G.playerTypes.computerEasy: ptype =  G.strings.computerEasy; break;
 			case G.playerTypes.computerHard: ptype =  G.strings.computerHard; break;
 		}
-		return G.display.playerNameForIndex(pn)+":"+ptype;
+		return G.display.playerNameForIndex(pn)+": "+ptype;
 	}
 	
 	self.increaseType = function(pn) {

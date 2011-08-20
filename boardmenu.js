@@ -1,8 +1,6 @@
-G.BoardMenuWidth = 230;
-G.BoardMenuHeight = 350;
+G.BoardMenuWidth = 280;
+G.BoardMenuHeight = 395;
 
-// TODO: button color when string change (should be hover, not pressed)
-// Todo: player names with corresponding colors in the button labels!
 // Todo: flood cannot change color (when more than 2 players)
 // Todo: check that player settings are valid before start game
 G.BoardMenu = function() {
@@ -11,6 +9,8 @@ G.BoardMenu = function() {
 	self.canvas = document.getElementById("optionsmenu");
 	self.canvas.width = G.BoardMenuWidth;
 	self.canvas.height = G.BoardMenuHeight;
+	self.canvas.style.width = G.BoardMenuWidth;
+	self.canvas.style.height = G.BoardMenuHeight;
 	self.selectedBoard = 0;
 	
 	self.mouse = {
@@ -22,27 +22,34 @@ G.BoardMenu = function() {
 	
 	self.init = function() {
 		self.optionButtons = [];
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 60, 200, 40, G.playerManager.typeName(0), 
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 40, 60, 200, 40, G.playerManager.typeName(0), 
 			function(){self.selectPlayer(0);} ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 105, 200, 40, G.playerManager.typeName(1), 
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 40, 105, 200, 40, G.playerManager.typeName(1), 
 			function(){self.selectPlayer(1);} ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 150, 200, 40, G.playerManager.typeName(2),
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 40, 150, 200, 40, G.playerManager.typeName(2),
 			function(){self.selectPlayer(2);} ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 195, 200, 40, G.playerManager.typeName(3), 
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 40, 195, 200, 40, G.playerManager.typeName(3), 
 			function(){self.selectPlayer(3);} ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 240, 200, 40, G.display.boardName(self.selectedBoard), self.selectBoard ));
-		self.optionButtons.push(new G.ClickableOption(self.canvas, 15, 285, 200, 40, G.strings.closeMenuButton, self.deactivate ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 40, 240, 200, 40, G.display.boardName(self.selectedBoard), self.selectBoard ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 40, 285, 200, 40, self.gameModeString(), self.switchGameMode ));
+		self.optionButtons.push(new G.ClickableOption(self.canvas, 40, 330, 200, 40, G.strings.startGame, self.startGame ));
+		self.optionButtons[0].labelColor = G.colors.purpleHighlight;
+		self.optionButtons[1].labelColor = G.colors.orangeHighlight;
+		self.optionButtons[2].labelColor = G.colors.blueHighlight;
+		self.optionButtons[3].labelColor = G.colors.magentaHighlight;
 	}
 	
 	self.selectPlayer = function(n) {
 		G.playerManager.increaseType(n);
 		self.optionButtons[n].label = G.playerManager.typeName(n);
+		self.optionButtons[n].pressed = false;
 		self.optionButtons[n].redraw();
 	}
 	
 	self.selectBoard = function() {
-		self.selectedBoard = self.selectedBoard + 1 % G.boardCount;
+		self.selectedBoard = (self.selectedBoard + 1) % G.boardCount;
 		self.optionButtons[4].label = G.display.boardName(self.selectedBoard);
+		self.optionButtons[4].pressed = false;
 		self.optionButtons[4].redraw();
 	}
 	
@@ -56,17 +63,42 @@ G.BoardMenu = function() {
 		G.pauseManager.disablePause();
 	}
 	
+	self.startGame = function() {
+		if (G.playerManager.isValid()) {
+			self.hide();
+			G.menu.hide();
+			G.main.restartGame();
+			G.main.drawInitialGame();
+			G.pauseManager.disablePause();
+		}
+	}
+	
+	self.gameModeString = function() {
+		if (G.defenseMode)
+			return G.strings.normalMode;
+		return G.strings.aggressiveMode;
+	}
+
+	self.switchGameMode = function() {
+		G.defenseMode = !G.defenseMode;
+		
+		self.optionButtons[5].label = self.gameModeString();
+		self.optionButtons[5].pressed = false;
+		self.optionButtons[5].redraw();
+	}
+	
 	// show / hide
 	self.show = function() {
 		self.canvas.style.width = G.BoardMenuWidth;
 		self.canvas.style.height = G.BoardMenuHeight;
+		self.canvas.width = G.BoardMenuWidth;
+		self.canvas.height = G.BoardMenuHeight;
+		
 		self.repaint();
 		
 		self.canvas.addEventListener('mousemove', self.moveEvent, false);
 		self.canvas.addEventListener('mouseup', self.releaseEvent, false);
 		self.canvas.addEventListener('mousedown', self.pressEvent, false);
-		
-		G.optionsButton.drawNormal();
 	}
 	
 	self.hide = function() {
@@ -91,8 +123,8 @@ G.BoardMenu = function() {
 		
 		ctxt.fillStyle = G.colors.black;
 		ctxt.font = "bold 18px CustomFont, sans-serif";
-		var textLen = ctxt.measureText("OPTIONS").width;
-		ctxt.fillText(G.strings.BoardMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
+		var textLen = ctxt.measureText(G.strings.boardMenu).width;
+		ctxt.fillText(G.strings.boardMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
 		
 		for (var i=0; i<self.optionButtons.length; i++)
 			self.optionButtons[i].drawNormal();
