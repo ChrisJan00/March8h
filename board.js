@@ -43,6 +43,8 @@ G.StoneHolder.prototype = {
 		
 	drawEmpty : function()
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		var ctxt = G.graphicsManager.bgContext;
 		var bw = 3;
@@ -138,6 +140,8 @@ G.StoneHolder.prototype = {
 	},
 	
 	drawAllTiles : function() {
+		if (G.menu.active)
+			return;
 		var self = this;
 		for (var x=0;x<self.cols;x++)
 			for (var y=0;y<self.rows;y++) {
@@ -149,6 +153,8 @@ G.StoneHolder.prototype = {
 	},
 	
 	redrawTileBackground : function(x,y, col) {
+		if (G.menu.active)
+			return;
 		var color = this.cellColor((x+y)%2);
 		if (this[x][y] && this[x][y].active)
 			color = this[x][y].bgColor;
@@ -173,6 +179,8 @@ G.StoneHolder.prototype = {
 	},
 	
 	redrawTile : function(x,y,col) {
+		if (G.menu.active)
+			return;
 		// if there is no tile, draw empty space
 		this.redrawTileBackground(x,y,col);
 		
@@ -202,6 +210,8 @@ G.StoneHolder.prototype = {
 	},
 	
 	refreshAllTileBorders : function() {
+		if (G.menu.active)
+			return;
 		for (var x=0;x<this.cols;x++)
 			for (var y=0;y<this.rows;y++) 
 				this.refreshTileBorders(x,y);
@@ -209,12 +219,17 @@ G.StoneHolder.prototype = {
 	
 	refreshTileBordersExpansive : function(x,y) 
 	{
+		if (G.menu.active)
+			return;
 		for (var i=-1; i<2; i++)
 			for (var j=-1; j<2; j++)
 				G.board.refreshTileBorders(x+i, y+j);
 	},
 	
 	refreshTileBorders : function(x,y) {
+		if (G.menu.active)
+			return;
+			
 		if (x<0 || x>=this.cols || y<0 || y>=this.rows)
 			return;
 			
@@ -267,12 +282,16 @@ G.StoneHolder.prototype = {
 	},	
 	startTileBlinking : function(x,y) 
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		setTimeout(function(){self.blinkTile(x,y,G.framesPerStrip * 2)}, G.animationDelay/2);
 	},
 	
 	blinkTile : function(x,y,frame) 
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		var stone = this[x][y];
 		if (!stone) return;
@@ -289,12 +308,17 @@ G.StoneHolder.prototype = {
 	
 	startTileAnimation : function(x,y) 
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		setTimeout(function(){self.animateTile(x, y, 0)}, G.animationDelay);
 	},
 	
 	animateTile : function(x,y, frame) 
 	{
+		if (G.menu.active)
+			return;
+			
  		var stone = this[x][y];
  		
  		this.redrawTileBackground(x, y);
@@ -328,11 +352,15 @@ G.StoneHolder.prototype = {
 	},
 	
 	startBorderAnimation: function(x,y) {
+		if (G.menu.active)
+			return;
 		G.turnDelay = Math.max(G.turnDelay, (this.borderTileSide+1)*this.borderAnimationDelay);
 		this.borderAnimation(x,y, this.borderTileSide);
 	},
 	
 	borderAnimation: function(x,y,frame) {
+		if (G.menu.active)
+			return;
 		var ix = this.x0 + x*this.side;
 		var iy = this.y0 + y*this.side;
 		

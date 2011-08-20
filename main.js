@@ -295,6 +295,9 @@ G.Main = function() {
 		G.turnEnabled = true;
 		G.turnDelay = 0;
 		
+		if (G.menu.active)
+			return;
+		
 		if (!G.waitingForRestart)
 			for (var i=0; i<4; i++)
 				if (G.playerManager.isVisible(i))

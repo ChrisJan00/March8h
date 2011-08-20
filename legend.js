@@ -71,6 +71,9 @@ G.Display = function() {
 	}
 	
 	self.showPlayerScore = function(pn) {
+		if (G.menu.active)
+			return;
+			
 		var size = 50;
 		var x0, y0;
 		
@@ -109,6 +112,8 @@ G.Display = function() {
 	}
 	
 	self.showPlayer = function() {
+		if (G.menu.active)
+			return;
 		var data = G.coords.text
 		var ctxt = G.graphicsManager.messagesContext;
 		
@@ -135,6 +140,8 @@ G.Display = function() {
 	}
 	
 	self.showOrder = function() {
+		if (G.menu.active)
+			return;
 	//	return;
 		// only arrows pointing to the right by now
 		var drawArrow = function(xfrom,yfrom,xto,yto) {
@@ -183,6 +190,8 @@ G.Display = function() {
 	
 	
 	self.checkVictory = function() {
+		if (G.menu.active)
+			return;
 		var data = G.coords.text
 		
 		// ToDo: this also doesn't belong here, we should separate logic from display
