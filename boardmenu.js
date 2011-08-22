@@ -127,6 +127,13 @@ G.BoardMenu = function() {
 		var textLen = ctxt.measureText(G.strings.boardMenu).width;
 		ctxt.fillText(G.strings.boardMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
 		
+		self.optionButtons[0].label = G.playerManager.typeName(0); 
+		self.optionButtons[1].label = G.playerManager.typeName(1);
+		self.optionButtons[2].label = G.playerManager.typeName(2);
+		self.optionButtons[3].label = G.playerManager.typeName(3);
+		self.optionButtons[4].label = G.display.boardName(self.selectedBoard);
+		self.optionButtons[5].label = self.gameModeString();
+		
 		for (var i=0; i<self.optionButtons.length; i++)
 			self.optionButtons[i].drawNormal();
 		
