@@ -74,13 +74,14 @@ G.BoardMenu = function() {
 	}
 	
 	self.gameModeString = function() {
-		if (G.defenseMode)
+		if (G.defenseMode && !G.overflowMode)
 			return G.strings.normalMode;
 		return G.strings.aggressiveMode;
 	}
 
 	self.switchGameMode = function() {
 		G.defenseMode = !G.defenseMode;
+		G.overflowMode = !G.defenseMode;
 		
 		self.optionButtons[5].label = self.gameModeString();
 		self.optionButtons[5].pressed = false;

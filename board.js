@@ -172,7 +172,7 @@ G.StoneHolder.prototype = {
 		G.graphicsManager.mark(mx,my,this.side,this.side);
 		
 		if (this[x][y] && this[x][y].active && this == G.board) {
-				this[x][y].perceivedOwner = this[x][y].owner;
+				this[x][y].formerOwner = this[x][y].owner;
 				this.refreshTileBordersExpansive(x,y);
 		}
 		
@@ -249,8 +249,8 @@ G.StoneHolder.prototype = {
 			var diagLD = (x>0 && y<this.rows-1 && this[x-1][y+1] && this[x-1][y+1].owner == stone.owner && this[x-1][y+1].element == stone.element);
 			var diagRD = (x<this.cols-1 && y<this.rows-1 && this[x+1][y+1] && this[x+1][y+1].owner == stone.owner && this[x+1][y+1].element == stone.element);
 			
-			var colorSoft = G.display.colorForPlayer(stone.perceivedOwner);
-			var colorHard = G.display.colorForPlayerBorder(stone.perceivedOwner);
+			var colorSoft = G.display.colorForPlayer(stone.formerOwner);
+			var colorHard = G.display.colorForPlayerBorder(stone.formerOwner);
 					
 			// draw own border
 			ctxt.fillStyle = hideLeft? colorSoft : colorHard;
@@ -407,7 +407,8 @@ G.StoneHolder.prototype = {
 			visible : true,
 			active : stone.active,
 			element: stone.element,
-			owner : stone.owner
+			owner : stone.owner,
+			formerOwner : stone.formerOwner,
 		};
 	 	newStone.bgColor = G.display.colorForPlayer(stone.owner);
 	 	if (!this[x][y])

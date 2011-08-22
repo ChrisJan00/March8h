@@ -69,6 +69,7 @@ G.Main = function() {
 		G.computerEnabled = true;
 		G.computerDelay = 1000;//1500;
 		G.defenseMode = true;
+		G.overflowMode = false;
 		G.computerChoice = [0,0,0];
 		
 		G.initPiles();

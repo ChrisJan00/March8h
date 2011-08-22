@@ -77,10 +77,12 @@ G.FloodCheck = function() {
 	}
 	
 	self.findAttacks = function(sx, sy, fakeStone) {
-		function parsePosition(ix,iy) {
+		function parsePosition(ix,iy, formerOwner) {
 			var victim = self.board[ix]?self.board[ix][iy]:null;
 			if (victim && victim.owner != ownerAttacker && victim.element == elemWanted && 
 				self.floodMarkers[ix][iy]) {
+				if ((!G.overflowMode) && formerOwner > -1 && victim.owner != formerOwner)
+					return;
 				victim.step = step+1;
 				attackStack.push(victim);
 				resultStack.push(victim);
@@ -101,17 +103,20 @@ G.FloodCheck = function() {
 		var elemWanted = self.colorWonBy(masterStone.element);
 		var ownerAttacker = masterStone.owner;
 		var step = masterStone.step;
+		var firstAttack = true;
 		
 		while (attackStack.length) {
 			var stone = attackStack.shift();
 			var ix = stone.ix;
 			var iy = stone.iy;
 			step = stone.step;
-			
-			parsePosition(ix-1, iy);
-			parsePosition(ix+1, iy);
-			parsePosition(ix, iy+1);
-			parsePosition(ix, iy-1);
+			var formerOwner = firstAttack? -1 : stone.formerOwner;
+
+			parsePosition(ix-1, iy, formerOwner);
+			parsePosition(ix+1, iy, formerOwner);
+			parsePosition(ix, iy+1, formerOwner);
+			parsePosition(ix, iy-1, formerOwner);
+			firstAttack = false;
 		}
 		
 		return resultStack;
@@ -147,7 +152,7 @@ G.FloodCheck = function() {
 			bgColor : from.bgColor,
 			visible : true,
 			active : to.active,
-			perceivedOwner : formerOwner,
+			formerOwner : from.owner,
 		}
 		
 		if (self.board == G.board) {

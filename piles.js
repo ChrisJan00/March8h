@@ -93,6 +93,7 @@ G.PileClass.prototype.chooseTiles = function() {
 		}
 		st.element = G.randint(4);
 		st.owner = this.owner;
+		st.formerOwner = this.owner;
 		tileList.push(st);
 	}
 	
