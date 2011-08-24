@@ -54,6 +54,8 @@ G.strings = {
 	b8x8h4 : "8x8, 4 holes",
 	b8x8h8 : "8x8, 8 holes",
 	b8x8h12 : "8x8, 12 holes",
+	b8x8h15 : "8x8, 15 holes",
+	b8x8h16 : "8x8, 16 holes",
 	startGame : "start game",
 	normalMode : "normal mode",
 	aggressiveMode : "aggressive mode"

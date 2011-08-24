@@ -51,7 +51,7 @@ G.Main = function() {
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
 		G.board = new G.BoardClass();
-		G.boardCount = 9;
+		G.boardCount = 11;
 	
 		G.coords = {
 			text : {
@@ -147,6 +147,8 @@ G.Main = function() {
 			case 6: G.board.set8x8h4(); break;
 			case 7: G.board.set8x8h8(); break;
 			case 8: G.board.set8x8h12(); break;
+			case 9: G.board.set8x8h15(); break;
+			case 10: G.board.set8x8h16(); break;
 		}
 	}
 	
@@ -170,6 +172,8 @@ G.Main = function() {
 			vertSpace = 480;
 
 		G.graphicsManager.resizeCanvas(horzSpace, vertSpace);
+		if (G.playerManager.count() == 3)
+			vertSpace = vertSpace - extraBottomSpace;
 		
 		G.board.x0 = Math.floor(G.graphicsManager.width / 2 - G.board.width/2);
 		if (vertDimension < vertSpace)

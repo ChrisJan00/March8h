@@ -67,6 +67,8 @@ G.Display = function() {
 			case 6: return G.strings.b8x8h4;
 			case 7: return G.strings.b8x8h8;
 			case 8: return G.strings.b8x8h12;
+			case 9: return G.strings.b8x8h15;
+			case 10: return G.strings.b8x8h16;
 		}
 	}
 	

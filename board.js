@@ -582,3 +582,12 @@ G.BoardClass.prototype.set8x8h12 = function() {
 	this.addHoles([[2,0],[5,0],[0,2],[3,2],[7,2],[5,3],[2,4],[0,5],[4,5],[7,5],[2,7],[5,7]]);
 }
 
+G.BoardClass.prototype.set8x8h15 = function() {
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[3,0],[3,1],[3,2],[3,4],[3,5],[3,6],[3,7]]);
+}
+
+G.BoardClass.prototype.set8x8h16 = function() {
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[4,0],[3,1],[4,1],[2,2],[5,2],[0,4],[1,3],[6,3],[7,4],[1,4],[6,4],[2,5],[5,5],[3,6],[4,6],[4,7]]);
+}

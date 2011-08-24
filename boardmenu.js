@@ -95,6 +95,8 @@ G.BoardMenu = function() {
 		self.canvas.width = G.BoardMenuWidth;
 		self.canvas.height = G.BoardMenuHeight;
 		
+		G.playerManager.order = [];
+		
 		self.repaint();
 		
 		self.canvas.addEventListener('mousemove', self.moveEvent, false);
