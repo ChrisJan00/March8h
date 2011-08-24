@@ -45,6 +45,8 @@ G.PlayerManager = function() {
 	}
 	
 	self.currentId = function() {
+		if (self.order.length == 0)
+			return -1;
 		return self.order[self.current];
 	}
 	

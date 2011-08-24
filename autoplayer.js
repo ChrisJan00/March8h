@@ -4,6 +4,9 @@ G.computerPlay = function() {
 	var pn = G.playerManager.currentId();
 	var decisionExp = 5;
 	
+	if (pn == -1)
+		return [-1, -1, -1];
+	
 	self.maximizeEntropy = G.playerManager.currentType() == G.playerTypes.computerHard;
 	self.availableCount = G.Piles[pn].stoneCount;
 	
@@ -124,8 +127,10 @@ G.computerPlay = function() {
 }
 
 G.computerMove = function(mix,miy,elem) {
-		// find one stone in own pile
+		if (elem == -1)
+			return false;
 		
+		// find one stone in own pile
 		var currentPile = G.Piles[G.playerManager.currentId()];
 		
 		var stone = currentPile.getStoneByElement(elem);

@@ -97,6 +97,7 @@ G.Main = function() {
 		
 		G.waitingForRestart = false;
 		G.waitingForTurn = false;
+		G.gameReady = false;
 	}
 	
 	self.restartMenu = function() {
@@ -107,6 +108,7 @@ G.Main = function() {
 	
 	self.restartGame = function() {
 		G.waitingForRestart = false;
+		G.gameReady = false;
 		G.pauseManager.disablePause();
 		G.playerManager.rand();
 		self.setBoard();
@@ -132,6 +134,7 @@ G.Main = function() {
 		G.optionsButton.drawNormal();
 		G.gameLog.updateVisible();
 		G.graphicsManager.redraw();
+		G.gameReady = true;
 		self.enableTurn();
 	}
 	
@@ -303,7 +306,7 @@ G.Main = function() {
 		if (G.menu.active)
 			return;
 		
-		if (!G.waitingForRestart)
+		if (G.gameReady && !G.waitingForRestart)
 			for (var i=0; i<4; i++)
 				if (G.playerManager.isVisible(i))
 					G.Piles[i].redrawBorder(G.playerManager.currentId() == i);
