@@ -1,9 +1,13 @@
 //----------------------------------------------------------
 G.computerPlay = function() {
 	var self = this;
-	var pn = G.action.turn;
+	var pn = G.playerManager.currentId();
 	var decisionExp = 5;
 	
+	if (pn == -1)
+		return [-1, -1, -1];
+	
+	self.maximizeEntropy = G.playerManager.currentType() == G.playerTypes.computerHard;
 	self.availableCount = G.Piles[pn].stoneCount;
 	
 	self.computeStones = function() {
@@ -32,18 +36,20 @@ G.computerPlay = function() {
 			for (var iy=0;iy<G.board.rows;iy++) {
 				if (G.board[ix][iy])
 					continue;
+				if (G.board.hasHole(ix,iy))
+					continue;
 				for (var color=0;color<4;color++) {
 					var score = 0;
 					if (self.typeCount[color]<=0)
 						continue;
-					if (G.maximizeEntropy && self.typeCount[color]<self.maxCount)
+					if (self.maximizeEntropy && self.typeCount[color]<self.maxCount)
 						continue;
 					// rate move
 					if (G.defenseMode) {
 						if (self.isDefended(ix, iy, color, pn)) {
 							score = 0;
 						} else {
-							score = 1 + self.countAttacks(ix,iy,color,pn);
+							score = 4 + self.countAttacks(ix,iy,color,pn);
 						}
 					} else {
 						score = 1 + self.countAttacks(ix,iy,color,pn);
@@ -120,12 +126,13 @@ G.computerPlay = function() {
 	
 }
 
-G.computerMove = function(mix,miy,elem, pn) {
+G.computerMove = function(mix,miy,elem) {
+		if (elem == -1)
+			return false;
+		
 		// find one stone in own pile
+		var currentPile = G.Piles[G.playerManager.currentId()];
 		
-		var currentPile = G.Piles[pn];
-		
-		//currentPile.selection = G.Piles[pn].getStoneByElement(elem);
 		var stone = currentPile.getStoneByElement(elem);
 		var stoneIndex = stone.ix * currentPile.rows + stone.iy;
 		currentPile.del(stone.ix, stone.iy);
@@ -138,7 +145,7 @@ G.computerMove = function(mix,miy,elem, pn) {
 		
 		G.board.startBorderAnimation(mix,miy);
 		
-		G.gameLog.registerMove(G.action.turn, stone, stoneIndex);
+		G.gameLog.registerMove(G.playerManager.currentId(), stone, stoneIndex);
 	
 		//startFlood(mix, miy);
 		G.floodCheck.checkFlood(mix, miy);

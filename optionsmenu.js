@@ -52,6 +52,8 @@ G.OptionsMenu = function() {
 	self.show = function() {
 		self.canvas.style.width = G.OptionsMenuWidth;
 		self.canvas.style.height = G.OptionsMenuHeight;
+		self.canvas.width = G.OptionsMenuWidth;
+		self.canvas.height = G.OptionsMenuHeight;
 		self.repaint();
 		
 		self.canvas.addEventListener('mousemove', self.moveEvent, false);
@@ -72,18 +74,18 @@ G.OptionsMenu = function() {
 
 	self.repaint = function() {
 		var ctxt = self.canvas.getContext("2d");
-		ctxt.fillStyle = "#FFFFFF";
+		ctxt.fillStyle = G.colors.white;
 		ctxt.fillRect(0,0,self.canvas.width, self.canvas.height);
 		
-		ctxt.fillStyle = "#000000";
+		ctxt.fillStyle = G.colors.black;
 		ctxt.fillRect(0,0,self.canvas.width, 1);
 		ctxt.fillRect(0,0,1, self.canvas.height);
 		ctxt.fillRect(self.canvas.width - 1,0,1, self.canvas.height);
 		ctxt.fillRect(0, self.canvas.height-1, self.canvas.width, 1);
 		
-		ctxt.fillStyle = "#000000";
+		ctxt.fillStyle = G.colors.black;
 		ctxt.font = "bold 18px CustomFont, sans-serif";
-		var textLen = ctxt.measureText("OPTIONS").width;
+		var textLen = ctxt.measureText(G.strings.optionsMenu).width;
 		ctxt.fillText(G.strings.optionsMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
 		
 		for (var i=0; i<self.optionButtons.length; i++)
@@ -171,6 +173,7 @@ G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 	var self = this;
 	
 	self.label = text;
+	self.labelColor = G.colors.black;
 	self.x0 = x;
 	self.y0 = y;
 	self.width = w;
@@ -217,25 +220,35 @@ G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 	}
 	
 	self.drawNormal = function() {
-		self.draw("#FFFFFF");
+		self.draw(G.colors.white);
 	}
 	
 	self.drawHover = function() {
-		self.draw("#AAAAAA");
+		self.draw(G.colors.lightGrey);
 	}
 	
 	self.drawPressed = function() {
-		self.draw("#333333");
+		self.draw(G.colors.darkGrey);
+	}
+	
+	self.redraw = function() {
+		if (self.pressed)
+			self.drawPressed();
+		else
+		if (self.hovered)
+			self.drawHover();
+		else
+			self.drawNormal();
 	}
 	
 	self.draw = function(bgColor) {
 		var ctxt = self.ctxt;
 		ctxt.fillStyle = bgColor;
-		ctxt.strokeStyle = "#AAAAAA";
+		ctxt.strokeStyle = G.colors.lightGrey;
 		ctxt.fillRect(self.x0, self.y0, self.width, self.height);
 		ctxt.strokeRect(self.x0, self.y0, self.width, self.height);
 		
-		ctxt.fillStyle = "#000000";
+		ctxt.fillStyle = self.labelColor;
 		ctxt.font = "bold "+self.fontSize+"px CustomFont, sans-serif";
 		var textLen = ctxt.measureText(self.label).width;
 		ctxt.fillText(self.label, self.x0 + self.width/2 - textLen/2, self.y0 + self.height / 2 + self.fontSize/2 - 2);

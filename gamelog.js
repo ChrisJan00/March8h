@@ -50,8 +50,8 @@ G.GameLog = function() {
 	self.print = function(_who, text) 
 	{
 		self.lineCount++;
-		//var paragraphStart = "<p style=\"font-weight:bold; font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
-		var paragraphStart = "<span style=\"font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerLegend(_who)+"\">";
+		//var paragraphStart = "<p style=\"font-weight:bold; font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerBorder(_who)+"\">";
+		var paragraphStart = "<span style=\"font-family:CustomFont, sans-serif; color:"+G.display.colorForPlayerBorder(_who)+"\">";
 		var paragraphEnd = "<br></span>";
 		self.outputString = paragraphStart + text + paragraphEnd + self.outputString;
 		
@@ -83,7 +83,7 @@ G.GameLog = function() {
 	
 	self.playerName = function(_who)
 	{
-		if (_who==1 && G.computerEnabled)
+		if (!G.playerManager.isHuman(_who))
 			return G.strings.computerPlayerName;
 		return _who?G.strings.secondPlayerName:G.strings.firstPlayerName;
 	}
@@ -163,7 +163,7 @@ G.GameLog = function() {
 			if (defenseCount > 0) {
 				self.moves[self.index].defense = self.copyStone(defenseList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.playerManager.currentId(), 
 					{
 						element: G.floodCheck.colorThatWins(stone.element),
 						owner : 1-stone.owner,
@@ -175,7 +175,7 @@ G.GameLog = function() {
 			if (attackCount > 0) {
 				self.moves[self.index].attack = self.copyList(attackList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.playerManager.currentId(), 
 					stone,
 					{
 						element: G.floodCheck.colorWonBy(stone.element),
@@ -187,7 +187,7 @@ G.GameLog = function() {
 			if (attackCount > 0) {
 				self.moves[self.index].attack = self.copyList(attackList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.playerManager.currentId(), 
 					stone,
 					{
 						element: G.floodCheck.colorWonBy(stone.element),
@@ -198,7 +198,7 @@ G.GameLog = function() {
 			if (defenseCount > 0) {
 				self.moves[self.index].defense = self.copyStone(defenseList);
 				G.gameLog.showResult(
-					G.action.turn, 
+					G.playerManager.currentId(), 
 					{
 						element: G.floodCheck.colorThatWins(stone.element),
 						owner : 1-stone.owner
@@ -325,7 +325,7 @@ G.GameLog = function() {
 			iy : pileY,
 			owner : move.who,
 			element : move.element,
-			bgColor : "#FFFFFF",
+			bgColor : G.colors.white,
 			visible : true,
 			selected : false,
 			active : false
@@ -356,7 +356,7 @@ G.GameLog = function() {
 		// change the turn
 		G.floodCheck.board = G.board;
  		G.floodCheck.countMarkers();
-		G.action.turn = move.who;
+		G.playerManager.setCurrentId(move.who);
 		G.display.showPlayer();
 		G.graphicsManager.redraw();
 		//enableTurn();
@@ -411,7 +411,7 @@ G.GameLog = function() {
 		
 		G.floodCheck.board = G.board;
  		G.floodCheck.countMarkers();
-		G.action.turn = 1-_owner;
+		G.playerManager.next();
 		
 		if (G.board.stoneCount < G.board.maxStones) {
 			G.display.showPlayer();
