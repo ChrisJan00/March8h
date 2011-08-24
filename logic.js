@@ -39,7 +39,7 @@ G.FloodCheck = function() {
 	self.findDefender = function(ix, iy, fakeStone) {
 		function getDefender(x,y) {
 			var candidate = self.board[x]?self.board[x][y]:null;
-			if (candidate && candidate.owner == ownerWanted && candidate.element == elemWanted)
+			if (candidate && candidate.owner != ownerAttacked && candidate.element == elemWanted)
 				return candidate;
 			else
 				return false;
@@ -51,8 +51,8 @@ G.FloodCheck = function() {
 		}
 		
 		var attacker = false;
-		elemWanted = self.colorThatWins(stone.element);
-		ownerWanted = 1-stone.owner;
+		var elemWanted = self.colorThatWins(stone.element);
+		var ownerAttacked = stone.owner;
 		
 		return getDefender(ix-1,iy) ||
 			   getDefender(ix+1,iy) || 
@@ -77,10 +77,12 @@ G.FloodCheck = function() {
 	}
 	
 	self.findAttacks = function(sx, sy, fakeStone) {
-		function parsePosition(ix,iy) {
+		function parsePosition(ix,iy, formerOwner) {
 			var victim = self.board[ix]?self.board[ix][iy]:null;
-			if (victim && victim.owner == ownerWanted && victim.element == elemWanted && 
+			if (victim && victim.owner != ownerAttacker && victim.element == elemWanted && 
 				self.floodMarkers[ix][iy]) {
+				if ((!G.overflowMode) && formerOwner > -1 && victim.owner != formerOwner)
+					return;
 				victim.step = step+1;
 				attackStack.push(victim);
 				resultStack.push(victim);
@@ -99,19 +101,22 @@ G.FloodCheck = function() {
 		attackStack.push(masterStone);
 		masterStone.step = -1;
 		var elemWanted = self.colorWonBy(masterStone.element);
-		var ownerWanted = 1-masterStone.owner;
+		var ownerAttacker = masterStone.owner;
 		var step = masterStone.step;
+		var firstAttack = true;
 		
 		while (attackStack.length) {
 			var stone = attackStack.shift();
 			var ix = stone.ix;
 			var iy = stone.iy;
 			step = stone.step;
-			
-			parsePosition(ix-1, iy);
-			parsePosition(ix+1, iy);
-			parsePosition(ix, iy+1);
-			parsePosition(ix, iy-1);
+			var formerOwner = firstAttack? -1 : stone.formerOwner;
+
+			parsePosition(ix-1, iy, formerOwner);
+			parsePosition(ix+1, iy, formerOwner);
+			parsePosition(ix, iy+1, formerOwner);
+			parsePosition(ix, iy-1, formerOwner);
+			firstAttack = false;
 		}
 		
 		return resultStack;
@@ -138,6 +143,7 @@ G.FloodCheck = function() {
 	}
 	
 	self.convertStone = function(from, to) {
+		var formerOwner = self.board[to.ix][to.iy].owner;
 		self.board[to.ix][to.iy] = {
 			ix : to.ix,
 			iy : to.iy,
@@ -146,10 +152,10 @@ G.FloodCheck = function() {
 			bgColor : from.bgColor,
 			visible : true,
 			active : to.active,
+			formerOwner : from.owner,
 		}
 		
 		if (self.board == G.board) {
-			self.board[to.ix][to.iy].invertedColors = true;
 			var delay = to.step*G.animationDelay;
 			setTimeout(function(){G.board.startTileAnimation(to.ix, to.iy);}, delay);
 			G.turnDelay = Math.max(G.turnDelay, G.animationDelay * (G.framesPerStrip+2) + delay);
@@ -186,6 +192,8 @@ G.FloodCheck = function() {
 		G.counts = [];
 		G.counts[0] = 0;
 		G.counts[1] = 0;
+		G.counts[2] = 0;
+		G.counts[3] = 0;
 		for (var i=0; i<self.board.cols; i++)
 			for (var j=0; j<self.board.rows; j++) {
 				if (self.board[i][j]) {

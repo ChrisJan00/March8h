@@ -45,11 +45,13 @@ G.Main = function() {
 		G.animationDelay = 250;
 		G.framesPerStrip = 4;
 		
-		G.turn = 0;
+		G.playerManager = new G.PlayerManager();
+		G.playerManager.init();
 		
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
 		G.board = new G.BoardClass();
+		G.boardCount = 11;
 	
 		G.coords = {
 			text : {
@@ -57,14 +59,17 @@ G.Main = function() {
 				y0: 5,
 				width: 300,
 				height: 62
+			},
+			legend : {
+				x0: 0,
+				y0: 440
 			}
 		};
 	
 		G.computerEnabled = true;
 		G.computerDelay = 1000;//1500;
-		G.maximizeEntropy = false;
 		G.defenseMode = true;
-		G.computerHard = false;
+		G.overflowMode = false;
 		G.computerChoice = [0,0,0];
 		
 		G.initPiles();
@@ -85,6 +90,14 @@ G.Main = function() {
 		G.optionsMenu.hide();
 		G.optionsButton = new G.ClickableOption( G.graphicsManager.messagesLayer, 605, 5, 50, 25, G.strings.optionsButton, G.optionsMenu.activate );
 		G.optionsButton.fontSize = 10;
+		
+		G.boardMenu = new G.BoardMenu();
+		G.boardMenu.init();
+		G.boardMenu.hide();
+		
+		G.waitingForRestart = false;
+		G.waitingForTurn = false;
+		G.gameReady = false;
 	}
 	
 	self.restartMenu = function() {
@@ -94,27 +107,135 @@ G.Main = function() {
 	}
 	
 	self.restartGame = function() {
+		G.waitingForRestart = false;
+		G.gameReady = false;
 		G.pauseManager.disablePause();
-		G.turn = G.randint(2);
+		G.playerManager.rand();
+		self.setBoard();
 		G.board.clearContents();
-		G.Piles[0].chooseTiles();
-		G.Piles[1].chooseTiles();
+		G.board.putExcessTiles();
+		G.Piles.chooseAll();
 		G.floodCheck.countMarkers();
 		G.gameLog.init();
 		self.enableTurn();
 	}
 	
 	self.drawInitialGame = function() {
+		self.repositionEverything();
 		G.graphicsManager.clearBackground();
-		G.Piles[0].drawFromScratch();
-		G.Piles[1].drawFromScratch();
+		for (var i=0; i<4; i++)
+			if (G.playerManager.isVisible(i)) {
+				G.Piles[i].drawFromScratch();
+		}
 		G.board.drawEmpty();
+		G.board.drawAllTiles();
 		G.display.showPlayer();
 		G.display.showOrder();
 		G.optionsButton.drawNormal();
 		G.gameLog.updateVisible();
 		G.graphicsManager.redraw();
+		G.gameReady = true;
 		self.enableTurn();
+	}
+	
+	self.setBoard = function() {
+		var bn = G.boardMenu.selectedBoard;
+		switch (bn) {
+			case 0: G.board.set6x6full(); break;
+			case 1: G.board.set4x4(); break;
+			case 2: G.board.set6x6h4(); break;
+			case 3: G.board.set6x6h5(); break;
+			case 4: G.board.set6x6h6(); break;
+			case 5: G.board.set8x8full(); break;
+			case 6: G.board.set8x8h4(); break;
+			case 7: G.board.set8x8h8(); break;
+			case 8: G.board.set8x8h12(); break;
+			case 9: G.board.set8x8h15(); break;
+			case 10: G.board.set8x8h16(); break;
+		}
+	}
+	
+	self.repositionEverything = function() {
+		var pn;
+		var extraWidth = 60;
+		var horzPileCount = Math.max(G.playerManager.count() - 2, 0);
+		// 90 = 50 player score + 20 on each side
+		var topSpace = 90;
+		if (G.playerManager.count() == 4)
+			topSpace = Math.max(90, G.Piles.heightOfHorizontal() + 30);
+		var legendSpace = 40;
+		var extraBottomSpace = G.playerManager.count() >= 3 ? G.Piles.heightOfHorizontal() + 30 : 0;
+		var horzSpace = G.Piles.widthOfVertical() * 2 + G.board.width + extraWidth;
+		var vertSpace = topSpace + G.board.height + extraBottomSpace + legendSpace;
+		var vertDimension = vertSpace;
+		
+		if (horzSpace  < 640)
+			horzSpace = 640;
+		if (vertSpace < 480)
+			vertSpace = 480;
+
+		G.graphicsManager.resizeCanvas(horzSpace, vertSpace);
+		if (G.playerManager.count() == 3)
+			vertSpace = vertSpace - extraBottomSpace;
+		
+		G.board.x0 = Math.floor(G.graphicsManager.width / 2 - G.board.width/2);
+		if (vertDimension < vertSpace)
+			G.board.y0 = Math.floor(G.graphicsManager.height / 2 - G.board.height/2);
+		else
+			G.board.y0 = topSpace;
+		
+		// first pile
+		pn = G.playerManager.idForOrder(0);
+		G.Piles[pn].setVertical(true);
+		G.Piles[pn].x0 = Math.floor(G.board.x0 / 2 - G.Piles.widthOfVertical()/2);
+		if (vertDimension < vertSpace)
+			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles.heightOfVertical()/2);
+		else if (G.Piles.heightOfVertical() < G.board.height)
+			G.Piles[pn].y0 = Math.floor(G.board.y0 + G.board.height/2 - G.Piles.heightOfVertical()/2);
+		else
+			G.Piles[pn].y0 = topSpace;
+			
+		// second pile
+		pn = G.playerManager.idForOrder(1);
+		if (G.playerManager.count() == 4)
+			pn = G.playerManager.idForOrder(2);
+		G.Piles[pn].setVertical(true);
+		G.Piles[pn].x0 = G.board.x0 + G.board.width + Math.floor(G.board.x0 / 2 - G.Piles.widthOfVertical()/2);
+		if (vertDimension < vertSpace)
+			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height / 2 - G.Piles.heightOfVertical()/2);
+		else if (G.Piles.heightOfVertical() < G.board.height)
+			G.Piles[pn].y0 = Math.floor(G.board.y0 + G.board.height/2 - G.Piles.heightOfVertical()/2);
+		else
+			G.Piles[pn].y0 = topSpace;
+			
+		// third
+		if (G.playerManager.count() >= 3) {
+			pn = G.playerManager.idForOrder(2);
+			if (G.playerManager.count() == 4)
+				pn = G.playerManager.idForOrder(3);
+			G.Piles[pn].setVertical(false);
+			G.Piles[pn].x0 = Math.floor(G.graphicsManager.width / 2 - G.Piles.widthOfHorizontal()/2);
+			G.Piles[pn].y0 = Math.floor(G.graphicsManager.height - legendSpace - extraBottomSpace/2 - G.Piles.heightOfHorizontal()/2);
+		}
+		
+		// fourth
+		if (G.playerManager.count() == 4) {
+			pn = G.playerManager.idForOrder(1);
+			G.Piles[pn].setVertical(false);
+			G.Piles[pn].x0 = Math.floor(G.graphicsManager.width / 2 - G.Piles.widthOfHorizontal()/2);
+			G.Piles[pn].y0 = Math.floor(topSpace/2 - G.Piles.heightOfHorizontal()/2);
+		}
+		
+		G.coords.text.x0 = G.board.x0;
+		G.coords.text.width = G.board.width;
+		G.optionsButton.x0 = G.graphicsManager.width - G.optionsButton.width - 5;
+		G.optionsButton.y0 = 10; //G.Piles[1].y0 - G.optionsButton.height - 10;
+		
+		G.coords.legend.y0 = G.graphicsManager.height - 40;
+		
+		// probably the graphicsmanager should do this
+		G.xoffset = G.findAbsoluteX(G.gameCanvas);
+		G.yoffset = G.findAbsoluteY(G.gameCanvas);
 	}
 	
 	self.connectMouse = function() {
@@ -140,19 +261,18 @@ G.Main = function() {
 			return;
 		}
 		
-		G.optionsButton.managePressed(G.mouse.x, G.mouse.y );
-		
+		G.optionsButton.managePressed(G.mouse.x, G.mouse.y);
 		if (!G.turnEnabled)
 			return;
 			
 		
-		if (G.turn == -1) {
+		if (G.waitingForRestart) {
 			self.restartGame();
 			self.drawInitialGame();
 			return;
 		}
 		
-		if (G.turn==0 || !G.computerEnabled)
+		if (G.playerManager.isHuman())
 			self.manageTurn();
 	}
 	
@@ -183,11 +303,17 @@ G.Main = function() {
 		G.turnEnabled = true;
 		G.turnDelay = 0;
 		
-		G.Piles[0].redrawBorder(G.turn == 0);
-		G.Piles[1].redrawBorder(G.turn == 1);
+		if (G.menu.active)
+			return;
 		
-		if (G.computerEnabled && G.turn == 1) {
-				setTimeout(self.manageTurn, G.computerDelay);
+		if (G.gameReady && !G.waitingForRestart)
+			for (var i=0; i<4; i++)
+				if (G.playerManager.isVisible(i))
+					G.Piles[i].redrawBorder(G.playerManager.currentId() == i);
+		
+		if ((!G.waitingForTurn) && (!G.playerManager.isHuman())) {
+			G.waitingForTurn = true;
+			setTimeout(self.manageTurn, G.computerDelay);
 		}
 	}
 	
@@ -199,26 +325,31 @@ G.Main = function() {
 	self.manageTurn = function()
 	{
 		var turnIsReady = false;
+		G.waitingForTurn = false;
 		G.turnDelay = 0;
-			
 		
-		if (G.computerEnabled && G.turn == 1) {
+		if (!G.playerManager.isHuman()) {
 			G.computerChoice = G.computerPlay();
 			var c = G.computerChoice;
-			turnIsReady = G.computerMove(c[0],c[1],c[2], 1);
+			turnIsReady = G.computerMove(c[0],c[1],c[2]);
 		} else {
-			if (G.Piles[0].isClicked(G.mouse.x, G.mouse.y))
-				G.Piles[0].manageClicked(G.mouse.x, G.mouse.y);
-			else if (G.Piles[1].isClicked(G.mouse.x, G.mouse.y))
-				G.Piles[1].manageClicked(G.mouse.x, G.mouse.y);
-			else if (G.board.isClicked(G.mouse.x, G.mouse.y))
-		 		turnIsReady = G.board.manageClicked(G.mouse.x, G.mouse.y);
+			for (var i=0; i<5; i++) {
+				if (i==4) {
+					if (G.board.isClicked(G.mouse.x, G.mouse.y))
+						 turnIsReady = G.board.manageClicked(G.mouse.x, G.mouse.y);
+					break;
+				}
+				if (G.playerManager.isVisible(i) && G.Piles[i].isClicked(G.mouse.x, G.mouse.y)) {
+					G.Piles[i].manageClicked(G.mouse.x, G.mouse.y);
+					break;
+				}
+			}
 	 	}
 	 		
 	 	if (turnIsReady) {	
 	 		G.floodCheck.board = G.board;
 	 		G.floodCheck.countMarkers();
-			G.turn = 1-G.turn;
+			G.playerManager.next();
 			
 			if (G.board.stoneCount < G.board.maxStones) {
 				 G.display.showPlayer();

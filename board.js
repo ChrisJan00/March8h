@@ -7,8 +7,6 @@ G.StoneHolder.prototype = {
 	cols : 1,
 	width : 50,
 	height : 50,
-	x1 : 50,
-	y1 : 50,
 	stoneCount : 0,
 	borderTileSide : 6,
 	borderAnimationDelay : 150,
@@ -20,10 +18,19 @@ G.StoneHolder.prototype = {
 		this.rows = numRows;
 		this.width = this.side * numCols;
 		this.height = this.side * numRows;
-		this.x1 = this.x0 + this.width;
-		this.y1 = this.y0 + this.height;
 		this.maxStones = this.cols * this.rows;
 		this.clearContents();
+	},
+	
+	x1 : function() { return this.x0 + this.width; },
+	y1 : function() { return this.y0 + this.height; },
+	
+	addHoles : function(holeList) {
+		if (this.holes)
+			this.stoneCount -= this.holes.length;
+		this.holes = holeList;
+		if (holeList)
+			this.stonecount += this.holes.length;
 	},
 	
 	cellColor : function(ind) {
@@ -36,6 +43,8 @@ G.StoneHolder.prototype = {
 		
 	drawEmpty : function()
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		var ctxt = G.graphicsManager.bgContext;
 		var bw = 3;
@@ -65,19 +74,87 @@ G.StoneHolder.prototype = {
 			ctxt.fillRect(self.x0 + x*self.side, self.y0 + y*self.side, self.side, self.side);
 		}
 		
+		self.drawHoles( ctxt );	
 		G.graphicsManager.mark(self.x0 - bw, self.y0 - bw, self.width + bw*2, self.height + bw*2);
 		//G.graphicsManager.redraw();
 	},
 	
+	drawHoles : function( ctxt ) {
+		var self = this;
+		if (!self.holes)
+			return;
+			
+		// holes
+		for (var ii=0; ii<self.holes.length; ii++) {
+			var hx = self.x0 + self.holes[ii][0] * self.side;
+			var hy = self.y0 + self.holes[ii][1] * self.side;
+			ctxt.fillStyle = G.colors.white;
+			ctxt.fillRect(hx, hy, self.side, self.side);
+			
+			// left
+			if (self.holes[ii][0] == 0) {
+				ctxt.fillRect(hx-2, hy, 2, self.side);
+			} else if (!self.hasHole(self.holes[ii][0]-1, self.holes[ii][1])) {
+				ctxt.strokeStyle = self.borderColor(1);
+				ctxt.beginPath();
+				ctxt.moveTo(hx, hy);
+				ctxt.lineTo(hx, hy+self.side);
+				ctxt.stroke();
+			}
+			
+			// right
+			if (self.holes[ii][0] == self.cols - 1) {
+				ctxt.fillRect(hx + self.side, hy, 2, self.side);
+			} else if (!self.hasHole(self.holes[ii][0]+1, self.holes[ii][1])) {
+				ctxt.strokeStyle = self.borderColor(0);
+				ctxt.beginPath();
+				ctxt.moveTo(hx + self.side, hy);
+				ctxt.lineTo(hx + self.side, hy+self.side);
+				ctxt.stroke();
+			}
+			
+			// up
+			if (self.holes[ii][1] == 0) {
+				ctxt.fillRect(hx, hy-2, self.side, 2);
+			} else if (!self.hasHole(self.holes[ii][0], self.holes[ii][1]-1)) {
+				ctxt.strokeStyle = self.borderColor(1);
+				ctxt.beginPath();
+				ctxt.moveTo(hx, hy);
+				ctxt.lineTo(hx+self.side, hy);
+				ctxt.stroke();
+			}
+			
+			// down
+			if (self.holes[ii][1] == self.rows - 1) {
+				ctxt.fillRect(hx, hy + self.side, self.side, 2);
+			} else if (!self.hasHole(self.holes[ii][0], self.holes[ii][1]+1)) {
+				ctxt.strokeStyle = self.borderColor(0);
+				ctxt.beginPath();
+				ctxt.moveTo(hx, hy  + self.side);
+				ctxt.lineTo(hx + self.side, hy+self.side);
+				ctxt.stroke();
+			}
+						
+			G.graphicsManager.mark(hx-2, hy-2, self.side+4, self.side+4);
+		}
+	},
+	
 	drawAllTiles : function() {
+		if (G.menu.active)
+			return;
 		var self = this;
 		for (var x=0;x<self.cols;x++)
-			for (var y=0;y<self.rows;y++)
+			for (var y=0;y<self.rows;y++) {
+				if (self.hasHole(x,y))
+					continue;
 				self.redrawTile(x,y);
+			}
 		//this.refreshAllTileBorders();
 	},
 	
 	redrawTileBackground : function(x,y, col) {
+		if (G.menu.active)
+			return;
 		var color = this.cellColor((x+y)%2);
 		if (this[x][y] && this[x][y].active)
 			color = this[x][y].bgColor;
@@ -95,13 +172,15 @@ G.StoneHolder.prototype = {
 		G.graphicsManager.mark(mx,my,this.side,this.side);
 		
 		if (this[x][y] && this[x][y].active && this == G.board) {
-				this[x][y].invertedColors = false;
+				this[x][y].formerOwner = this[x][y].owner;
 				this.refreshTileBordersExpansive(x,y);
 		}
 		
 	},
 	
 	redrawTile : function(x,y,col) {
+		if (G.menu.active)
+			return;
 		// if there is no tile, draw empty space
 		this.redrawTileBackground(x,y,col);
 		
@@ -131,6 +210,8 @@ G.StoneHolder.prototype = {
 	},
 	
 	refreshAllTileBorders : function() {
+		if (G.menu.active)
+			return;
 		for (var x=0;x<this.cols;x++)
 			for (var y=0;y<this.rows;y++) 
 				this.refreshTileBorders(x,y);
@@ -138,12 +219,17 @@ G.StoneHolder.prototype = {
 	
 	refreshTileBordersExpansive : function(x,y) 
 	{
+		if (G.menu.active)
+			return;
 		for (var i=-1; i<2; i++)
 			for (var j=-1; j<2; j++)
 				G.board.refreshTileBorders(x+i, y+j);
 	},
 	
 	refreshTileBorders : function(x,y) {
+		if (G.menu.active)
+			return;
+			
 		if (x<0 || x>=this.cols || y<0 || y>=this.rows)
 			return;
 			
@@ -163,40 +249,32 @@ G.StoneHolder.prototype = {
 			var diagLD = (x>0 && y<this.rows-1 && this[x-1][y+1] && this[x-1][y+1].owner == stone.owner && this[x-1][y+1].element == stone.element);
 			var diagRD = (x<this.cols-1 && y<this.rows-1 && this[x+1][y+1] && this[x+1][y+1].owner == stone.owner && this[x+1][y+1].element == stone.element);
 			
-			var perceivedOwner = stone.invertedColors? (1-stone.owner) : stone.owner;
+			var colorSoft = G.display.colorForPlayer(stone.formerOwner);
+			var colorHard = G.display.colorForPlayerBorder(stone.formerOwner);
 					
 			// draw own border
-			ctxt.fillStyle = hideLeft? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideLeft? colorSoft : colorHard;
 			ctxt.fillRect(ix, iy+1, 1, this.side-2);
 			
-			ctxt.fillStyle = hideRight? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideRight? colorSoft : colorHard;
 			ctxt.fillRect(ix+this.side-1, iy+1, 1, this.side-2);
 			
-			ctxt.fillStyle = hideUp? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideUp? colorSoft : colorHard;
 			ctxt.fillRect(ix+1, iy, this.side-2, 1);
 		
-			ctxt.fillStyle = hideDown? 
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = hideDown? colorSoft : colorHard;
 			ctxt.fillRect(ix+1, iy+this.side-1, this.side-2, 1);
 			
-			ctxt.fillStyle = G.display.colorForPlayerBorder(perceivedOwner);
-			ctxt.fillStyle = (hideLeft && hideUp && diagLU)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideLeft && hideUp && diagLU)? colorSoft : colorHard;
 			ctxt.fillRect(ix, iy, 1, 1);
 			
-			ctxt.fillStyle = (hideRight && hideUp && diagRU)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideRight && hideUp && diagRU)? colorSoft : colorHard;
 			ctxt.fillRect(ix+this.side-1, iy, 1, 1);
 				
-			ctxt.fillStyle = (hideLeft && hideDown && diagLD)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideLeft && hideDown && diagLD)? colorSoft : colorHard;
 			ctxt.fillRect(ix, iy+this.side-1, 1, 1);
 				
-			ctxt.fillStyle = (hideRight && hideDown && diagRD)?
-				G.display.colorForPlayer(perceivedOwner) : G.display.colorForPlayerBorder(perceivedOwner);
+			ctxt.fillStyle = (hideRight && hideDown && diagRD)? colorSoft : colorHard;
 			ctxt.fillRect(ix+this.side-1, iy+this.side-1, 1, 1);
 
 			G.graphicsManager.mark(ix, iy, this.side, this.side);
@@ -204,12 +282,16 @@ G.StoneHolder.prototype = {
 	},	
 	startTileBlinking : function(x,y) 
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		setTimeout(function(){self.blinkTile(x,y,G.framesPerStrip * 2)}, G.animationDelay/2);
 	},
 	
 	blinkTile : function(x,y,frame) 
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		var stone = this[x][y];
 		if (!stone) return;
@@ -226,12 +308,17 @@ G.StoneHolder.prototype = {
 	
 	startTileAnimation : function(x,y) 
 	{
+		if (G.menu.active)
+			return;
 		var self = this;
 		setTimeout(function(){self.animateTile(x, y, 0)}, G.animationDelay);
 	},
 	
 	animateTile : function(x,y, frame) 
 	{
+		if (G.menu.active)
+			return;
+			
  		var stone = this[x][y];
  		
  		this.redrawTileBackground(x, y);
@@ -265,11 +352,15 @@ G.StoneHolder.prototype = {
 	},
 	
 	startBorderAnimation: function(x,y) {
+		if (G.menu.active)
+			return;
 		G.turnDelay = Math.max(G.turnDelay, (this.borderTileSide+1)*this.borderAnimationDelay);
 		this.borderAnimation(x,y, this.borderTileSide);
 	},
 	
 	borderAnimation: function(x,y,frame) {
+		if (G.menu.active)
+			return;
 		var ix = this.x0 + x*this.side;
 		var iy = this.y0 + y*this.side;
 		
@@ -316,7 +407,8 @@ G.StoneHolder.prototype = {
 			visible : true,
 			active : stone.active,
 			element: stone.element,
-			owner : stone.owner
+			owner : stone.owner,
+			formerOwner : stone.formerOwner,
 		};
 	 	newStone.bgColor = G.display.colorForPlayer(stone.owner);
 	 	if (!this[x][y])
@@ -336,11 +428,14 @@ G.StoneHolder.prototype = {
 		for (var i=0;i<self.cols;i++)
 			self[i] = [];
 		self.stoneCount = 0;
+
+		if (self.holes)
+			self.stoneCount = self.stoneCount + self.holes.length;
 	},
 	
 	isClicked : function( mouseX, mouseY ) {
 		var self = this;
-		return mouseX>=self.x0 && mouseX<self.x1 && mouseY>=self.y0 && mouseY<self.y1;
+		return mouseX>=self.x0 && mouseX<self.x1() && mouseY>=self.y0 && mouseY<self.y1();
 	},
 	
 	coordsOf : function( mouseX, mouseY ) {
@@ -349,13 +444,27 @@ G.StoneHolder.prototype = {
 		var x = Math.floor((mouseX - self.x0)/self.side);
 		var y = Math.floor((mouseY - self.y0)/self.side);
 		return [ x , y ];
-	}
+	},
 	
+	hasHole : function( ix, iy ) {
+		if (this.holes) {
+			for (var ii=0; ii<this.holes.length; ii++)
+				if (this.holes[ii][0]==ix && this.holes[ii][1]==iy)
+					return true;
+		}
+		return false;
+	},
+	
+	holeCount : function() {
+		return this.holes?this.holes.length:0;
+	}
 }
 
 G.BoardClass = function() {
 	this.setDimensions(6,6, 180, 70);
+	this.addHoles(false);
 }
+
 G.BoardClass.prototype = new G.StoneHolder;
 
 G.BoardClass.prototype.manageClicked = function( mx, my ) 
@@ -364,12 +473,16 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	var mix = posInBoard[0];
 	var miy = posInBoard[1];
 	
-	var currentPile = G.Piles[G.turn];
+	var currentPile = G.Piles[G.playerManager.currentId()];
 	
 	// place taken?
 	if (this[mix][miy])
 		return false;
 		
+	// is it a hole?
+	if (this.hasHole(mix, miy))
+		return false;
+			
 	// no selection?
 	var stone = currentPile.selection;
 	if (!stone)
@@ -386,7 +499,7 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	
 	this.startBorderAnimation(mix,miy);
 
-	G.gameLog.registerMove(G.turn, stone, stoneIndex);
+	G.gameLog.registerMove(G.playerManager.currentId(), stone, stoneIndex);
 	
 	G.floodCheck.checkFlood(mix, miy);
 
@@ -395,3 +508,86 @@ G.BoardClass.prototype.manageClicked = function( mx, my )
 	return true;
 }
 
+G.BoardClass.prototype.excessTiles = function() {
+		var totalTiles = this.rows * this.cols - this.holeCount();
+		var tilesPerPlayer = Math.floor(totalTiles / G.playerManager.count());
+		return totalTiles - tilesPerPlayer * G.playerManager.count();
+}
+
+G.BoardClass.prototype.putExcessTiles = function() {
+	for (var ii=0; ii<this.excessTiles(); ii++) {
+		var x,y;
+		do {
+			x = G.randint(this.cols);
+			y = G.randint(this.rows);
+		} while (this.hasHole(x,y) || this[x][y]);
+		var elem = G.randint(4);
+		var st = {
+				ix : x,
+				iy : y,
+				bgColor : G.colors.white,
+				visible: true,
+				selected: false,
+				element: elem,
+				owner : -1,
+				active : true
+		};
+		this.set(x,y,st);
+	}
+}
+	
+// boards
+G.BoardClass.prototype.set4x4 = function() {
+	this.setDimensions(4, 4, 180, 70);
+	this.addHoles(false);
+}
+
+G.BoardClass.prototype.set6x6full = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles(false);
+}
+
+G.BoardClass.prototype.set6x6h4 = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles([[3,1], [4,3], [2,4], [1,2]]);
+}
+
+G.BoardClass.prototype.set6x6h5 = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles([[2,1], [1,2], [4,2], [4,3], [2,5]]);
+}
+
+G.BoardClass.prototype.set6x6h6 = function() {
+	this.setDimensions(6, 6, 180, 70);
+	this.addHoles([[2,0], [5,2], [3,5], [0,3], [3,2], [2,3]]);
+}
+
+G.BoardClass.prototype.set8x8full = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles(false);
+}
+
+G.BoardClass.prototype.set8x8h4 = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[2,2],[2,5],[5,2],[5,5]]);
+}
+
+G.BoardClass.prototype.set8x8h8 = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[2,2],[2,5],[5,2],[5,5],[4,0],[7,4],[3,7],[0,3]]);
+}
+
+G.BoardClass.prototype.set8x8h12 = function() {	
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[2,0],[5,0],[0,2],[3,2],[7,2],[5,3],[2,4],[0,5],[4,5],[7,5],[2,7],[5,7]]);
+}
+
+G.BoardClass.prototype.set8x8h15 = function() {
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[3,0],[3,1],[3,2],[3,4],[3,5],[3,6],[3,7]]);
+}
+
+G.BoardClass.prototype.set8x8h16 = function() {
+	this.setDimensions(8, 8, 180, 70);
+	this.addHoles([[4,0],[3,1],[4,1],[2,2],[5,2],[0,4],[1,3],[6,3],[7,4],[1,4],[6,4],[2,5],[5,5],[3,6],[4,6],[4,7]]);
+}

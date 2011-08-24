@@ -52,6 +52,8 @@ G.OptionsMenu = function() {
 	self.show = function() {
 		self.canvas.style.width = G.OptionsMenuWidth;
 		self.canvas.style.height = G.OptionsMenuHeight;
+		self.canvas.width = G.OptionsMenuWidth;
+		self.canvas.height = G.OptionsMenuHeight;
 		self.repaint();
 		
 		self.canvas.addEventListener('mousemove', self.moveEvent, false);
@@ -83,7 +85,7 @@ G.OptionsMenu = function() {
 		
 		ctxt.fillStyle = G.colors.black;
 		ctxt.font = "bold 18px CustomFont, sans-serif";
-		var textLen = ctxt.measureText("OPTIONS").width;
+		var textLen = ctxt.measureText(G.strings.optionsMenu).width;
 		ctxt.fillText(G.strings.optionsMenu, self.canvas.width/2 - textLen/2, 15 + 40 / 2 + 7);
 		
 		for (var i=0; i<self.optionButtons.length; i++)
@@ -171,6 +173,7 @@ G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 	var self = this;
 	
 	self.label = text;
+	self.labelColor = G.colors.black;
 	self.x0 = x;
 	self.y0 = y;
 	self.width = w;
@@ -228,6 +231,16 @@ G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 		self.draw(G.colors.darkGrey);
 	}
 	
+	self.redraw = function() {
+		if (self.pressed)
+			self.drawPressed();
+		else
+		if (self.hovered)
+			self.drawHover();
+		else
+			self.drawNormal();
+	}
+	
 	self.draw = function(bgColor) {
 		var ctxt = self.ctxt;
 		ctxt.fillStyle = bgColor;
@@ -235,7 +248,7 @@ G.ClickableOption = function(canvas, x, y, w, h, text, callBack) {
 		ctxt.fillRect(self.x0, self.y0, self.width, self.height);
 		ctxt.strokeRect(self.x0, self.y0, self.width, self.height);
 		
-		ctxt.fillStyle = G.colors.black;
+		ctxt.fillStyle = self.labelColor;
 		ctxt.font = "bold "+self.fontSize+"px CustomFont, sans-serif";
 		var textLen = ctxt.measureText(self.label).width;
 		ctxt.fillText(self.label, self.x0 + self.width/2 - textLen/2, self.y0 + self.height / 2 + self.fontSize/2 - 2);

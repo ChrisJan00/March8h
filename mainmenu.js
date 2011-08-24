@@ -5,25 +5,35 @@ G.GameMenu = function() {
 	self.buttons = [];
 	
 	self.pvpno = function() {
-		G.computerEnabled = false;
-		G.defenseMode = false;
+		//G.computerEnabled = false;
+		G.playerManager.types = [G.playerTypes.human, G.playerTypes.human, G.playerTypes.none, G.playerTypes.none];
+		G.boardMenu.selectedBoard = 0;
+		G.defenseMode = true;
+		G.overflowMode = false;
 		G.menu.hide();
 		G.main.restartGame();
 		G.main.drawInitialGame();
 	}
 	
 	self.pvpdef = function() {
-		G.computerEnabled = false;
-		G.defenseMode = true;
+		//G.computerEnabled = false;
+		G.playerManager.types = [G.playerTypes.human, G.playerTypes.human, G.playerTypes.none, G.playerTypes.none];
+		G.boardMenu.selectedBoard = 0;
+		G.defenseMode = false;
+		G.overflowMode = true;
 		G.menu.hide();
 		G.main.restartGame();
 		G.main.drawInitialGame();
 	}
 	
 	self.compeasy = function() {
-		G.computerEnabled = true;
-		G.maximizeEntropy = false;
-		G.defenseMode = false;
+		//G.computerEnabled = true;
+		//G.maximizeEntropy = false;
+		
+		G.playerManager.types = [G.playerTypes.human, G.playerTypes.computerEasy, G.playerTypes.none, G.playerTypes.none];
+		G.boardMenu.selectedBoard = 0;
+		G.defenseMode = true;
+		G.overflowMode = false;
 		G.menu.hide();
 		G.main.restartGame();
 		G.main.drawInitialGame();
@@ -40,10 +50,11 @@ G.GameMenu = function() {
 	
 	self.create = function() 
 	{
-		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 160, 400, 50, G.strings.pvpEasy, self.pvpno));
-		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 220, 400, 50, G.strings.pvpDef, self.pvpdef));
-		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 280, 400, 50, G.strings.pvcEasy, self.compeasy));
-		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 340, 400, 50, G.strings.pvcDef, self.comphard));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 160, 400, 50, G.strings.pvpNormal, self.pvpno));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 220, 400, 50, G.strings.pvpAgressive, self.pvpdef));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 280, 400, 50, G.strings.pvcNormal, self.compeasy));
+		//self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 340, 400, 50, G.strings.pvcDef, self.comphard));
+		self.buttons.push(new G.ClickableOption(G.graphicsManager.messagesLayer, 140, 340, 400, 50, G.strings.selectCustom, G.boardMenu.show));
 		
 	}
 	
@@ -53,6 +64,7 @@ G.GameMenu = function() {
 	
 	self.show = function()
 	{	
+		G.graphicsManager.resizeCanvas(680, 480);
 		var width = G.graphicsManager.width - 100;
 		var height = G.graphicsManager.height - 100;
 		var x0 = 50;
@@ -79,6 +91,7 @@ G.GameMenu = function() {
 	
 	self.hide = function()
 	{
+		G.boardMenu.hide();
 		G.graphicsManager.clearBackground();
 		self.active = false;
 	}

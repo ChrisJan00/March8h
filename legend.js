@@ -2,25 +2,96 @@ G.Display = function() {
 	var self = this;
 	
 	self.colorForPlayer = function(pn) {
-		return pn? G.colors.orange : G.colors.purple;
+		switch(pn) {
+			case -1: return G.colors.grey;
+			case 0: return G.colors.purple;
+			case 1: return G.colors.orange;
+			case 2: return G.colors.blue;
+			case 3: return G.colors.magenta;
+		}
 	}
 	
 	self.colorForPlayerBorder = function(pn) {
-		return pn? G.colors.orangeBorder : G.colors.purpleBorder;
+		switch(pn) {
+			case -1: return G.colors.greyBorder;
+			case 0: return G.colors.purpleBorder;
+			case 1: return G.colors.orangeBorder;
+			case 2: return G.colors.blueBorder;
+			case 3: return G.colors.magentaBorder;
+		}
 	}
 	
 	self.colorForPlayerBlink = function(pn) {
-		return pn? G.colors.orangeHighlight : G.colors.purpleHighlight;
+		switch(pn) {
+			case -1: return G.colors.greyHighlight;
+			case 0: return G.colors.purpleHighlight;
+			case 1: return G.colors.orangeHighlight;
+			case 2: return G.colors.blueHighlight;
+			case 3: return G.colors.magentaHighlight;
+		}
 	}
 	
 	self.colorForPlayerBackground = function(pn) {
-		return pn? G.colors.orangeBackground : G.colors.purpleBackground;
+		switch(pn) {
+			case -1: return G.colors.greyBackground;
+			case 0: return G.colors.purpleBackground;
+			case 1: return G.colors.orangeBackground;
+			case 2: return G.colors.blueBackground;
+			case 3: return G.colors.magentaBackground;
+		}
+	}
+	
+	self.playerTextForIndex = function(pn) {
+		if (!G.playerManager.isHuman())
+			return G.strings.thinkingMessage;
+		return self.playerNameForIndex(pn);
+	}
+	
+	self.playerNameForIndex = function(pn) {
+		switch(pn) {
+			case 0: return G.strings.firstPlayerName;
+			case 1: return G.strings.secondPlayerName;
+			case 2: return G.strings.thirdPlayerName;
+			case 3: return G.strings.fourthPlayerName;
+		}
+	}
+	
+	self.boardName = function(bn) {
+		switch (bn) {
+			case 0: return G.strings.b6x6;
+			case 1: return G.strings.b4x4;
+			case 2: return G.strings.b6x6h4;
+			case 3: return G.strings.b6x6h5;
+			case 4: return G.strings.b6x6h6;
+			case 5: return G.strings.b8x8;
+			case 6: return G.strings.b8x8h4;
+			case 7: return G.strings.b8x8h8;
+			case 8: return G.strings.b8x8h12;
+			case 9: return G.strings.b8x8h15;
+			case 10: return G.strings.b8x8h16;
+		}
 	}
 	
 	self.showPlayerScore = function(pn) {
+		if (G.menu.active)
+			return;
+			
 		var size = 50;
-		var x0 = G.Piles[pn].x0 + G.Piles[pn].width/2 - size/2;
-		var y0 = G.Piles[pn].y0 / 2 - size/2;
+		var x0, y0;
+		
+		if (G.Piles[pn].vertical) {
+			x0 = G.Piles[pn].x0 + G.Piles[pn].width/2 - size/2;
+			y0 = G.Piles[pn].y0 - 55 - size/2;
+			if (G.playerManager.count() == 4
+				&& x0 > G.graphicsManager.width/2)
+					y0 = G.Piles[pn].y0 + G.Piles[pn].height + 55 - size / 2;
+		} else {
+			x0 = G.Piles[pn].x0 - 55 - size/2;
+			y0 = G.Piles[pn].y0 + G.Piles[pn].height/2 - size/2;
+			if (G.playerManager.count() == 4
+				&& y0 < G.graphicsManager.height/2)
+					x0 = G.Piles[pn].x0 + G.Piles[pn].width + 55 - size/2;
+		}
 		
 		var ctxt = G.graphicsManager.messagesContext;
 		G.graphicsManager.mark(x0, y0, size, size);
@@ -43,31 +114,36 @@ G.Display = function() {
 	}
 	
 	self.showPlayer = function() {
+		if (G.menu.active)
+			return;
 		var data = G.coords.text
 		var ctxt = G.graphicsManager.messagesContext;
 		
 		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
 		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		var pn = G.turn;
+		var pn = G.playerManager.currentId();
 		
-		self.showPlayerScore(0);
-		self.showPlayerScore(1);
+		for (var i=0; i<4; i++) {
+			if (G.playerManager.isVisible(i))
+				self.showPlayerScore(i);
+		}
 		
-		ctxt.font = "bold 28px CustomFont, sans-serif";
-		ctxt.fillStyle = self.colorForPlayerBorder(pn);
-		var msg  = (pn?G.strings.secondPlayerName:G.strings.firstPlayerName);
-		if (G.computerEnabled && pn==1)
-			msg = G.strings.thinkingMessage;
-		var msglen = ctxt.measureText(msg);
-		ctxt.fillText(msg, 320 - msglen.width/2, data.y0+data.height/2+14 );
-		
-		//G.Piles[0].redrawBorder(G.turn==0);
-		//G.Piles[1].redrawBorder(G.turn==1);
-		G.Piles[0].redrawBorder(false);
-		G.Piles[1].redrawBorder(false);
+		if (G.playerManager.count() < 4) {
+			ctxt.font = "bold 28px CustomFont, sans-serif";
+			ctxt.fillStyle = self.colorForPlayerBorder(pn);
+			var msg  = self.playerTextForIndex(pn);
+			var msglen = ctxt.measureText(msg);
+			ctxt.fillText(msg, data.x0+data.width/2 - msglen.width/2, data.y0+data.height/2+14 );
+		}
+		for (var i=0; i<4; i++) {
+			if (G.playerManager.isVisible(i))
+					G.Piles[i].redrawBorder(false);
+		}
 	}
 	
 	self.showOrder = function() {
+		if (G.menu.active)
+			return;
 	//	return;
 		// only arrows pointing to the right by now
 		var drawArrow = function(xfrom,yfrom,xto,yto) {
@@ -86,10 +162,10 @@ G.Display = function() {
 		var width = s * G.board.cols
 		var b = Math.floor((width - 45 - 4*s)/10);
 		var al = 15;
-		var y = G.board.y0 + G.board.rows * G.board.side
+		var y = G.board.y0 + G.board.height
 		
 		var x0 = G.board.x0
-		var y0 = y + 15
+		var y0 = G.coords.legend.y0
 		var y1 = y + G.imageFire.height/2 + 5
 		var ctxt = G.graphicsManager.messagesContext;
 		G.graphicsManager.mark(0, y0, G.graphicsManager.width, 25);
@@ -116,38 +192,61 @@ G.Display = function() {
 	
 	
 	self.checkVictory = function() {
+		if (G.menu.active)
+			return;
 		var data = G.coords.text
-		G.turn = -1;
-		var counts = G.counts;
-		var victory1 = counts[0]>counts[1];
+		
+		// ToDo: this also doesn't belong here, we should separate logic from display
+		var victorious = -1;
+		var victorycount = -1;
+		for (var i=0; i<4; i++)
+			if (G.counts[i] > victorycount) {
+				victorious = i;
+				victorycount = G.counts[i]
+			}
+		
+		var tiecount = 0;
+		for (var i = 0; i < 4; i++)
+			if (G.counts[i] == victorycount)
+				tiecount++;
+				
+		var tiegame = (tiecount > 1);
+		
+		// TODO: this does NOT belong here! it is logic!
+		G.waitingForRestart = true;
 		
 		G.graphicsManager.mark(data.x0, data.y0, data.width, data.height);
 		
-		var ctxt = G.graphicsManager.messagesContext;
-		ctxt.clearRect(data.x0,data.y0,data.width,data.height);
-		var pn = G.turn;
-		ctxt.font = "bold 24px CustomFont, sans-serif";
-		ctxt.fillStyle = self.colorForPlayerBorder(pn);
-		
-		var msg;
-		if (counts[0]>counts[1]) {
-			ctxt.fillStyle = self.colorForPlayerBorder(0);
-			msg = G.strings.firstVictory;
-		} else if (counts[0] < counts[1]) {
-			ctxt.fillStyle = self.colorForPlayerBorder(1);
-			msg = G.strings.secondVictory;
-		} else {
-			ctxt.fillStyle = G.colors.black;
-			msg = G.strings.tieGame;
+		if (G.playerManager.count() < 4) {
+			var ctxt = G.graphicsManager.messagesContext;
+			ctxt.clearRect(data.x0,data.y0,data.width,data.height);
+			ctxt.font = "bold 24px CustomFont, sans-serif";
+			
+			var msg;
+			if (tiegame) {
+				ctxt.fillStyle = G.colors.black;
+				msg = G.strings.tieGame;
+			} else if (victorious == 0) {
+				ctxt.fillStyle = self.colorForPlayerBorder(0);
+				msg = G.strings.firstVictory;
+			} else if (victorious == 1) {
+				ctxt.fillStyle = self.colorForPlayerBorder(1);
+				msg = G.strings.secondVictory;
+			} else if (victorious == 2) {
+				ctxt.fillStyle = self.colorForPlayerBorder(2);
+				msg = G.strings.thirdVictory;
+			} else if (victorious == 3) {
+				ctxt.fillStyle = self.colorForPlayerBorder(3);
+				msg = G.strings.fourthVictory;
+			}
+			var msglen = ctxt.measureText(msg);
+			ctxt.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
 		}
-		var msglen = ctxt.measureText(msg);
-		ctxt.fillText(msg, data.x0 + data.width/2 - msglen.width/2, data.y0+data.height/2 );
-		
-		self.showPlayerScore(0);
-		self.showPlayerScore(1);
-		
-		G.Piles[0].redrawBorder(true);
-		G.Piles[1].redrawBorder(true);
+		for (var i=0; i<4; i++)
+			if (G.playerManager.isVisible(i)) {
+				self.showPlayerScore(i);
+				G.Piles[i].redrawBorder(true);
+		}
 	}
 }
 

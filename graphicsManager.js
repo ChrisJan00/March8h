@@ -94,4 +94,18 @@ G.GraphicsManager = function() {
 		self.bgContext.fillRect(0,0,self.width,self.height);
 		self.mark(0,0, self.width, self.height);
 	}
+	
+	self.resizeCanvas = function(newWidth, newHeight) {
+		self.gameCanvas.width = newWidth;
+		self.gameCanvas.height = newHeight;
+		self.gameCanvas.style.width = newWidth;
+		self.gameCanvas.style.height = newHeight;
+		self.width = newWidth;
+		self.height = newHeight;
+		for (var ii=0; ii < self.layers.length; ii++) {
+			self.layers[ii].width = newWidth;
+			self.layers[ii].height = newHeight;
+		}
+	}
+	
 }
