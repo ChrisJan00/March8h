@@ -22,7 +22,7 @@ G.strings = {
 	playAction : "played",
 	prePosition : "at",
 	turn : "turn",
-	possesive : "'s",
+	possessive : "'s",
 	plural : "s",
 	pvpEasy : "player vs player (easy)",
 	pvpDef : "player vs player (defense)",
