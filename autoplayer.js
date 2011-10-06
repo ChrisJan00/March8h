@@ -2,7 +2,8 @@
 G.computerPlay = function() {
 	var self = this;
 	var pn = G.playerManager.currentId();
-	var decisionExp = 5;
+	var decisionExp = 3;
+	var decisionBase = 1.73
 	
 	if (pn == -1)
 		return [-1, -1, -1];
@@ -17,16 +18,23 @@ G.computerPlay = function() {
 	self.computeEntropies = function() {
 		self.entropies = [0,0,0,0];
 		self.maxCount = 0;
+		if (self.availableCount == 1) {
+			self.entropies = [0.5,0.5,0.5,0.5];
+			self.maxCount = 1;
+			return
+		}
 		for (var i=0;i<4;i++) {
-			if (self.typeCount[i]>self.maxCount)
-				self.maxCount = self.typeCount[i];
-			self.typeCount[i]--;
-			for (var j=0;j<4;j++)
-				if (self.typeCount[j]>0) {
-					var px = self.typeCount[j]/self.availableCount;
-					self.entropies[i] -= px*Math.log(px)/Math.log(2);
-				}
-			self.typeCount[i]++;
+			if (self.typeCount[i] > 0) {
+				if (self.typeCount[i]>self.maxCount)
+					self.maxCount = self.typeCount[i];
+				self.typeCount[i]--;
+				for (var j=0;j<4;j++)
+					if (self.typeCount[j]>0) {
+						var px = self.typeCount[j]/self.availableCount;
+						self.entropies[i] -= px*Math.log(px)/Math.log(2);
+					}
+				self.typeCount[i]++;
+			}
 		}
 	}
 	
@@ -49,7 +57,7 @@ G.computerPlay = function() {
 						if (self.isDefended(ix, iy, color, pn)) {
 							score = 0;
 						} else {
-							score = 4 + self.countAttacks(ix,iy,color,pn);
+							score = 2 + self.countAttacks(ix,iy,color,pn);
 						}
 					} else {
 						score = 1 + self.countAttacks(ix,iy,color,pn);
@@ -62,9 +70,9 @@ G.computerPlay = function() {
 			}
 	}
 	
-	self.check = function(x,y,color,owner) {
+	self.checkDefense = function(x,y,color,owner) {
 		var candidate = G.board[x]?G.board[x][y]:null;
-		if ( candidate && candidate.element == color && candidate.owner == owner)
+		if ( candidate && candidate.element == color && candidate.owner != owner)
 			return true;
 		else return false;
 	}
@@ -73,10 +81,10 @@ G.computerPlay = function() {
 	{
 		// returns true if there is a neighbouring enemy tile that kills this one
 		var attackColor = G.floodCheck.colorThatWins(color);
-		return  self.check(ix-1, iy, attackColor, owner) ||
-				self.check(ix+1, iy, attackColor, owner) ||
-				self.check(ix, iy-1, attackColor, owner) ||
-				self.check(ix, iy+1, attackColor, owner);
+		return  self.checkDefense(ix-1, iy, attackColor, owner) ||
+				self.checkDefense(ix+1, iy, attackColor, owner) ||
+				self.checkDefense(ix, iy-1, attackColor, owner) ||
+				self.checkDefense(ix, iy+1, attackColor, owner);
 	}
 	
 	self.countAttacks = function( x, y, color, _owner )

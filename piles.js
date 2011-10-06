@@ -235,7 +235,7 @@ G.initPiles = function()
 		return ind? G.colors.blueBorderDark : G.colors.blueBorderLight;
 	}
 	G.Piles[3].borderColor = function(ind) {
-		return ind? G.colors.mangentaBorderDark : G.colors.magentaBorderLight;
+		return ind? G.colors.magentaBorderDark : G.colors.magentaBorderLight;
 	}
 	
 	G.Piles.chooseAll = function() {
