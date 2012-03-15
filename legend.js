@@ -57,19 +57,7 @@ G.Display = function() {
 	}
 	
 	self.boardName = function(bn) {
-		switch (bn) {
-			case 0: return G.strings.b6x6;
-			case 1: return G.strings.b4x4;
-			case 2: return G.strings.b6x6h4;
-			case 3: return G.strings.b6x6h5;
-			case 4: return G.strings.b6x6h6;
-			case 5: return G.strings.b8x8;
-			case 6: return G.strings.b8x8h4;
-			case 7: return G.strings.b8x8h8;
-			case 8: return G.strings.b8x8h12;
-			case 9: return G.strings.b8x8h15;
-			case 10: return G.strings.b8x8h16;
-		}
+		return G.predefinedBoards[bn].boardName;
 	}
 	
 	self.showPlayerScore = function(pn) {

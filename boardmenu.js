@@ -47,7 +47,7 @@ G.BoardMenu = function() {
 	}
 	
 	self.selectBoard = function() {
-		self.selectedBoard = (self.selectedBoard + 1) % G.boardCount;
+		self.selectedBoard = (self.selectedBoard + 1) % G.predefinedBoards.length;
 		self.optionButtons[4].label = G.display.boardName(self.selectedBoard);
 		self.optionButtons[4].pressed = false;
 		self.optionButtons[4].redraw();

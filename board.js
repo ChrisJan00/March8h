@@ -12,8 +12,8 @@ G.StoneHolder.prototype = {
 	borderAnimationDelay : 150,
 	
 	setDimensions : function( numCols, numRows, x0, y0 ) {
-		this.x0 = x0;
-		this.y0 = y0;
+		this.x0 = x0 || 180;
+		this.y0 = y0 || 70;
 		this.cols = numCols;
 		this.rows = numRows;
 		this.width = this.side * numCols;
@@ -31,6 +31,16 @@ G.StoneHolder.prototype = {
 		this.holes = holeList;
 		if (holeList)
 			this.stonecount += this.holes.length;
+	},
+
+	fromStringArray : function(stringArray) {
+		this.setDimensions(  stringArray.length, stringArray[0].length );
+		var tmpHoleList = []
+		for (var i = 0; i<stringArray.length; i++)
+			for (var j = 0; j<stringArray[i].length; j++)
+				if (stringArray[j][i]!= "0")
+					tmpHoleList.push([i,j]);
+		this.addHoles(tmpHoleList);
 	},
 	
 	cellColor : function(ind) {
@@ -535,59 +545,4 @@ G.BoardClass.prototype.putExcessTiles = function() {
 		this.set(x,y,st);
 	}
 }
-	
-// boards
-G.BoardClass.prototype.set4x4 = function() {
-	this.setDimensions(4, 4, 180, 70);
-	this.addHoles(false);
-}
 
-G.BoardClass.prototype.set6x6full = function() {
-	this.setDimensions(6, 6, 180, 70);
-	this.addHoles(false);
-}
-
-G.BoardClass.prototype.set6x6h4 = function() {
-	this.setDimensions(6, 6, 180, 70);
-	this.addHoles([[3,1], [4,3], [2,4], [1,2]]);
-}
-
-G.BoardClass.prototype.set6x6h5 = function() {
-	this.setDimensions(6, 6, 180, 70);
-	this.addHoles([[2,1], [1,2], [4,2], [4,3], [2,5]]);
-}
-
-G.BoardClass.prototype.set6x6h6 = function() {
-	this.setDimensions(6, 6, 180, 70);
-	this.addHoles([[2,0], [5,2], [3,5], [0,3], [3,2], [2,3]]);
-}
-
-G.BoardClass.prototype.set8x8full = function() {	
-	this.setDimensions(8, 8, 180, 70);
-	this.addHoles(false);
-}
-
-G.BoardClass.prototype.set8x8h4 = function() {	
-	this.setDimensions(8, 8, 180, 70);
-	this.addHoles([[2,2],[2,5],[5,2],[5,5]]);
-}
-
-G.BoardClass.prototype.set8x8h8 = function() {	
-	this.setDimensions(8, 8, 180, 70);
-	this.addHoles([[2,2],[2,5],[5,2],[5,5],[4,0],[7,4],[3,7],[0,3]]);
-}
-
-G.BoardClass.prototype.set8x8h12 = function() {	
-	this.setDimensions(8, 8, 180, 70);
-	this.addHoles([[2,0],[5,0],[0,2],[3,2],[7,2],[5,3],[2,4],[0,5],[4,5],[7,5],[2,7],[5,7]]);
-}
-
-G.BoardClass.prototype.set8x8h15 = function() {
-	this.setDimensions(8, 8, 180, 70);
-	this.addHoles([[0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[3,0],[3,1],[3,2],[3,4],[3,5],[3,6],[3,7]]);
-}
-
-G.BoardClass.prototype.set8x8h16 = function() {
-	this.setDimensions(8, 8, 180, 70);
-	this.addHoles([[4,0],[3,1],[4,1],[2,2],[5,2],[0,4],[1,3],[6,3],[7,4],[1,4],[6,4],[2,5],[5,5],[3,6],[4,6],[4,7]]);
-}

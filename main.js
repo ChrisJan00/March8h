@@ -51,7 +51,6 @@ G.Main = function() {
 		G.pauseManager = new G.PauseManager();
 		G.display = new G.Display();
 		G.board = new G.BoardClass();
-		G.boardCount = 11;
 	
 		G.coords = {
 			text : {
@@ -139,20 +138,7 @@ G.Main = function() {
 	}
 	
 	self.setBoard = function() {
-		var bn = G.boardMenu.selectedBoard;
-		switch (bn) {
-			case 0: G.board.set6x6full(); break;
-			case 1: G.board.set4x4(); break;
-			case 2: G.board.set6x6h4(); break;
-			case 3: G.board.set6x6h5(); break;
-			case 4: G.board.set6x6h6(); break;
-			case 5: G.board.set8x8full(); break;
-			case 6: G.board.set8x8h4(); break;
-			case 7: G.board.set8x8h8(); break;
-			case 8: G.board.set8x8h12(); break;
-			case 9: G.board.set8x8h15(); break;
-			case 10: G.board.set8x8h16(); break;
-		}
+		G.board.fromStringArray(G.predefinedBoards[G.boardMenu.selectedBoard].tiles);
 	}
 	
 	self.repositionEverything = function() {
