@@ -467,6 +467,16 @@ G.StoneHolder.prototype = {
 	
 	holeCount : function() {
 		return this.holes?this.holes.length:0;
+	},
+
+	updatedStoneCount : function() {
+		this.stoneCount = 0;
+		for (var ii=0; ii<this.cols; ii++)
+			for (var jj=0; jj<this.rows; jj++)
+				if (this[ii][jj]) this.stoneCount++;
+		if (self.holes)
+			this.stoneCount += this.holes.length;
+		return this.stoneCount;
 	}
 }
 

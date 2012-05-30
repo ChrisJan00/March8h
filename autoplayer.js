@@ -9,7 +9,7 @@ G.computerPlay = function() {
 		return [-1, -1, -1];
 	
 	self.maximizeEntropy = G.playerManager.currentType() == G.playerTypes.computerHard;
-	self.availableCount = G.Piles[pn].stoneCount;
+	self.availableCount = G.Piles[pn].updatedStoneCount();
 	
 	self.computeStones = function() {
 		self.typeCount = G.Piles[pn].countStoneTypes();
