@@ -81,7 +81,7 @@ G.FloodCheck = function() {
 			var victim = self.board[ix]?self.board[ix][iy]:null;
 			if (victim && victim.owner != ownerAttacker && victim.element == elemWanted && 
 				self.floodMarkers[ix][iy]) {
-				if ((!G.overflowMode) && formerOwner > -1 && victim.owner != formerOwner)
+				if ((!G.overflowMode) && formerOwner != -2 && victim.owner != formerOwner)
 					return;
 				victim.step = step+1;
 				attackStack.push(victim);
@@ -110,7 +110,7 @@ G.FloodCheck = function() {
 			var ix = stone.ix;
 			var iy = stone.iy;
 			step = stone.step;
-			var formerOwner = firstAttack? -1 : stone.formerOwner;
+			var formerOwner = firstAttack? -2 : stone.formerOwner;
 
 			parsePosition(ix-1, iy, formerOwner);
 			parsePosition(ix+1, iy, formerOwner);
