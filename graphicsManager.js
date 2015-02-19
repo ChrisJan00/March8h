@@ -106,6 +106,9 @@ G.GraphicsManager = function() {
 			self.layers[ii].width = newWidth;
 			self.layers[ii].height = newHeight;
 		}
+		
+		// special: adjust log window
+		document.getElementById("logWindow").style.height = newHeight - 40;
 	}
 	
 }

@@ -143,7 +143,6 @@ G.FloodCheck = function() {
 	}
 	
 	self.convertStone = function(from, to) {
-		var formerOwner = self.board[to.ix][to.iy].owner;
 		self.board[to.ix][to.iy] = {
 			ix : to.ix,
 			iy : to.iy,
@@ -152,7 +151,7 @@ G.FloodCheck = function() {
 			bgColor : from.bgColor,
 			visible : true,
 			active : to.active,
-			formerOwner : from.owner,
+			formerOwner : to.owner,
 		}
 		
 		if (self.board == G.board) {
